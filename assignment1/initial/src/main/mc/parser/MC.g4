@@ -26,7 +26,7 @@ options{
 
 program  : mctype 'main' LB RB LP body? RP EOF ;
 
-mctype: INTTYPE | VOIDTYPE ;
+mctype: INTTYPE | VOIDTYPE | BOOLTYPE | FLOATTYPE;
 
 body: funcall SEMI;
 
@@ -34,13 +34,25 @@ exp: funcall | INTLIT ;
 
 funcall: ID LB exp? RB ;
 
+ID: [_a-zA-Z][_a-zA-Z0-9]+ ;
+
 INTTYPE: 'int' ;
 
 VOIDTYPE: 'void' ;
 
-ID: [a-zA-Z]+ ;
+BOOLTYPE: 'boolean' ;
+
+FLOATTYPE: 'float' ;
+
+KEYWORD: 'break'|'continue'|'else'|'for'|'if'|'return'|'do'|'while'|'true'|'false'|'string' ;
+
+OPERATOR: '+'|'-'|'*'|'/'|'!'|'%'|'||'|'&&'|'!='|'=='|'<'|'>'|'<='|'>='|'=' ;
 
 INTLIT: [0-9]+;
+
+LS: '[' ;
+
+RS: ']' ;
 
 LB: '(' ;
 
@@ -51,6 +63,8 @@ LP: '{';
 RP: '}';
 
 SEMI: ';' ;
+
+COMMA: ',';
 
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 
