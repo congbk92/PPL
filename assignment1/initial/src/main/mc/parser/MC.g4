@@ -34,8 +34,6 @@ exp: funcall | INTLIT ;
 
 funcall: ID LB exp? RB ;
 
-ID: [_a-zA-Z][_a-zA-Z0-9]+ ;
-
 INTTYPE: 'int' ;
 
 VOIDTYPE: 'void' ;
@@ -45,6 +43,13 @@ BOOLTYPE: 'boolean' ;
 FLOATTYPE: 'float' ;
 
 KEYWORD: 'break'|'continue'|'else'|'for'|'if'|'return'|'do'|'while'|'true'|'false'|'string' ;
+
+ID: [_a-zA-Z][_a-zA-Z0-9]*;
+
+COMMENT: '//'~'\n'* -> skip; //skip single line comment
+
+COMMENTMULTI: '/*'.*'*/' -> skip; //skip multiline comment
+
 
 OPERATOR: '+'|'-'|'*'|'/'|'!'|'%'|'||'|'&&'|'!='|'=='|'<'|'>'|'<='|'>='|'=' ;
 
