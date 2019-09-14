@@ -17,35 +17,62 @@ class LexerSuite(unittest.TestCase):
 
     #2.Test keywords
     def test_keyword_ws(self):
-        self.assertTrue(TestLexer.checkLexeme("boolean break\tcontinue\relse\nfor float\tif\nint\rreturn void\tdo\nwhile\rtrue false string",
-            "boolean,break,continue,else,for,float,if,int,return,void,do,while,true,false,string,<EOF>",120))
+        self.assertTrue(TestLexer.checkLexeme("break\tcontinue\relse\nfor float\tif\nint\rreturn void\tdo\nwhile\rtrue false",
+            "break,continue,else,for,float,if,int,return,void,do,while,true,false,<EOF>",120))
     def test_keyword_separator(self):
-        self.assertTrue(TestLexer.checkLexeme("boolean;break[continue]else}for{float)if(int,return;void;do;while;true;false;string",
-            "boolean,;,break,[,continue,],else,},for,{,float,),if,(,int,,,return,;,void,;,do,;,while,;,true,;,false,;,string,<EOF>",121))
+        self.assertTrue(TestLexer.checkLexeme("break[continue]else}for{float)if(int,return;void;do;while;true;false",
+            "break,[,continue,],else,},for,{,float,),if,(,int,,,return,;,void,;,do,;,while,;,true,;,false,<EOF>",121))
 
     def test_keyword_failcase(self):
-        self.assertTrue(TestLexer.checkLexeme("booleanbreakcontinueelseforfloatifintreturnvoiddowhiletruefalsestring",
-            "booleanbreakcontinueelseforfloatifintreturnvoiddowhiletruefalsestring,<EOF>",122))
+        self.assertTrue(TestLexer.checkLexeme("breakcontinueelseforfloatifintreturnvoiddowhiletruefalse",
+            "breakcontinueelseforfloatifintreturnvoiddowhiletruefalse,<EOF>",122))
 
     #3.Test operators
+    def test_operator_ws(self):
+        self.assertTrue(TestLexer.checkLexeme("int void\tboolean\rfloat\nstring","int,void,boolean,float,string,<EOF>",130))
+    def test_operator_separator(self):
+        self.assertTrue(TestLexer.checkLexeme("int[void]boolean{float}str ing();,","int,[,void,],boolean,{,float,},str,ing,(,),;,,,<EOF>",131))
 
     #4.Test separators
+    def test_separator(self):
+        self.assertTrue(TestLexer.checkLexeme("[]{}();,","[,],{,},(,),;,,,<EOF>",141))
+
     #5.Test literals
         #1.interger
     def test_integer_id(self):
-        self.assertTrue(TestLexer.checkLexeme("123a123","123,a123,<EOF>",130))
+        self.assertTrue(TestLexer.checkLexeme("123a123","123,a123,<EOF>",150))
     def test_integer_mid_id(self):
-        self.assertTrue(TestLexer.checkLexeme("_123a123","_123a123,<EOF>",131))
+        self.assertTrue(TestLexer.checkLexeme("_123a123","_123a123,<EOF>",151))
     def test_integer_mid_id_1(self):
-        self.assertTrue(TestLexer.checkLexeme("_a123ajghjdgh412342","_a123ajghjdgh412342,<EOF>",132))
+        self.assertTrue(TestLexer.checkLexeme("_a123ajghjdgh412342","_a123ajghjdgh412342,<EOF>",152))
         #2.float
         #3.boolean
-        #4.string
+        #4.string[]{}();,
+
     #6.Comment and ws
     def test_comment_single_line(self):
         self.assertTrue(TestLexer.checkLexeme("//This is a line comments","<EOF>",180))
-    def test_comment_multi_line(self):
-        self.assertTrue(TestLexer.checkLexeme("/*This is a comment, \n \n \n \n \r\t 42341v%@%^&#$^&@$v dfvaf$@#%@!#$GSADF5245*****/","<EOF>",185))
+    def test_comment_single_line_multi(self):
+        self.assertTrue(TestLexer.checkLexeme("////This is a line/// comments///","<EOF>",181))
+    def test_comment_single_line_keywords(self):
+        self.assertTrue(TestLexer.checkLexeme("//break continue else for float if int return void do while true false","<EOF>",182))
+    def test_comment_single_line_operator_ws(self):
+        self.assertTrue(TestLexer.checkLexeme("//+ - * / ! % | && != == < > <= >= = \t \r","<EOF>",183))
+    def test_comment_single_line_id(self):
+        self.assertTrue(TestLexer.checkLexeme("//This is a line comments\n123abc123","123,abc123,<EOF>",184))        
+    def test_comment_multi_line_1(self):
+        self.assertTrue(TestLexer.checkLexeme("/*This is a comment, 42341v%@%^&#$^&@$v dfvaf$@#%@!#$GSADF5245*****/","<EOF>",185))
+    def test_comment_multi_line_2(self):
+        self.assertTrue(TestLexer.checkLexeme("/*This is a comment, \n \n \n \n \r\t 42341v%@%^&#$^&@$v dfvaf$@#%@!#$GSADF5245*****/","<EOF>",186))
+    def test_comment_multi_line_3(self):
+        self.assertTrue(TestLexer.checkLexeme("/*This /**/","<EOF>",187))
+    def test_comment_multi_line_4(self):
+        self.assertTrue(TestLexer.checkLexeme("/*This \n/**///%$@#%$@#%4","<EOF>",188)) 
+    def test_comment_multi_line_5(self):
+        self.assertTrue(TestLexer.checkLexeme("/*This /**/*/","*,/,<EOF>",189))
+    def test_comment_multi_line_6(self):
+        self.assertTrue(TestLexer.checkLexeme("/*This /**/*//Comment","*,<EOF>",190)) 
     #7.Test wrong cases
     def test_wrong_token(self):
-        self.assertTrue(TestLexer.checkLexeme("aA?sVN","aA,Error Token ?",190))
+        self.assertTrue(TestLexer.checkLexeme("aA?sVN","aA,Error Token ?",191))
+    #8.Other

@@ -26,7 +26,7 @@ options{
 
 program  : mctype 'main' LB RB LP body? RP EOF ;
 
-mctype: INTTYPE | VOIDTYPE | BOOLTYPE | FLOATTYPE;
+mctype: INTTYPE | VOIDTYPE | BOOLTYPE | FLOATTYPE | STRINGTYPE;
 
 body: funcall SEMI;
 
@@ -42,18 +42,19 @@ BOOLTYPE: 'boolean' ;
 
 FLOATTYPE: 'float' ;
 
-KEYWORD: 'break'|'continue'|'else'|'for'|'if'|'return'|'do'|'while'|'true'|'false'|'string' ;
+STRINGTYPE: 'string' ;
+
+KEYWORD: 'break'|'continue'|'else'|'for'|'if'|'return'|'do'|'while'|'true'|'false' ;
 
 ID: [_a-zA-Z][_a-zA-Z0-9]*;
 
+INTLIT: [0-9]+;
+
 COMMENT: '//'~'\n'* -> skip; //skip single line comment
 
-COMMENTMULTI: '/*'.*'*/' -> skip; //skip multiline comment
-
+COMMENTMULTI: '/*'.*?'*/' -> skip; //skip multiline comment
 
 OPERATOR: '+'|'-'|'*'|'/'|'!'|'%'|'||'|'&&'|'!='|'=='|'<'|'>'|'<='|'>='|'=' ;
-
-INTLIT: [0-9]+;
 
 LS: '[' ;
 
