@@ -46,9 +46,13 @@ STRINGTYPE: 'string' ;
 
 KEYWORD: 'break'|'continue'|'else'|'for'|'if'|'return'|'do'|'while'|'true'|'false' ;
 
-ID: [_a-zA-Z][_a-zA-Z0-9]*;
+FLOATLIT: [0-9]+([.][0-9]+)?[eE][-]?[0-9]+|[0-9]+[.][0-9]*|[.][0-9]+([eE][-]?[0-9]+)? ;
 
 INTLIT: [0-9]+;
+
+STRINGLIT: ([^"']+);
+
+ID: [_a-zA-Z][_a-zA-Z0-9]*;
 
 COMMENT: '//'~'\n'* -> skip; //skip single line comment
 
