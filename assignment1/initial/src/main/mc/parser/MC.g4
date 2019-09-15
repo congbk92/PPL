@@ -28,11 +28,15 @@ program  : mctype 'main' LB RB LP body? RP EOF ;
 
 mctype: INTTYPE | VOIDTYPE | BOOLTYPE | FLOATTYPE | STRINGTYPE;
 
-body: funcall SEMI;
+body: funcall SEMI val_declare*;
 
-exp: funcall | INTLIT ;
+exp: funcall | INTLIT | FLOATLIT | STRINGLIT | BOOLLIT;
 
 funcall: ID LB exp? RB ;
+
+val_type: INTTYPE | BOOLTYPE | FLOATTYPE | STRINGTYPE;
+
+val_declare: val_type ID (COMMA ID)* SEMI;
 
 INTTYPE: 'int' ;
 
@@ -44,11 +48,13 @@ FLOATTYPE: 'float' ;
 
 STRINGTYPE: 'string' ;
 
-KEYWORD: 'break'|'continue'|'else'|'for'|'if'|'return'|'do'|'while'|'true'|'false' ;
+KEYWORD: 'break'|'continue'|'else'|'for'|'if'|'return'|'do'|'while' ;
 
 FLOATLIT: [0-9]+([.][0-9]+)?[eE][-]?[0-9]+|[0-9]+[.][0-9]*|[.][0-9]+([eE][-]?[0-9]+)? ;
 
 INTLIT: [0-9]+;
+
+BOOLLIT: 'true'|'false' ;
 
 STRINGLIT: ([^"']+);
 
