@@ -53,11 +53,11 @@ class LexerSuite(unittest.TestCase):
     def test_float_normal_Ee_dot(self):
         self.assertTrue(TestLexer.checkLexeme("1.2E5 1.2e5 .1E2 .1e5 1.2E51.2e5","1.2E5,1.2e5,.1E2,.1e5,1.2E51,.2e5,<EOF>",162))   
     def test_float_abnormal_Ee_dot(self):
-        self.assertTrue(TestLexer.checkLexeme("1.E5 1.2e .1E .2E51.e","1.,E5,1.2,e,.1,E,.2E51,Error Token .",163))   
+        self.assertTrue(TestLexer.checkLexeme("1.E5 1.2e .1E .2E51.e","1.E5,1.2,e,.1,E,.2E51,Error Token .",163))   
     def test_float_normal_Ee_dot_sub(self):
         self.assertTrue(TestLexer.checkLexeme("1.2E-5 1.2e-5 .1E-2 .1e-5 1.2E-51.2e-5","1.2E-5,1.2e-5,.1E-2,.1e-5,1.2E-51,.2e-5,<EOF>",164))   
     def test_float_abnormal_Ee_dot_sub(self):
-        self.assertTrue(TestLexer.checkLexeme("1.E-5 1.2e- .1E- 1..3E-2 .2E-51.e-","1.,E,-,5,1.2,e,-,.1,E,-,1.,.3E-2,.2E-51,Error Token .",165))   
+        self.assertTrue(TestLexer.checkLexeme("1.E-5 1.2e- .1E- 1..3E-2 .2E-51.e-","1.E-5,1.2,e,-,.1,E,-,1.,.3E-2,.2E-51,Error Token .",165))   
     def test_float_normal_Ee_sub(self):
         self.assertTrue(TestLexer.checkLexeme("1E-5 1e-5 1E-51e-5","1E-5,1e-5,1E-51,e,-,5,<EOF>",164))   
     def test_float_abnormal_Ee_sub(self):
