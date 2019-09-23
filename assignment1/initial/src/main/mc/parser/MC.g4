@@ -76,7 +76,21 @@ INTLIT: [0-9]+;
 
 BOOLLIT: 'true'|'false' ;
 
-STRINGLIT: ([^"']+);
+//STRINGLIT: ([^"']+);
+
+//fragment Quote: '"';
+
+//STRINGLIT: ('?'':'Quote) ([^Quote\]|\.)* (?:Quote) ;
+
+
+#STRINGLIT: QUOTE (ESC|.)*? QUOTE ;
+
+#fragment QUOTE: [\"] -> skip;
+
+#fragment
+#ESC : '\\b' | '\\f' | '\\r' | '\\n' | '\\t' | '\\"' | '\\\\';
+
+STRING:                 <skip>'\'' (~'\'' | '\'\'')* <skip>'\'';
 
 ID: [_a-zA-Z][_a-zA-Z0-9]*;
 

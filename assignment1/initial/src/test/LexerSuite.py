@@ -76,12 +76,12 @@ class LexerSuite(unittest.TestCase):
         self.assertTrue(TestLexer.checkLexeme("1..3e1 1...3e1","1.,.3e1,1.,Error Token .",169))         
         #3.boolean
         #4.string
-    '''
+    
     def test_string_normal(self):
         self.assertTrue(TestLexer.checkLexeme("\"This is a nomal string\"","This is a nomal string",170))   
-    def test_string_normal_endline(self):
-        self.assertTrue(TestLexer.checkLexeme("\"This is a nomal string \\n with endline\"","This is a nomal string \n with endline",171))
-    '''
+    #def test_string_normal_endline(self):
+        #self.assertTrue(TestLexer.checkLexeme("\"This is a nomal string \\n with endline\"","This is a nomal string \n with endline",171))
+    
     #6.Comment and ws
     def test_comment_single_line(self):
         self.assertTrue(TestLexer.checkLexeme("//This is a line comments","<EOF>",180))
