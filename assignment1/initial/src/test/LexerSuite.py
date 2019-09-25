@@ -78,7 +78,7 @@ class LexerSuite(unittest.TestCase):
         #4.string
     
     def test_string_normal(self):
-        self.assertTrue(TestLexer.checkLexeme("\"This is a nomal string\"","This is a nomal string",170))   
+        self.assertTrue(TestLexer.checkLexeme("\"This is nomal string\"","\"This is nomal string\",<EOF>",170))   
     #def test_string_normal_endline(self):
         #self.assertTrue(TestLexer.checkLexeme("\"This is a nomal string \\n with endline\"","This is a nomal string \n with endline",171))
     

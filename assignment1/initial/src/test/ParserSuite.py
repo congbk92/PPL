@@ -208,6 +208,22 @@ class ParserSuite(unittest.TestCase):
         expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,0))
 
+    def test_draff(self):        
+        input = """int main () {
+                {
+                    int a;
+                    abcd(abcd[a+b*c+d*e]);
+                    {
+                        putIntLn(4);
+                        int a1;
+                    }
+                    if (abcd[a+c+b+d] + 1.2 > abce + 143 + fdsfs ) a = a+a;
+                }
+                putIntLn(4);
+                int a1;
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,111111))
 
     '''
     def test_declare_list_variable(self):
