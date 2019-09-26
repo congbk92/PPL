@@ -473,31 +473,6 @@ class ParserSuite(unittest.TestCase):
         expect = "Error on line 4 col 43: ="
         self.assertTrue(TestParser.checkParser(input,expect,220))
     
-    def test_wrong_decl_invalid_variable_1(self):
-        input = """int abdffre[123];
-                    string badgdfa()
-                    {
-                        boolean int,abcde,asda;
-                    }
-                    """
-        expect = "Error on line 4 col 32: int"
-        self.assertTrue(TestParser.checkParser(input,expect,299))
-    
-    def test_wrong_decl_invalid_variable_2(self):
-        input = """int abdffre[123];
-                    string badgdfa()
-                    {
-                        boolean 123abcde;
-                    }
-                    """
-        expect = "Error on line 4 col 32: 123"
-        self.assertTrue(TestParser.checkParser(input,expect,297))
-    
-    def test_wrong_decl_invalid_list_variable(self):
-        input = """int abdffre[123],abe,asd,;"""
-        expect = "Error on line 1 col 25: ;"
-        self.assertTrue(TestParser.checkParser(input,expect,298))
-    
     def test_wrong_decl_arr_without_size(self):
         input = """int abdffre[123];
                     string badgdfa()
@@ -543,17 +518,12 @@ class ParserSuite(unittest.TestCase):
         input = """123string func(){}"""
         expect = "Error on line 1 col 0: 123"
         self.assertTrue(TestParser.checkParser(input,expect,228))
-    
-    def test_wrong_decl_func_invalid_type_3(self):
-        input = """ int[3] func(){}"""
-        expect = "Error on line 1 col 5: 3"
-        self.assertTrue(TestParser.checkParser(input,expect,296))
         
     def test_wrong_decl_func_missing_func_name(self):
         input = """boolean (){}"""
         expect = "Error on line 1 col 8: ("
         self.assertTrue(TestParser.checkParser(input,expect,229))   
-        
+
     def test_wrong_decl_func_invalid_func_name_1(self):
         input = """boolean 123bssfd(){}"""
         expect = "Error on line 1 col 8: 123"
@@ -656,6 +626,7 @@ class ParserSuite(unittest.TestCase):
             1 == 2 && 2 != 54;
             1 > 2 || 2.54 < 54;
             1 >= 2.e43 && 2.33e-2 <= 54e54;
+            func(1 >= 2.e43 && 2.33e-2 <= 54e54);
         }"""
         expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,246))
@@ -762,6 +733,7 @@ class ParserSuite(unittest.TestCase):
             c = 32 * 4324;
             d = 4234/341;
             e = 34%534;
+            func(34%534);
         }"""
         expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,258))
@@ -797,35 +769,367 @@ class ParserSuite(unittest.TestCase):
         }"""
         expect = "Error on line 3 col 19: ||"
         self.assertTrue(TestParser.checkParser(input,expect,262))
-    
-    def test_wrong_int_type_5(self):
-        input = """void testFunc()
-        {
-            a = !12;
-        }"""
-        expect = "Error on line 3 col 17: 12"
-        self.assertTrue(TestParser.checkParser(input,expect,263))
 
-    def test_wrong_int_type_6(self):
+    def test_wrong_int_type_5(self):
         input = """void testFunc()
         {
             a = 12%1E2;
         }"""
         expect = "Error on line 3 col 19: 1E2"
-        self.assertTrue(TestParser.checkParser(input,expect,264))
+        self.assertTrue(TestParser.checkParser(input,expect,263))
         
-    def test_wrong_int_type_7(self):
+    def test_wrong_int_type_6(self):
         input = """void testFunc()
         {
             a = 12==1E2;
         }"""
         expect = "Error on line 3 col 20: 1E2"
-        self.assertTrue(TestParser.checkParser(input,expect,265))
+        self.assertTrue(TestParser.checkParser(input,expect,264))
 
-    def test_wrong_int_type_8(self):
+    def test_wrong_int_type_7(self):
         input = """void testFunc()
         {
             a = 12!=1E2;
         }"""
         expect = "Error on line 3 col 20: 1E2"
-        self.assertTrue(TestParser.checkParser(input,expect,266))       
+        self.assertTrue(TestParser.checkParser(input,expect,265))
+
+    def test_float_type(self):
+        input = """void testFunc()
+        {
+            f = -423.65423;
+            12e3 + 21;
+            43.E654 - 231;
+            32.E-643 * 4324;
+            4234/341.53;
+            a = 12e3 + 21;
+            b = 43.E654 - 231;
+            c = 32.E-643 * 4324;
+            d = 4234/341.53;
+            func(4234/341.53);
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,266))
+
+    def test_wrong_float_type_1(self):
+        input = """void testFunc()
+        {
+            1e32[12];
+        }"""
+        expect = "Error on line 3 col 16: ["
+        self.assertTrue(TestParser.checkParser(input,expect,267))
+
+    def test_wrong_float_type_2(self):
+        input = """void testFunc()
+        {
+            !1e32;
+        }"""
+        expect = "Error on line 3 col 13: 1e32"
+        self.assertTrue(TestParser.checkParser(input,expect,268))
+
+    def test_wrong_float_type_3(self):
+        input = """void testFunc()
+        {
+            1e32%3;
+        }"""
+        expect = "Error on line 3 col 16: %"
+        self.assertTrue(TestParser.checkParser(input,expect,269))
+
+    def test_wrong_float_type_4(self):
+        input = """void testFunc()
+        {
+            1e32 == 3;
+        }"""
+        expect = "Error on line 3 col 17: =="
+        self.assertTrue(TestParser.checkParser(input,expect,270))
+
+    def test_wrong_float_type_5(self):
+        input = """void testFunc()
+        {
+            1e32 != 3;
+        }"""
+        expect = "Error on line 3 col 17: !="
+        self.assertTrue(TestParser.checkParser(input,expect,271))
+
+    def test_wrong_float_type_6(self):
+        input = """void testFunc()
+        {
+            1e32 && 3;
+        }"""
+        expect = "Error on line 3 col 17: &&"
+        self.assertTrue(TestParser.checkParser(input,expect,272))
+
+    def test_wrong_float_type_7(self):
+        input = """void testFunc()
+        {
+            1e32 || 3;
+        }"""
+        expect = "Error on line 3 col 17: ||"
+        self.assertTrue(TestParser.checkParser(input,expect,273))
+
+    def test_string_type(self):
+        input = """void testFunc()
+        {
+            a = "input string";
+            func("param string");
+            "input string";
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,274))
+
+    def test_wrong_string_type_1(self):
+        input = """void testFunc()
+        {
+            a = "abc"[12];
+        }"""
+        expect = "Error on line 3 col 21: ["
+        self.assertTrue(TestParser.checkParser(input,expect,275))
+
+    def test_wrong_string_type_2(self):
+        input = """void testFunc()
+        {
+            a = -"abc";
+        }"""
+        expect = "Error on line 3 col 17: \"abc\""
+        self.assertTrue(TestParser.checkParser(input,expect,276))
+
+    def test_wrong_string_type_3(self):
+        input = """void testFunc()
+        {
+            a = !"abc";
+        }"""
+        expect = "Error on line 3 col 17: \"abc\""
+        self.assertTrue(TestParser.checkParser(input,expect,277))
+
+    def test_wrong_string_type_4(self):
+        input = """void testFunc()
+        {
+            a = "abc"/"dsa";
+        }"""
+        expect = "Error on line 3 col 21: /"
+        self.assertTrue(TestParser.checkParser(input,expect,278))
+
+    def test_wrong_string_type_5(self):
+        input = """void testFunc()
+        {
+            a = "abc"*"dsa";
+        }"""
+        expect = "Error on line 3 col 21: *"
+        self.assertTrue(TestParser.checkParser(input,expect,279))
+
+    def test_wrong_string_type_6(self):
+        input = """void testFunc()
+        {
+            a = "abc"%"dsa";
+        }"""
+        expect = "Error on line 3 col 21: %"
+        self.assertTrue(TestParser.checkParser(input,expect,280))
+
+    def test_wrong_string_type_7(self):
+        input = """void testFunc()
+        {
+            a = "abc"+"dsa";
+        }"""
+        expect = "Error on line 3 col 21: +"
+        self.assertTrue(TestParser.checkParser(input,expect,281))
+
+    def test_wrong_string_type_8(self):
+        input = """void testFunc()
+        {
+            a = "abc"-"dsa";
+        }"""
+        expect = "Error on line 3 col 21: -"
+        self.assertTrue(TestParser.checkParser(input,expect,282))
+
+    def test_wrong_string_type_9(self):
+        input = """void testFunc()
+        {
+            a = "abc">"dsa";
+        }"""
+        expect = "Error on line 3 col 21: >"
+        self.assertTrue(TestParser.checkParser(input,expect,283))
+
+    def test_wrong_string_type_10(self):
+        input = """void testFunc()
+        {
+            a = "abc">="dsa";
+        }"""
+        expect = "Error on line 3 col 21: >="
+        self.assertTrue(TestParser.checkParser(input,expect,284))
+
+    def test_wrong_string_type_11(self):
+        input = """void testFunc()
+        {
+            a = "abc"<"dsa";
+        }"""
+        expect = "Error on line 3 col 21: <"
+        self.assertTrue(TestParser.checkParser(input,expect,285))
+
+    def test_wrong_string_type_12(self):
+        input = """void testFunc()
+        {
+            a = "abc"<="dsa";
+        }"""
+        expect = "Error on line 3 col 21: <="
+        self.assertTrue(TestParser.checkParser(input,expect,286))
+
+    def test_wrong_string_type_13(self):
+        input = """void testFunc()
+        {
+            a = "abc"=="dsa";
+        }"""
+        expect = "Error on line 3 col 21: =="
+        self.assertTrue(TestParser.checkParser(input,expect,287))
+
+    def test_wrong_string_type_14(self):
+        input = """void testFunc()
+        {
+            a = "abc"!="dsa";
+        }"""
+        expect = "Error on line 3 col 21: !="
+        self.assertTrue(TestParser.checkParser(input,expect,288))
+
+    def test_wrong_string_type_15(self):
+        input = """void testFunc()
+        {
+            a = "abc"&&"dsa";
+        }"""
+        expect = "Error on line 3 col 21: &&"
+        self.assertTrue(TestParser.checkParser(input,expect,289))
+
+    def test_wrong_string_type_16(self):
+        input = """void testFunc()
+        {
+            a = "abc"||"dsa";
+        }"""
+        expect = "Error on line 3 col 21: ||"
+        self.assertTrue(TestParser.checkParser(input,expect,290))
+
+    def test_arr_type(self):
+        input = """void testFunc()
+        {
+            abcde[123];
+            -abcde[123];
+            !abcde[123];
+            arr1[123]/arr2[123];
+            arr1[123]*arr2[123];
+            arr1[123]%arr2[123];
+            arr1[123]+arr2[123];
+            arr1[123]-arr2[123];
+            arr1[123]>arr2[123];
+            arr1[123]>=arr2[123];
+            arr1[123]<arr2[123];
+            arr1[123]<=arr2[123];
+            arr1[123]==arr2[123];
+            arr1[123]!=arr2[123];
+            arr1[123]&&arr2[123];
+            arr1[123]||arr2[123];
+            a = arr1[123];
+            a = arr1[123+123*321/4324 + arr[21] + func1(abc) + func2(arr[1]) * func3(arr)[13]];
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,291)) 
+
+    def test_wrong_arr_type_1(self):
+        input = """void testFunc()
+        {
+            a = arr[1][5];
+        }"""
+        expect = "Error on line 3 col 22: ["
+        self.assertTrue(TestParser.checkParser(input,expect,292))
+
+    def test_wrong_arr_type_2(self):
+        input = """void testFunc()
+        {
+            a = arr[1>2];
+        }"""
+        expect = "Error on line 3 col 21: >"
+        self.assertTrue(TestParser.checkParser(input,expect,293))
+
+    #arr pointer type true case already test in decl func
+    def test_wrong_arr_pnt_type_1(self):
+        input = """void[] testFunc()
+        {
+        }"""
+        expect = "Error on line 1 col 4: ["
+        self.assertTrue(TestParser.checkParser(input,expect,294))
+
+    def test_wrong_arr_pnt_type_2(self):
+        input = """int[12] testFunc()
+        {
+        }"""
+        expect = "Error on line 1 col 4: 12"
+        self.assertTrue(TestParser.checkParser(input,expect,295))
+
+    def test_wrong_arr_pnt_type_3(self):
+        input = """int[] testFunc(void a[])
+        {
+        }"""
+        expect = "Error on line 1 col 15: void"
+        self.assertTrue(TestParser.checkParser(input,expect,296))
+
+    def test_wrong_arr_pnt_type_4(self):
+        input = """int[] testFunc(string a[123])
+        {
+        }"""
+        expect = "Error on line 1 col 24: 123"
+        self.assertTrue(TestParser.checkParser(input,expect,297))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Add some missing testcase
+    def test_wrong_decl_arr_invalid_size_5(self):
+        input = """string abdffre["true"];"""
+        expect = "Error on line 1 col 15: \"true\""
+        self.assertTrue(TestParser.checkParser(input,expect,395))
+
+    def test_wrong_decl_func_invalid_type_3(self):
+        input = """ int[3] func(){}"""
+        expect = "Error on line 1 col 5: 3"
+        self.assertTrue(TestParser.checkParser(input,expect,396))
+
+    def test_wrong_decl_invalid_variable_2(self):
+        input = """int abdffre[123];
+                    string badgdfa()
+                    {
+                        boolean 123abcde;
+                    }
+                    """
+        expect = "Error on line 4 col 32: 123"
+        self.assertTrue(TestParser.checkParser(input,expect,397))
+
+    def test_wrong_decl_invalid_list_variable(self):
+        input = """int abdffre[123],abe,asd,;"""
+        expect = "Error on line 1 col 25: ;"
+        self.assertTrue(TestParser.checkParser(input,expect,398))
+
+    def test_wrong_decl_invalid_variable_1(self):
+        input = """int abdffre[123];
+                    string badgdfa()
+                    {
+                        boolean int,abcde,asda;
+                    }
+                    """
+        expect = "Error on line 4 col 32: int"
+        self.assertTrue(TestParser.checkParser(input,expect,399))

@@ -90,8 +90,10 @@ floatExpr4: indexExpr | floatExpr5 ;
 floatExpr5: LB (floatExpr | intExpr) RB | INTLIT | FLOATLIT | ID | invocExpr ;
 
 
-stringExpr: STRINGLIT ;
+stringExpr: varialble ASSIGN stringExpr | STRINGLIT ;
+
 indexExpr: (ID | invocExpr) LS intExpr RS ;
+
 invocExpr: ID LB lisExpr RB ;
 lisExpr: expr lisExprTail | ; // Nullable
 lisExprTail: CM expr lisExprTail | ;
