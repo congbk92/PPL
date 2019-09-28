@@ -890,7 +890,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = -"abc";
         }"""
-        expect = "Error on line 3 col 17: \"abc\""
+        expect = "Error on line 3 col 17: abc"
         self.assertTrue(TestParser.checkParser(input,expect,276))
 
     def test_wrong_string_type_3(self):
@@ -898,7 +898,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = !"abc";
         }"""
-        expect = "Error on line 3 col 17: \"abc\""
+        expect = "Error on line 3 col 17: abc"
         self.assertTrue(TestParser.checkParser(input,expect,277))
 
     def test_wrong_string_type_4(self):
@@ -1075,8 +1075,54 @@ class ParserSuite(unittest.TestCase):
         expect = "Error on line 1 col 24: 123"
         self.assertTrue(TestParser.checkParser(input,expect,297))
 
-
-
+    def test_wrong_operator_1(self):  #()
+        input = """void testFunc()
+        {
+            !(1>b); //()
+            !1>b;
+        }"""
+        expect = "Error on line 4 col 13: 1"
+        self.assertTrue(TestParser.checkParser(input,expect,298))
+    
+    def test_wrong_operator_2(self):  #[] - 
+        input = """void testFunc()
+        {
+            a[1 + 3] = b[2*b[3+a[n + a(1) + k()[k()]]]];
+            k = a + - b - c - d - e ------f; //-
+            k = a - + b;    
+        }"""
+        expect = "Error on line 5 col 20: +"
+        self.assertTrue(TestParser.checkParser(input,expect,299))
+    
+    def test_wrong_precedence_operator(self):
+        input = """void testFunc()
+        {
+            a=b=c=d=true&&1>2||1>=2&&1<2||1<=2&&1==2||1!=2&&1+2>a||1-2>a&&1*2>a||1/2>a||1%2>a&&1+-2>b||a21[1/2];
+            re = (a)[100];
+        }"""
+        expect = "Error on line 4 col 20: ["
+        self.assertTrue(TestParser.checkParser(input,expect,300))
+    
+    def test_wrong_assign_operator(self):
+        input = """void testFunc()
+        {
+            a=b=c=d+1=e;
+        }"""
+        expect = "Error on line 3 col 21: ="
+        self.assertTrue(TestParser.checkParser(input,expect,301))
+    
+    #Test statement and control flow
+    def test_if_else_statement(self):
+        input = """void testFunc()
+        {
+            if (1*2>5/a) a = a+2;
+            if (5+7 != 8%func()) a = a + 2;
+            else b = b + func(a*b);
+            
+            
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,302))
 
 
 
@@ -1101,7 +1147,7 @@ class ParserSuite(unittest.TestCase):
 #Add some missing testcase
     def test_wrong_decl_arr_invalid_size_5(self):
         input = """string abdffre["true"];"""
-        expect = "Error on line 1 col 15: \"true\""
+        expect = "Error on line 1 col 15: true"
         self.assertTrue(TestParser.checkParser(input,expect,395))
 
     def test_wrong_decl_func_invalid_type_3(self):

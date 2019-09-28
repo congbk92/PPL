@@ -65,7 +65,7 @@ class LexerSuite(unittest.TestCase):
     def test_float_normal_Ee_sub(self):
         self.assertTrue(TestLexer.checkLexeme("1E-5 1e-5 1E-51e-5","1E-5,1e-5,1E-51,e,-,5,<EOF>",164))   
     def test_float_abnormal_Ee_sub(self):
-        self.assertTrue(TestLexer.checkLexeme("eeEE- e-5 5E- e-55E-","eeEE,-,e,-,5,5,E,-,e,-,55,E,-,<EOF>",165))   
+        self.assertTrue(TestLexer.checkLexeme("12345678E90 eeEE- e-5 5E- e-55E-","12345678E90,eeEE,-,e,-,5,5,E,-,e,-,55,E,-,<EOF>",165))   
     def test_float_abnormal_sub_dot(self):
         self.assertTrue(TestLexer.checkLexeme("1ee-.","1,ee,-,Error Token .",166))   
     def test_float_abnormal_double_eE(self):
@@ -78,13 +78,30 @@ class LexerSuite(unittest.TestCase):
         #4.string
     
     def test_string_normal(self):
-        self.assertTrue(TestLexer.checkLexeme("\"This is nomal string\"","\"This is nomal string\",<EOF>",170))   
-    #def test_string_normal_endline(self):
-        #self.assertTrue(TestLexer.checkLexeme("\"This is a nomal string \\n with endline\"","This is a nomal string \n with endline",171))
-    
+        self.assertTrue(TestLexer.checkLexeme("\"This is nomal string\"\"This is 2nd string\"","This is nomal string,This is 2nd string,<EOF>",170))
+    def test_string_normal_with_escape(self):
+        self.assertTrue(TestLexer.checkLexeme(" \" \\b  \\f \\r \\n \\t \\\" \\\\ \" "," \\b  \\f \\r \\n \\t \\\" \\\\ ,<EOF>",171))   
+    def test_string_unclose_newline(self):
+        self.assertTrue(TestLexer.checkLexeme("abcde\"This is a unclose string \n","abcde,Unclosed String: This is a unclose string ",172))
+    def test_string_unclose_newline_1(self):
+        self.assertTrue(TestLexer.checkLexeme("\"This is a nomal string\"\"string " ,"This is a nomal string,Unclosed String: string ",173))
+    def test_string_unclose_eof(self):
+        self.assertTrue(TestLexer.checkLexeme("abcde\"This is a unclose string  ","abcde,Unclosed String: This is a unclose string  ",174))
+    def test_string_illegal_1(self):
+        self.assertTrue(TestLexer.checkLexeme(" \"This illegal string with \b in string  ","Illegal Escape In String: This illegal string with \b",175))
+    def test_string_illegal_2(self):
+        self.assertTrue(TestLexer.checkLexeme(" \"This illegal string with \f in string  ","Illegal Escape In String: This illegal string with \f",176))
+    def test_string_illegal_3(self):
+        self.assertTrue(TestLexer.checkLexeme(" \"This illegal string with \r in string  ","Illegal Escape In String: This illegal string with \n",177)) #Need verify
+    def test_string_illegal_4(self):
+        self.assertTrue(TestLexer.checkLexeme(" \"This illegal string with \t in string  ","Illegal Escape In String: This illegal string with \t",178))
+    def test_string_illegal_5(self):
+        self.assertTrue(TestLexer.checkLexeme(" \"This illegal string with \\ in string  ","Illegal Escape In String: This illegal string with \\",179))
+    def test_string_illegal_6(self):
+        self.assertTrue(TestLexer.checkLexeme(" \"This illegal string with\" \"in string \n ","This illegal string with,Unclosed String: in string ",199))
     #6.Comment and ws
     def test_comment_single_line(self):
-        self.assertTrue(TestLexer.checkLexeme("//This is a line comments","<EOF>",180))
+        self.assertTrue(TestLexer.checkLexeme("""//This is a line comments""","<EOF>",180))
     def test_comment_single_line_multi(self):
         self.assertTrue(TestLexer.checkLexeme("////This is a line/// comments///","<EOF>",181))
     def test_comment_single_line_keywords(self):
@@ -104,8 +121,13 @@ class LexerSuite(unittest.TestCase):
     def test_comment_multi_line_5(self):
         self.assertTrue(TestLexer.checkLexeme("/*This /**/*/","*,/,<EOF>",189))
     def test_comment_multi_line_6(self):
-        self.assertTrue(TestLexer.checkLexeme("/*This /**/*//Comment","*,<EOF>",190)) 
+        self.assertTrue(TestLexer.checkLexeme("/*This /**/*//Comment","*,<EOF>",190))
+    def test_comment_multi_line_7(self):
+        self.assertTrue(TestLexer.checkLexeme(""" /*This 
+                                                 is multiline
+
+                                                 comment*/""","<EOF>",191)) 
     #7.Test wrong cases
     def test_wrong_token(self):
-        self.assertTrue(TestLexer.checkLexeme("aA?sVN","aA,Error Token ?",191))
+        self.assertTrue(TestLexer.checkLexeme("aA?sVN","aA,Error Token ?",192))
     #8.Other

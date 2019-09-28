@@ -7,15 +7,23 @@ from lexererr import *
 @lexer::members {
 def emit(self):
     tk = self.type
-    if tk == self.UNCLOSE_STRING:       
-        result = super().emit();
-        raise UncloseString(result.text);
-    elif tk == self.ILLEGAL_ESCAPE:
-        result = super().emit();
-        raise IllegalEscape(result.text);
+    if tk == self.ILLEGAL_ESCAPE:
+        result = super().emit().text;
+        raise IllegalEscape(result[1:len(result)]);
+    elif tk == self.STRINGLIT:
+        tmpStr = super().emit().text;
+        tmpStr = tmpStr[1:len(tmpStr)-1];
+        super().emit().text = tmpStr;
+        return tmpStr;
+    elif tk == self.UNCLOSE_STRING:
+        result = super().emit().text;
+        lastPost = len(result);
+        if "\n" in result:
+            lastPost = lastPost - 1;
+        raise UncloseString(result[1:lastPost]);
     elif tk == self.ERROR_CHAR:
         result = super().emit();
-        raise ErrorToken(result.text); 
+        raise ErrorToken(result.text);
     else:
         return super().emit();
 }
@@ -135,10 +143,6 @@ INTLIT: [0-9]+ ;
 
 BOOLEANLIT: 'true'|'false' ;
 
-fragment Esc : '\\b' | '\\f' | '\\r' | '\\n' | '\\t' | '\\"' | '\\\\' ;
-
-STRINGLIT: '"'(Esc|.)*?'"' ;
-
 ID: [_a-zA-Z][_a-zA-Z0-9]* ;
 
 COMMENT: '//'~'\n'* -> skip ; //skip single line comment
@@ -191,9 +195,22 @@ SM: ';' ;
 
 CM: ',' ;
 
+fragment Esc : '\\' [bfnrt"\\] ;   // \b \f \n \r \t " \
+
+fragment IllegalEsc : [\b\f\r\t"\\] ;   // \b \f \n \r \t " \
+
+//STRINGLIT: '"'(Esc|.)*?'"' ;
+
+//UNCLOSE_STRING: '"'(Esc|.)*?('\n'|EOF);
+
+//ILLEGAL_ESCAPE: '"'('\\' ~[btnfr"\\]| ~'\\')*? ;
+
+STRINGLIT: '"' ( '\\' [bfnrt"\\] | ~[\b\f\n\r\t"\\] )*? '"';
+
+UNCLOSE_STRING: '"' ( '\\' [bfnrt"\\] | ~[\b\f\n\r\t"\\] )*? ('\n'|EOF);
+
+ILLEGAL_ESCAPE: '"' ( '\\' [bfnrt"\\] | ~[\b\f\n\r\t"\\] )*? [\b\f\r\t\\];
+
 WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
 
-
-ERROR_CHAR: .;
-UNCLOSE_STRING: .;
-ILLEGAL_ESCAPE: .;
+ERROR_CHAR: . ;
