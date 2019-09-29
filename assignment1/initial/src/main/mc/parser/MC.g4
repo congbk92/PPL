@@ -195,22 +195,12 @@ SM: ';' ;
 
 CM: ',' ;
 
-fragment Esc : '\\' [bfnrt"\\] ;   // \b \f \n \r \t " \
-
-fragment IllegalEsc : [\b\f\r\t"\\] ;   // \b \f \n \r \t " \
-
-//STRINGLIT: '"'(Esc|.)*?'"' ;
-
-//UNCLOSE_STRING: '"'(Esc|.)*?('\n'|EOF);
-
-//ILLEGAL_ESCAPE: '"'('\\' ~[btnfr"\\]| ~'\\')*? ;
-
 STRINGLIT: '"' ( '\\' [bfnrt"\\] | ~[\b\f\n\r\t"\\] )*? '"';
 
 UNCLOSE_STRING: '"' ( '\\' [bfnrt"\\] | ~[\b\f\n\r\t"\\] )*? ('\n'|EOF);
 
 ILLEGAL_ESCAPE: '"' ( '\\' [bfnrt"\\] | ~[\b\f\n\r\t"\\] )*? [\b\f\r\t\\];
 
-WS : [ \t\r\n]+ -> skip ; // skip spaces, tabs, newlines
+WS : [ \t\f\r\n]+ -> skip ; // skip spaces, tabs, formfeed, carriage return, newlines
 
 ERROR_CHAR: . ;
