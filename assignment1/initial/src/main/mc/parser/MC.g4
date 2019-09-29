@@ -69,14 +69,13 @@ tailListStmt: stmt tailListStmt | ;
 forStmt: FOR LP expr SM boolExpr SM expr RP stmt ;
 breakStmt: BREAK SM ;
 continueStmt: CONTINUE SM ;
-returnStmt: RETURN (expr) SM ;
+returnStmt: RETURN expr? SM ;
 exprStmt: expr SM ;
 
-expr: varialble ASSIGN expr | rightExpr ;
+expr: boolExpr | intExpr | floatExpr | stringExpr| indexExpr | invocExpr ;
 
-rightExpr: boolExpr | intExpr | floatExpr | stringExpr| indexExpr | invocExpr | ID ;
-
-boolExpr:  boolExpr  OR boolExpr2 | boolExpr2 ;
+boolExpr: varialble ASSIGN boolExpr | boolExpr1 ;
+boolExpr1:  boolExpr1  OR boolExpr2 | boolExpr2 ;
 boolExpr2: boolExpr2 AND boolExpr3 | boolExpr3 ;
 boolExpr3: boolExpr4 ( EQ | DIF ) boolExpr4 | intExpr ( EQ | DIF ) intExpr | boolExpr4 ;
 boolExpr4: (intExpr|floatExpr)( BIG | BIGEQ | LESS | LESSEQ )(intExpr|floatExpr) | boolExpr5 ;
@@ -84,20 +83,22 @@ boolExpr5: NOT boolExpr5  | boolExpr6 ;
 boolExpr6: indexExpr | boolExpr7 ;
 boolExpr7: LB boolExpr RB | BOOLEANLIT | ID | invocExpr ;
 
-intExpr: intExpr ( ADD | SUB ) intExpr2 | intExpr2 ;
+intExpr: varialble ASSIGN intExpr | intExpr1 ;
+intExpr1: intExpr1 ( ADD | SUB ) intExpr2 | intExpr2 ;
 intExpr2: intExpr2 (MUL | DIV | MOD ) intExpr3 | intExpr3 ;
 intExpr3: SUB intExpr3 | intExpr4 ;
 intExpr4: indexExpr | intExpr5 ;
 intExpr5: LB intExpr RB | INTLIT | ID | invocExpr ;
 
-floatExpr: floatExpr (ADD | SUB) floatExpr2 | floatExpr2 ;
+floatExpr: varialble ASSIGN floatExpr | floatExpr1 ;
+floatExpr1: floatExpr1 (ADD | SUB) floatExpr2 | floatExpr2 ;
 floatExpr2: floatExpr2 (MUL | DIV) floatExpr3 | floatExpr3 ;
 floatExpr3: SUB floatExpr3 | floatExpr4 ;
 floatExpr4: indexExpr | floatExpr5 ;
 floatExpr5: LB (floatExpr | intExpr) RB | INTLIT | FLOATLIT | ID | invocExpr ;
 
 
-stringExpr: STRINGLIT ;
+stringExpr: varialble ASSIGN stringExpr | STRINGLIT ;
 
 indexExpr: (ID | invocExpr) LS intExpr RS ;
 
