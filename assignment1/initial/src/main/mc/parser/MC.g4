@@ -66,7 +66,7 @@ ifStmt: IF LB boolExpr RB stmt (ELSE stmt)? ;
 dowhileStmt: DO listStmt WHILE boolExpr SM ;
 listStmt: stmt tailListStmt ;
 tailListStmt: stmt tailListStmt | ;
-forStmt: FOR LP expr SM boolExpr SM expr RP stmt ;
+forStmt: FOR LB expr SM boolExpr SM expr RB stmt ;
 breakStmt: BREAK SM ;
 continueStmt: CONTINUE SM ;
 returnStmt: RETURN expr? SM ;
