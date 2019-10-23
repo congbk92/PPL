@@ -441,7 +441,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = -true;
         }"""
-        expect = "Error on line 3 col 17: true"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,248))
         
     def test_wrong_boolean_type_3(self):
@@ -449,7 +449,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true/false;
         }"""
-        expect = "Error on line 3 col 20: /"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,249))
         
     def test_wrong_boolean_type_4(self):
@@ -457,7 +457,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true*false;
         }"""
-        expect = "Error on line 3 col 20: *"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,250))
     
     def test_wrong_boolean_type_5(self):
@@ -465,7 +465,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true%false;
         }"""
-        expect = "Error on line 3 col 20: %"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,251))
         
     def test_wrong_boolean_type_6(self):
@@ -473,7 +473,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true+false;
         }"""
-        expect = "Error on line 3 col 20: +"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,252))
 
     def test_wrong_boolean_type_7(self):
@@ -481,7 +481,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true - false;
         }"""
-        expect = "Error on line 3 col 21: -"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,253))
 
     def test_wrong_boolean_type_8(self):
@@ -489,7 +489,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true > false;
         }"""
-        expect = "Error on line 3 col 21: >"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,254))
         
     def test_wrong_boolean_type_9(self):
@@ -497,7 +497,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true >= false;
         }"""
-        expect = "Error on line 3 col 21: >="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,255))
         
     def test_wrong_boolean_type_10(self):
@@ -505,7 +505,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true < false;
         }"""
-        expect = "Error on line 3 col 21: <"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,256))
     
     def test_wrong_boolean_type_11(self):
@@ -513,7 +513,7 @@ class ParserSuite(unittest.TestCase):
         {
             b = true <= false;
         }"""
-        expect = "Error on line 3 col 21: <="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,257))
         
     def test_int_type(self):
@@ -548,7 +548,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = !12;
         }"""
-        expect = "Error on line 3 col 17: 12"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,260))   
         
     def test_wrong_int_type_3(self):
@@ -556,7 +556,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = 12 && 342;
         }"""
-        expect = "Error on line 3 col 19: &&"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,261))
         
     def test_wrong_int_type_4(self):
@@ -564,7 +564,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = 12 || 5;
         }"""
-        expect = "Error on line 3 col 19: ||"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,262))
 
     def test_wrong_int_type_5(self):
@@ -572,7 +572,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = 12%1E2;
         }"""
-        expect = "Error on line 3 col 19: 1E2"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,263))
         
     def test_wrong_int_type_6(self):
@@ -580,7 +580,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = 12==1E2;
         }"""
-        expect = "Error on line 3 col 20: 1E2"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,264))
 
     def test_wrong_int_type_7(self):
@@ -588,7 +588,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = 12!=1E2;
         }"""
-        expect = "Error on line 3 col 20: 1E2"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,265))
 
     def test_float_type(self):
@@ -621,7 +621,7 @@ class ParserSuite(unittest.TestCase):
         {
             !1e32;
         }"""
-        expect = "Error on line 3 col 13: 1e32"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,268))
 
     def test_wrong_float_type_3(self):
@@ -629,7 +629,7 @@ class ParserSuite(unittest.TestCase):
         {
             1e32%3;
         }"""
-        expect = "Error on line 3 col 16: %"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,269))
 
     def test_wrong_float_type_4(self):
@@ -637,7 +637,7 @@ class ParserSuite(unittest.TestCase):
         {
             1e32 == 3;
         }"""
-        expect = "Error on line 3 col 17: =="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,270))
 
     def test_wrong_float_type_5(self):
@@ -645,7 +645,7 @@ class ParserSuite(unittest.TestCase):
         {
             1e32 != 3;
         }"""
-        expect = "Error on line 3 col 17: !="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,271))
 
     def test_wrong_float_type_6(self):
@@ -653,7 +653,7 @@ class ParserSuite(unittest.TestCase):
         {
             1e32 && 3;
         }"""
-        expect = "Error on line 3 col 17: &&"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,272))
 
     def test_wrong_float_type_7(self):
@@ -661,7 +661,7 @@ class ParserSuite(unittest.TestCase):
         {
             1e32 || 3;
         }"""
-        expect = "Error on line 3 col 17: ||"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,273))
 
     def test_string_type(self):
@@ -687,7 +687,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = -"abc";
         }"""
-        expect = "Error on line 3 col 17: abc"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,276))
 
     def test_wrong_string_type_3(self):
@@ -695,7 +695,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = !"abc";
         }"""
-        expect = "Error on line 3 col 17: abc"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,277))
 
     def test_wrong_string_type_4(self):
@@ -703,7 +703,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"/"dsa";
         }"""
-        expect = "Error on line 3 col 21: /"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,278))
 
     def test_wrong_string_type_5(self):
@@ -711,7 +711,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"*"dsa";
         }"""
-        expect = "Error on line 3 col 21: *"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,279))
 
     def test_wrong_string_type_6(self):
@@ -719,7 +719,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"%"dsa";
         }"""
-        expect = "Error on line 3 col 21: %"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,280))
 
     def test_wrong_string_type_7(self):
@@ -727,7 +727,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"+"dsa";
         }"""
-        expect = "Error on line 3 col 21: +"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,281))
 
     def test_wrong_string_type_8(self):
@@ -735,7 +735,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"-"dsa";
         }"""
-        expect = "Error on line 3 col 21: -"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,282))
 
     def test_wrong_string_type_9(self):
@@ -743,7 +743,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc">"dsa";
         }"""
-        expect = "Error on line 3 col 21: >"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,283))
 
     def test_wrong_string_type_10(self):
@@ -751,7 +751,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc">="dsa";
         }"""
-        expect = "Error on line 3 col 21: >="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,284))
 
     def test_wrong_string_type_11(self):
@@ -759,7 +759,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"<"dsa";
         }"""
-        expect = "Error on line 3 col 21: <"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,285))
 
     def test_wrong_string_type_12(self):
@@ -767,7 +767,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"<="dsa";
         }"""
-        expect = "Error on line 3 col 21: <="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,286))
 
     def test_wrong_string_type_13(self):
@@ -775,7 +775,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"=="dsa";
         }"""
-        expect = "Error on line 3 col 21: =="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,287))
 
     def test_wrong_string_type_14(self):
@@ -783,7 +783,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"!="dsa";
         }"""
-        expect = "Error on line 3 col 21: !="
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,288))
 
     def test_wrong_string_type_15(self):
@@ -791,7 +791,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"&&"dsa";
         }"""
-        expect = "Error on line 3 col 21: &&"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,289))
 
     def test_wrong_string_type_16(self):
@@ -799,7 +799,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = "abc"||"dsa";
         }"""
-        expect = "Error on line 3 col 21: ||"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,290))
 
     def test_arr_type(self):
@@ -840,7 +840,7 @@ class ParserSuite(unittest.TestCase):
         {
             a = arr[1>2];
         }"""
-        expect = "Error on line 3 col 21: >"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,293))
 
     #arr pointer type true case already test in decl func
@@ -878,7 +878,7 @@ class ParserSuite(unittest.TestCase):
             !(1>b); //()
             !1>b;
         }"""
-        expect = "Error on line 4 col 13: 1"
+        expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,298))
     
     def test_wrong_operator_2(self):  #[] - 
