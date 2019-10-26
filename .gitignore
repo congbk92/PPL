@@ -1,5 +1,8 @@
-assignment1/initial/src/test/solutions/
-assignment1/initial/src/test/testcases/
-assignment1/initial/src/main/mc/parser/__pycache__/
-assignment1/initial/src/test/__pycache__/
-assignment1/initial/target/
+assignment*/initial/src/test/solutions/
+assignment*/initial/src/test/testcases/
+assignment*/initial/src/main/mc/parser/__pycache__/
+assignment*/initial/src/test/__pycache__/
+assignment*/initial/target/
+assignment2/initial/src/main/mc/utils/__pycache__/
+assignment2/initial/src/main/mc/astgen/__pycache__/
+

@@ -922,13 +922,158 @@ class ParserSuite(unittest.TestCase):
         expect = "successful"
         self.assertTrue(TestParser.checkParser(input,expect,302))
 
+    def test_wrong_if_else_statement_1(self):
+        input = """void testFunc()
+        {
+            if (1*2>5/a) a = a+2;
+            if (5+7 != 8%func()) a = a + 2;
+            else b = b + func(a*b);
+            else b = b + func(a*b);
+        }"""
+        expect = "Error on line 6 col 12: else"
+        self.assertTrue(TestParser.checkParser(input,expect,303))
+
+    def test_wrong_if_else_statement_2(self):
+        input = """void testFunc()
+        {
+            if (1*2>5/a) a = a+2;
+            if (5+7 != 8%func()){
+                a = a + 2;
+            }
+            a = a + 2;
+            else b = b + func(a*b);
+        }"""
+        expect = "Error on line 8 col 12: else"
+        self.assertTrue(TestParser.checkParser(input,expect,304))
 
 
 
+    def test_do_while_statement(self):
+        input = """void testFunc()
+        {
+            do a = b + c - d * e;
+            if (a > 3) b = b + 2;
+            else c = c%2;
+            while ("adad");
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,305))
+
+    def test_wrong_do_while_statement_1(self):
+        input = """void testFunc()
+        {
+            do a = b + c - d * e;
+            if (a > 3) b = b + 2;
+            else c = c%2;
+        }"""
+        expect = "Error on line 6 col 8: }"
+        self.assertTrue(TestParser.checkParser(input,expect,306))
+
+    def test_wrong_do_while_statement_2(self):
+        input = """void testFunc()
+        {
+            {
+            do a = b + c - d * e;
+            if (a > 3) b = b + 2;
+            else c = c%2;
+            }
+            while ("adad");
+        }"""
+        expect = "Error on line 7 col 12: }"
+        self.assertTrue(TestParser.checkParser(input,expect,307))
+
+    def test_break_statement(self):
+        input = """void testFunc()
+        {
+            break;
+            do a = b + c - d * e;
+            if (a > 3)
+            {
+                b = b + 2;
+                break;
+                {
+                    break;
+                    {
+                        break;
+                        break;
+                        break;
+                    }
+                }
+            }
+            else c = c%2;
+            break;
+            while ("adad");
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,308))
+
+    def test_continue_statement(self):
+        input = """void testFunc()
+        {
+                        continue;
+            do a = b + c - d * e;
+            if (a > 3)
+            {
+                b = b + 2;
+                continue;
+                {
+                    continue;
+                    {
+                        continue;
+                        continue;
+                        continue;
+                    }
+                }
+            }
+            else c = c%2;
+            continue;
+            while ("adad");
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,309))
 
 
+    def test_return_statement(self):
+        input = """void testFunc()
+        {
+            return abc;
+            do a = b + c - d * e;
+            if (a > 3)
+            {
+                b = b + 2;
+                return;
+                {
+                    return;
+                    {
+                        return;
+                        return 1+2+3;
+                        return;
+                    }
+                }
+            }
+            else c = c%2;
+            return 1 + abc[abcd[abcd[1+1]*10]];
+            while ("adad");
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,310))
 
 
+    def test_block_statement(self):
+        input = """void testFunc()
+        {
+            {
+                int a,b,c;
+                {
+                
+                }
+            }
+            {
+                {}{{{}}}
+            }
+        }"""
+        expect = "successful"
+        self.assertTrue(TestParser.checkParser(input,expect,310))
 
 
 
