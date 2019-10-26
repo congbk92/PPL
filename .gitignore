@@ -1,8 +1,13 @@
-assignment*/initial/src/test/solutions/
-assignment*/initial/src/test/testcases/
-assignment*/initial/src/main/mc/parser/__pycache__/
-assignment*/initial/src/test/__pycache__/
-assignment*/initial/target/
-assignment2/initial/src/main/mc/utils/__pycache__/
-assignment2/initial/src/main/mc/astgen/__pycache__/
+assignment/initial/src/test/solutions/
+assignment/initial/src/test/testcases/
+assignment/initial/src/main/mc/parser/__pycache__/
+assignment/initial/src/test/__pycache__/
+assignment/initial/target/
+assignment/initial/.DS_Store
+assignment/initial/src/.DS_Store
+assignment/initial/src/main/.DS_Store
+assignment/initial/src/main/mc/astgen/__pycache__/
+assignment/initial/src/main/mc/parser/.DS_Store
+assignment/initial/src/main/mc/utils/__pycache__/
+assignment/initial/src/test/.DS_Store
 
