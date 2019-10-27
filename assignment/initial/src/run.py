@@ -58,6 +58,6 @@ def printUsage():
     print("python3 run.py gen")
     print("python3 run.py test LexerSuite")
     print("python3 run.py test ParserSuite")
-
+    print("python3 run.py test ASTGenSuite")
 if __name__ == "__main__":
    main(sys.argv[1:])

@@ -37,16 +37,15 @@ program: manyDecl;
 manyDecl: decl tailDecl ;
 tailDecl: decl tailDecl | ;
 
-decl: funcDecl | globalVarDecl ;
+decl: funcDecl | varDecl ;
 
-globalVarDecl: varDecl ;
 varDecl: primitiveType listVar SM ;
 listVar: var tailListVar ;
 tailListVar: CM var tailListVar | ;
 var: ID | arrayDecl ;
 arrayDecl: ID LS INTLIT RS ;
 
-funcDecl: mctype ID LB paramList RB body ;
+funcDecl: mctype ID LB paramList RB body;
 body: blockStmt;
 mctype: primitiveType | arrayPntType | VOIDTYPE ;
 paramList: paramDecl tailParamList | ;
@@ -57,10 +56,9 @@ primitiveType: BOOLEANTYPE | INTTYPE | FLOATTYPE | STRINGTYPE ;
 arrayPntType: primitiveType LS RS ;
 
 blockStmt: LP listMemberBlock RP ;
-listMemberBlock: memberBlock taillistMemberBlock | ;
-taillistMemberBlock: memberBlock taillistMemberBlock | ;
-memberBlock: localVarDecl | stmt ;
-localVarDecl: varDecl ;
+listMemberBlock: memberBlock tailListMemberBlock | ;
+tailListMemberBlock: memberBlock tailListMemberBlock | ;
+memberBlock: varDecl | stmt ;
 
 stmt: ifStmt | dowhileStmt | forStmt | breakStmt | continueStmt | returnStmt | exprStmt | blockStmt ; 
 ifStmt: IF LB exp RB stmt (ELSE stmt)? ;
