@@ -40,10 +40,8 @@ tailDecl: decl tailDecl | ;
 decl: funcDecl | varDecl ;
 
 varDecl: primitiveType listVar SM ;
-listVar: var tailListVar ;
-tailListVar: CM var tailListVar | ;
-var: ID | arrayDecl ;
-arrayDecl: ID LS INTLIT RS ;
+listVar: var (CM var)* ;
+var: ID (LS INTLIT RS)?;
 
 funcDecl: mctype ID LB paramList RB body;
 body: blockStmt;

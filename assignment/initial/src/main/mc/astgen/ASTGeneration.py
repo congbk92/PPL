@@ -23,20 +23,15 @@ class ASTGeneration(MCVisitor):
 
     #varDecl: primitiveType listVar SM ;
     def visitVarDecl(self,ctx:MCParser.VarDeclContext):
-        self.varType = self.visit(ctx.primitiveType())
-        return self.visit(ctx.listVar()) 
-    #listVar: var tailListVar 
+        lstVar = self.visit(ctx.listVar())
+        mylambda = lambda x : VarDecl(x[0],ArrayType(x[1],self.visit(ctx.primitiveType()))) if x[1] >= 0 else VarDecl(x[0],self.visit(ctx.primitiveType()))
+        return list(map(mylambda,lstVar))
+    #listVar: var (CM var)* ;
     def visitListVar(self,ctx:MCParser.ListVarContext):
-        return [self.visit(ctx.var())] + self.visit(ctx.tailListVar())
-    #tailListVar: CM var tailListVar | ;
-    def visitTailListVar(self,ctx:MCParser.TailListVarContext):
-        return  [self.visit(ctx.var())] + self.visit(ctx.tailListVar()) if ctx.var() else []
-    #var: ID | arrayDecl ;
+        return [self.visit(i) for i in ctx.var()]
+    #var: ID (LS INTLIT RS)?;
     def visitVar(self,ctx:MCParser.VarContext):
-        return  self.visit(ctx.arrayDecl()) if ctx.arrayDecl() else VarDecl(ctx.ID().getText(),self.varType)
-    #arrayDecl: ID LS INTLIT RS;
-    def visitArrayDecl(self,ctx:MCParser.VarContext):
-        return VarDecl(ctx.ID().getText(),ArrayType(int(ctx.INTLIT().getText()),self.varType))
+        return  (ctx.ID().getText(),int(ctx.INTLIT().getText())) if ctx.getChildCount() == 4 else (ctx.ID().getText(),-1)
     #funcDecl: mctype ID LB paramList RB body;
     def visitFuncDecl(self,ctx:MCParser.FuncDeclContext):
         return FuncDecl(Id(ctx.ID().getText()),self.visit(ctx.paramList()),self.visit(ctx.mctype()),self.visit(ctx.body()))
@@ -55,13 +50,14 @@ class ASTGeneration(MCVisitor):
     #primitiveType: BOOLEANTYPE | INTTYPE | FLOATTYPE | STRINGTYPE ;
     def visitPrimitiveType(self,ctx:MCParser.PrimitiveTypeContext):
         if ctx.INTTYPE():
-            return IntType
+            return IntType()
         elif ctx.FLOATTYPE():
-            return FloatType
+            return FloatType()
         elif ctx.BOOLEANTYPE():
-            return BoolType
+            return BoolType()
         else:
-            return StringType
+            return StringType()
+
     ''' paramList: paramDecl tailParamList | ;
         tailParamList: CM paramDecl tailParamList | ;
     '''
@@ -95,23 +91,7 @@ class ASTGeneration(MCVisitor):
 
     #stmt: ifStmt | dowhileStmt | forStmt | breakStmt | continueStmt | returnStmt | exprStmt | blockStmt ;
     def visitStmt(self,ctx:MCParser.StmtContext):
-        if ctx.ifStmt():
-            return self.visit(ctx.ifStmt())
-        elif ctx.dowhileStmt():
-            return self.visit(ctx.dowhileStmt())
-        elif ctx.forStmt():
-            return self.visit(ctx.forStmt())
-        elif ctx.breakStmt():
-            return self.visit(ctx.breakStmt())
-        elif ctx.continueStmt():
-            return self.visit(ctx.continueStmt())
-        elif ctx.returnStmt():
-            return self.visit(ctx.returnStmt())
-        elif ctx.exprStmt():
-            return self.visit(ctx.exprStmt())
-        elif ctx.blockStmt():
-            return self.visit(ctx.blockStmt())
-    
+        return self.visit(ctx.getChild(0))
 
     #exprStmt: exp SM ;
     def visitExprStmt(self,ctx:MCParser.ExprStmtContext):
