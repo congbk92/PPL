@@ -43,7 +43,7 @@ class ASTGeneration(MCVisitor):
         elif ctx.arrayPntType():
             return self.visit(ctx.arrayPntType())
         else:
-            return VoidType
+            return VoidType()
     #arrayPntType: primitiveType LS RS ;
     def visitArrayPntType(self,ctx:MCParser.ArrayPntTypeContext):
         return ArrayPointerType(self.visit(ctx.primitiveType()))
@@ -105,7 +105,7 @@ class ASTGeneration(MCVisitor):
             return self.visit(ctx.binaryExpr())
     #lhs: ID | indexExpr ;
     def visitLhs(self,ctx:MCParser.LhsContext):
-        return self.visit(ctx.IndexExpr()) if ctx.IndexExpr() else Id(ctx.ID().getText())
+        return self.visit(ctx.indexExpr()) if ctx.indexExpr() else Id(ctx.ID().getText())
     #binaryExpr: binaryExpr OR binaryExpr1 | binaryExpr1;
     def visitBinaryExpr(self,ctx:MCParser.BinaryExprContext):
         if ctx.OR():
@@ -125,7 +125,7 @@ class ASTGeneration(MCVisitor):
         elif ctx.DIF():
             return BinaryOp(ctx.DIF().getText(), self.visit(ctx.binaryExpr3(0)), self.visit(ctx.binaryExpr3(1)))
         else:
-            return self.visit(ctx.binaryExpr3())
+            return self.visit(ctx.binaryExpr3(0))
     #binaryExpr3: binaryExpr4 (BIG | BIGEQ | LESS | LESSEQ) binaryExpr4 | binaryExpr4;
     def visitBinaryExpr3(self,ctx:MCParser.BinaryExpr3Context):
         if ctx.BIG():
@@ -156,22 +156,19 @@ class ASTGeneration(MCVisitor):
             return BinaryOp(ctx.MOD().getText(), self.visit(ctx.binaryExpr5()), self.visit(ctx.unaryExpr())) 
         else:
             return self.visit(ctx.unaryExpr())
-    #unaryExpr: (SUB | NOT) unaryExpr | indexExpr;
+    #unaryExpr: (SUB | NOT) unaryExpr | indexExpr | higherExpr;
     def visitUnaryExpr(self,ctx:MCParser.UnaryExprContext):
-        if ctx.SUB():
-            return UnaryOp(ctx.SUB().getText(),self.visit(ctx.unaryExpr()));
-        elif ctx.NOT():
-            return UnaryOp(ctx.NOT().getText(),self.visit(ctx.unaryExpr()));
+        if ctx.getChildCount() > 1:
+            return UnaryOp(ctx.getChild(0).getText(),self.visit(ctx.unaryExpr()));
         else:
-            return self.visit(ctx.indexExpr())
-    #indexExpr: (ID | funcall) LS exp RS | higherExpr;
+            return self.visit(ctx.getChild(0))
+    #indexExpr: (ID | funcall) LS exp RS;
     def visitIndexExpr(self,ctx:MCParser.IndexExprContext):
         if ctx.ID():
             return ArrayCell(Id(ctx.ID().getText()),self.visit(ctx.exp()))
-        elif ctx.funcall():
-            return ArrayCell(self.visit(ctx.funcall()),self.visit(ctx.exp()))
         else:
-            return self.visit(ctx.higherExpr())
+            return ArrayCell(self.visit(ctx.funcall()),self.visit(ctx.exp()))
+
     #higherExpr: LB exp RB | INTLIT | FLOATLIT| BOOLEANLIT | STRINGLIT | ID | funcall;
     def visitHigherExpr(self,ctx:MCParser.HigherExprContext):
         if ctx.exp():
@@ -181,9 +178,9 @@ class ASTGeneration(MCVisitor):
         elif ctx.FLOATLIT():
             return FloatLiteral(float(ctx.FLOATLIT().getText()))
         elif ctx.BOOLEANLIT():
-            return BooleanLiteral(bool(ctx.BOOLEANLIT().getText()))
+            return BooleanLiteral(ctx.BOOLEANLIT().getText() == "true")
         elif ctx.STRINGLIT():
-            return StringLiteral(ctx.FLOATLIT().getText())
+            return StringLiteral(ctx.STRINGLIT().getText())
         elif ctx.ID():
             return Id(ctx.ID().getText())
         else:

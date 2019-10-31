@@ -76,8 +76,8 @@ binaryExpr2: binaryExpr3 (EQ | DIF) binaryExpr3 | binaryExpr3;
 binaryExpr3: binaryExpr4 (BIG | BIGEQ | LESS | LESSEQ) binaryExpr4 | binaryExpr4;
 binaryExpr4: binaryExpr4 (ADD | SUB) binaryExpr5 | binaryExpr5;
 binaryExpr5: binaryExpr5 (MUL | DIV | MOD ) unaryExpr | unaryExpr;
-unaryExpr: (SUB | NOT) unaryExpr | indexExpr;
-indexExpr: (ID | funcall) LS exp RS | higherExpr;
+unaryExpr: (SUB | NOT) unaryExpr | indexExpr | higherExpr;
+indexExpr: (ID | funcall) LS exp RS;
 higherExpr: LB exp RB | INTLIT | FLOATLIT| BOOLEANLIT | STRINGLIT | ID | funcall;
 
 funcall: ID LB lisExpr RB ;

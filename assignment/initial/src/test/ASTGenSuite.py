@@ -3,6 +3,7 @@ from TestUtils import TestAST
 from AST import *
 
 class ASTGenSuite(unittest.TestCase):
+    ###Test Declare
     def test_declare_var(self):
         """Simple program: int main() {} """
         input = """int a;
@@ -276,7 +277,97 @@ class ASTGenSuite(unittest.TestCase):
                             FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],FloatType(),Block([VarDecl("a",StringType()),VarDecl("b",StringType()),VarDecl("c",StringType()),VarDecl("d",StringType()),VarDecl("a",ArrayType(40,StringType())),VarDecl("b",ArrayType(40,StringType())),VarDecl("c",ArrayType(40,StringType())),VarDecl("d",ArrayType(40,StringType()))])),
                             FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],StringType(),Block([VarDecl("a",StringType()),VarDecl("b",StringType()),VarDecl("c",StringType()),VarDecl("d",StringType()),VarDecl("a",ArrayType(40,StringType())),VarDecl("b",ArrayType(40,StringType())),VarDecl("c",ArrayType(40,StringType())),VarDecl("d",ArrayType(40,StringType()))]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
+        # -> miss void func
+    ###Test expression
+    def test_expr_ID(self):
+        input = """void func()
+                {
+                    a;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([Id("a")]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+    def test_expr_func_call(self):
+        input = """void func()
+                {
+                    funccall(a,1,"b",1.1,false);
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([CallExpr(Id("funccall"),[Id('a'),IntLiteral(1),StringLiteral('b'),FloatLiteral(1.1),BooleanLiteral(False)])]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
+    def test_expr_ArrayCell(self):
+        input = """void func()
+                {
+                    a[1];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([ArrayCell(Id("a"),IntLiteral(1))]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+    def test_expr_FuncArrayCell(self):
+        input = """void func()
+                {
+                    abc()[10];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([ArrayCell(CallExpr(Id("abc"),[]),IntLiteral(10))]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+    def test_expr_int_lit(self):
+        input = """void func()
+                {
+                    123;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([IntLiteral(123)]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+    def test_expr_bool_lit(self):
+        input = """void func()
+                {
+                    true;
+                    false;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([BooleanLiteral(True),BooleanLiteral(False)]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+    def test_expr_string_lit(self):
+        input = """void func()
+                {
+                    "This is a string";
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([StringLiteral("This is a string")]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_float_lit(self):
+        input = """void func()
+                {
+                    1.2; 1.; .11;
+                    1.2E5; 1.2e5; .1E2; .1e5;
+                    1.2E-5; 1.2e-5; .1E-2; .1e-5;
+                    1.E-5; 1.e-5;
+                    1E-5; 1e-5;
+                    1E5; 1e5;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([FloatLiteral(1.2),FloatLiteral(1.),FloatLiteral(.11),FloatLiteral(1.2E5),
+            FloatLiteral(1.2e5),FloatLiteral(.1E2),FloatLiteral(.1e5),FloatLiteral(1.2E-5),FloatLiteral(1.2e-5),FloatLiteral(.1E-2),FloatLiteral(.1e-5),
+            FloatLiteral(1.E-5),FloatLiteral(1.e-5),FloatLiteral(1E-5),FloatLiteral(1e-5),FloatLiteral(1E5),FloatLiteral(1e5)]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+    def test_expr_assign(self):
+        input = """void func()
+                {
+                    a = b;
+                    a = "String";
+                    a[1] = 1;
+                    a = true;
+                    a = false;
+                    a()[1] = 1e3;
+                    a = funcABC();
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([BinaryOp("=",Id('a'),Id('b')),BinaryOp("=",Id('a'),StringLiteral('String')),
+            BinaryOp("=",ArrayCell(Id('a'),IntLiteral(1)),IntLiteral(1)),BinaryOp("=",Id('a'),BooleanLiteral(True)),BinaryOp("=",Id('a'),BooleanLiteral(False)),
+            BinaryOp("=",ArrayCell(CallExpr(Id('a'),[]),IntLiteral(1)),FloatLiteral(1e3)),BinaryOp("=",Id('a'),CallExpr(Id('funcABC'),[]))]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_assign_assosiate(self):
+        input = """void func()
+                {
+                    a = b[1] = c()[1] = false;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([BinaryOp("=",Id('a'),BinaryOp('=',ArrayCell(Id('b'),IntLiteral(1)),BinaryOp('=',ArrayCell(CallExpr(Id('c'),[]),IntLiteral(1)),BooleanLiteral(False))))]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
 '''
     def test_simple_program(self):
