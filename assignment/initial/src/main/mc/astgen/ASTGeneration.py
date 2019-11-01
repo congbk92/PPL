@@ -196,10 +196,27 @@ class ASTGeneration(MCVisitor):
         return [self.visit(ctx.exp())] + self.visit(ctx.lisExprTail()) if ctx.exp() else []
     def visitLisExprTail(self,ctx:MCParser.LisExprTailContext):
         return [self.visit(ctx.exp())] + self.visit(ctx.lisExprTail()) if ctx.exp() else []
-'''
-    def visitExp(self,ctx:MCParser.ExpContext):
-        if (ctx.funcall()):
-            return self.visit(ctx.funcall())
-        else:
-            return IntLiteral(int(ctx.INTLIT().getText()))
-'''
+
+    #ifStmt: IF LB exp RB stmt (ELSE stmt)? ;
+    def visitIfStmt(self,ctx:MCParser.IfStmtContext):
+        return If(self.visit(ctx.exp()),self.visit(ctx.stmt(0)),self.visit(ctx.stmt(1))) if len(ctx.stmt()) == 2 else If(self.visit(ctx.exp()),self.visit(ctx.stmt(0)),None)
+
+    #dowhileStmt: DO listStmt WHILE exp SM ;
+    def visitDowhileStmt(self,ctx:MCParser.DowhileStmtContext):
+        return Dowhile(self.visit(ctx.listStmt()),self.visit(ctx.exp()))
+    #listStmt: stmt+
+    def visitListStmt(self,ctx:MCParser.ListStmtContext):
+        return [self.visit(i) for i in ctx.stmt()]
+
+    #forStmt: FOR LB exp SM exp SM exp RB stmt ;
+    def visitForStmt(self,ctx:MCParser.ForStmtContext):
+        return For(self.visit(ctx.exp(0)),self.visit(ctx.exp(1)),self.visit(ctx.exp(2)),self.visit(ctx.stmt()))
+    #breakStmt: BREAK SM ;
+    def visitBreakStmt(self,ctx:MCParser.BreakStmtContext):
+        return Break()
+    #continueStmt: CONTINUE SM ;
+    def visitContinueStmt(self,ctx:MCParser.ContinueStmtContext):
+        return Continue()
+    #returnStmt: RETURN exp? SM ;
+    def visitReturnStmt(self,ctx:MCParser.ReturnStmtContext):
+        return Return(self.visit(ctx.exp())) if ctx.exp() else Return(None)
