@@ -286,21 +286,61 @@ class ASTGenSuite(unittest.TestCase):
                 }"""
         expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([Id("a")]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
     def test_expr_func_call(self):
         input = """void func()
                 {
-                    funccall(a,1,"b",1.1,false);
+                    funccall(a,1,"b",1.1,false,a[1],func());
                 }"""
-        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([CallExpr(Id("funccall"),[Id('a'),IntLiteral(1),StringLiteral('b'),FloatLiteral(1.1),BooleanLiteral(False)])]))]))
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            CallExpr(Id("funccall"),[Id('a'),IntLiteral(1),StringLiteral('b'),FloatLiteral(1.1),BooleanLiteral(False),ArrayCell(Id("a"),IntLiteral(1)),CallExpr(Id("func"),[])])
+            ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_func_call_complex(self):
+        input = """void func()
+                {
+                    funccall(funccall(funccall(),funccall()),funccall(funccall(),funccall()));
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([ #CallExpr(Id("funccall"),[])
+            CallExpr(Id("funccall"),[CallExpr(Id("funccall"),[CallExpr(Id("funccall"),[]),CallExpr(Id("funccall"),[])]),CallExpr(Id("funccall"),[CallExpr(Id("funccall"),[]),CallExpr(Id("funccall"),[])])])
+            ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
     def test_expr_ArrayCell(self):
         input = """void func()
                 {
                     a[1];
+                    a[a];
+                    a["string"];
+                    a[1.1];
+                    a[true];
+                    a[false];
+                    a[func()];
+                    a[func()[1]];
+                    a[a[1]];
                 }"""
-        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([ArrayCell(Id("a"),IntLiteral(1))]))]))
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            ArrayCell(Id("a"),IntLiteral(1)),
+            ArrayCell(Id("a"),Id("a")),
+            ArrayCell(Id("a"),StringLiteral("string")),
+            ArrayCell(Id("a"),FloatLiteral(1.1)),
+            ArrayCell(Id("a"),BooleanLiteral(True)),
+            ArrayCell(Id("a"),BooleanLiteral(False)),
+            ArrayCell(Id("a"),CallExpr(Id("func"),[])),
+            ArrayCell(Id("a"),ArrayCell(CallExpr(Id("func"),[]),IntLiteral(1))),
+            ArrayCell(Id("a"),ArrayCell(Id("a"),IntLiteral(1))),
+            ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_ArrayCell_complex(self):
+        input = """void func()
+                {
+                    a[a[a[a[a[1]]]]];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([ArrayCell(Id("a"),ArrayCell(Id("a"),ArrayCell(Id("a"),ArrayCell(Id("a"),ArrayCell(Id("a"),IntLiteral(1))))))]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
     def test_expr_FuncArrayCell(self):
         input = """void func()
                 {
@@ -308,6 +348,39 @@ class ASTGenSuite(unittest.TestCase):
                 }"""
         expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([ArrayCell(CallExpr(Id("abc"),[]),IntLiteral(10))]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_FuncArrayCell_complex_1(self):
+        input = """void func()
+                {
+                    a(a(a()[1],a()[1])[1],a(a()[1],a()[1])[1])[1];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            ArrayCell(CallExpr(Id("a"),[ArrayCell(CallExpr(Id("a"),[ArrayCell(CallExpr(Id("a"),[]),IntLiteral(1)),ArrayCell(CallExpr(Id("a"),[]),IntLiteral(1))]),IntLiteral(1)),
+            ArrayCell(CallExpr(Id("a"),[ArrayCell(CallExpr(Id("a"),[]),IntLiteral(1)),ArrayCell(CallExpr(Id("a"),[]),IntLiteral(1))]),IntLiteral(1))]),IntLiteral(1))
+            ]))
+        ]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_FuncArrayCell_complex_2(self):
+        input = """void func()
+                {
+                    a()[a()[a()[a()[a()[a()]]]]];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            ArrayCell(CallExpr(Id("a"),[]), ArrayCell(CallExpr(Id("a"),[]), ArrayCell(CallExpr(Id("a"),[]), ArrayCell(CallExpr(Id("a"),[]), ArrayCell(CallExpr(Id("a"),[]),CallExpr(Id("a"),[]))))))
+            ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_FuncArrayCell_complex_3(self):
+        input = """void func()
+                {
+                    a(a()[a()[a()[1]]])[a(a()[a()[a()[1]]])[a(a()[a()[a()[1]]])[1]]];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            ArrayCell(CallExpr(Id("a"),[ArrayCell(CallExpr(Id("a"),[]),ArrayCell(CallExpr(Id("a"),[]),ArrayCell(CallExpr(Id("a"),[]),IntLiteral(1))))]),ArrayCell(CallExpr(Id("a"),[ArrayCell(CallExpr(Id("a"),[]),ArrayCell(CallExpr(Id("a"),[]),ArrayCell(CallExpr(Id("a"),[]),IntLiteral(1))))]),ArrayCell(CallExpr(Id("a"),[ArrayCell(CallExpr(Id("a"),[]),ArrayCell(CallExpr(Id("a"),[]),ArrayCell(CallExpr(Id("a"),[]),IntLiteral(1))))]),IntLiteral(1))))
+            ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
     def test_expr_int_lit(self):
         input = """void func()
                 {
@@ -728,16 +801,45 @@ class ASTGenSuite(unittest.TestCase):
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
-    def test_expr_precedence_highest(self):
+
+    def test_expr_precedence_highest_89(self):
         input = """void func()
                 {
                     (a = b) || (c = d);
-                    
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+        BinaryOp("||",BinaryOp("=",Id("a"),Id("b")),BinaryOp("=",Id("c"),Id("d"))),
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+
+    def test_expr_precedence_highest_78(self):
+        input = """void func()
+                {
                     (a || b) && (c || d);
-                    
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+        BinaryOp("&&",BinaryOp("||",Id("a"),Id("b")),BinaryOp("||",Id("c"),Id("d"))),
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+
+    def test_expr_precedence_highest_67(self):
+        input = """void func()
+                {
                     (a && b) == (c && d);
-                    (a && b) != (c && d);
-                    
+                    (a && b) != (c && d); 
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+        BinaryOp("==",BinaryOp("&&",Id("a"),Id("b")),BinaryOp("&&",Id("c"),Id("d"))),
+        BinaryOp("!=",BinaryOp("&&",Id("a"),Id("b")),BinaryOp("&&",Id("c"),Id("d"))),
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+
+    def test_expr_precedence_highest_56(self):
+        input = """void func()
+                {
                     (a == b) < (c == d);
                     (a != b) < (c != d);
                     (a == b)<= (c == d);
@@ -746,24 +848,8 @@ class ASTGenSuite(unittest.TestCase):
                     (a != b) > (c != d);                    
                     (a == b)>= (c == d);
                     (a != b)>= (c != d);
-
-                    a + (b > c) - (d > e);
-                    a + (b >= c) - (d >= e);
-                    a + (b < c) - (d < e);
-                    a + (b <= c) - (d <= e);
-                    
-                    (a+b)*(c-d);
-                    (a+b)/(c-d);
-                    (a+b)%(c-d);
-                    
-                    -(a*b)--(c/d)--(e%f);
-                    !(a*b)-!(c/d)-!(e%f);                   
                 }"""
         expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
-        BinaryOp("||",BinaryOp("=",Id("a"),Id("b")),BinaryOp("=",Id("c"),Id("d"))),
-        BinaryOp("&&",BinaryOp("||",Id("a"),Id("b")),BinaryOp("||",Id("c"),Id("d"))),
-        BinaryOp("==",BinaryOp("&&",Id("a"),Id("b")),BinaryOp("&&",Id("c"),Id("d"))),
-        BinaryOp("!=",BinaryOp("&&",Id("a"),Id("b")),BinaryOp("&&",Id("c"),Id("d"))),
         BinaryOp("<",BinaryOp("==",Id("a"),Id("b")),BinaryOp("==",Id("c"),Id("d"))),
         BinaryOp("<",BinaryOp("!=",Id("a"),Id("b")),BinaryOp("!=",Id("c"),Id("d"))),
         BinaryOp("<=",BinaryOp("==",Id("a"),Id("b")),BinaryOp("==",Id("c"),Id("d"))),
@@ -772,15 +858,71 @@ class ASTGenSuite(unittest.TestCase):
         BinaryOp(">",BinaryOp("!=",Id("a"),Id("b")),BinaryOp("!=",Id("c"),Id("d"))),
         BinaryOp(">=",BinaryOp("==",Id("a"),Id("b")),BinaryOp("==",Id("c"),Id("d"))),
         BinaryOp(">=",BinaryOp("!=",Id("a"),Id("b")),BinaryOp("!=",Id("c"),Id("d"))),
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+
+    def test_expr_precedence_highest_45(self):
+        input = """void func()
+                {
+                    a + (b > c) - (d > e);
+                    a + (b >= c) - (d >= e);
+                    a + (b < c) - (d < e);
+                    a + (b <= c) - (d <= e);
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
         BinaryOp("-",BinaryOp("+",Id("a"),BinaryOp(">",Id("b"),Id("c"))),BinaryOp(">",Id("d"),Id("e"))),
         BinaryOp("-",BinaryOp("+",Id("a"),BinaryOp(">=",Id("b"),Id("c"))),BinaryOp(">=",Id("d"),Id("e"))),
         BinaryOp("-",BinaryOp("+",Id("a"),BinaryOp("<",Id("b"),Id("c"))),BinaryOp("<",Id("d"),Id("e"))),
         BinaryOp("-",BinaryOp("+",Id("a"),BinaryOp("<=",Id("b"),Id("c"))),BinaryOp("<=",Id("d"),Id("e"))),
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+
+    def test_expr_precedence_highest_34(self):
+        input = """void func()
+                {
+                    (a+b)*(c-d);
+                    (a+b)/(c-d);
+                    (a+b)%(c-d);
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
         BinaryOp("*",BinaryOp("+",Id("a"),Id("b")),BinaryOp("-",Id("c"),Id("d"))),
         BinaryOp("/",BinaryOp("+",Id("a"),Id("b")),BinaryOp("-",Id("c"),Id("d"))),
         BinaryOp("%",BinaryOp("+",Id("a"),Id("b")),BinaryOp("-",Id("c"),Id("d"))),
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+
+    def test_expr_precedence_highest_23(self):
+        input = """void func()
+                {
+                    -(a*b)--(c/d)--(e%f);
+                    !(a*b)-!(c/d)-!(e%f);                   
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
         BinaryOp("-",BinaryOp("-",UnaryOp("-",BinaryOp("*",Id("a"),Id("b"))),UnaryOp("-",BinaryOp("/",Id("c"),Id("d")))),UnaryOp("-",BinaryOp("%",Id("e"),Id("f")))),
         BinaryOp("-",BinaryOp("-",UnaryOp("!",BinaryOp("*",Id("a"),Id("b"))),UnaryOp("!",BinaryOp("/",Id("c"),Id("d")))),UnaryOp("!",BinaryOp("%",Id("e"),Id("f")))),
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_precedence_for_decimal_operand(self):
+        input = """void func()
+                {
+                    a = a*-b[1] + a/-b[1] - a%-b[1];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+        BinaryOp("=",Id("a"),BinaryOp("-",BinaryOp("+",BinaryOp("*",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1)))),BinaryOp("/",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1))))),BinaryOp("%",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1))))))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_expr_precedence_for_binary_operand(self):
+        input = """void func()
+                {
+                    !a[1]||!b[1]&&!c[1];
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            BinaryOp("||",UnaryOp("!",ArrayCell(Id("a"),IntLiteral(1))),BinaryOp("&&",UnaryOp("!",ArrayCell(Id("b"),IntLiteral(1))),UnaryOp("!",ArrayCell(Id("c"),IntLiteral(1)))))
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
@@ -829,6 +971,26 @@ class ASTGenSuite(unittest.TestCase):
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
+    def test_stmt_if_else_complex_3(self):
+        input = """void func()
+                {
+                    if(a==1) b = 1;
+                    else if (a==2) b = 2;
+                    else if (a==3) b = 3;
+                    else if (a==4) b = 4;
+                    else if (a==5) b = 5;
+                    else b = 0;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+        If(BinaryOp("==",Id("a"),IntLiteral(1)),BinaryOp("=",Id("b"),IntLiteral(1)),
+            If(BinaryOp("==",Id("a"),IntLiteral(2)),BinaryOp("=",Id("b"),IntLiteral(2)),
+                If(BinaryOp("==",Id("a"),IntLiteral(3)),BinaryOp("=",Id("b"),IntLiteral(3)),
+                    If(BinaryOp("==",Id("a"),IntLiteral(4)),BinaryOp("=",Id("b"),IntLiteral(4)),
+                        If(BinaryOp("==",Id("a"),IntLiteral(5)),BinaryOp("=",Id("b"),IntLiteral(5)),
+                            BinaryOp("=",Id("b"),IntLiteral(0)))))))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
     def test_stmt_do_while(self):
         input = """void func()
                 {
@@ -842,7 +1004,7 @@ class ASTGenSuite(unittest.TestCase):
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
-    def test_stmt_do_while_complex(self):
+    def test_stmt_do_while_complex_1(self):
         input = """void func()
                 {
                     do
@@ -858,6 +1020,39 @@ class ASTGenSuite(unittest.TestCase):
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
+    def test_stmt_do_while_complex_2(self):
+        input = """void func()
+                {
+                    do
+                        do
+                            do
+                                a = a + 1;
+                            while a > b;
+                            do
+                                a = a + 1;
+                            while a > b;
+                        while a > b;
+                        do
+                            do
+                                a = a + 1;
+                            while a > b;
+                            do
+                                a = a + 1;
+                            while a > b;
+                        while a > b;
+                    while a > b;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([ #Dowhile([],BinaryOp(">",Id("a"),Id("b")))
+        Dowhile([Dowhile([Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp(">",Id("a"),Id("b"))),
+                          Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp(">",Id("a"),Id("b")))],
+                 BinaryOp(">",Id("a"),Id("b"))),
+                 Dowhile([Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp(">",Id("a"),Id("b"))),
+                          Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp(">",Id("a"),Id("b")))],
+                 BinaryOp(">",Id("a"),Id("b")))],
+        BinaryOp(">",Id("a"),Id("b")))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
     def test_stmt_for(self):
         input = """void func()
                 {
@@ -869,7 +1064,7 @@ class ASTGenSuite(unittest.TestCase):
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
-    def test_stmt_for_complex(self):
+    def test_stmt_for_complex_1(self):
         input = """void func()
                 {
                     for(i = 1; i < 10; i = i + 1)
@@ -881,6 +1076,28 @@ class ASTGenSuite(unittest.TestCase):
         expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
         For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
             Block([VarDecl("c",IntType()),VarDecl("d",IntType()),BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))]))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_for_complex_2(self):
+        input = """void func()
+                {
+                    for(i = 1; i < 10; i = i + 1)
+                        for(i = 1; i < 10; i = i + 1)
+                            for(i = 1; i < 10; i = i + 1)
+                                for(i = 1; i < 10; i = i + 1)
+                                    for(i = 1; i < 10; i = i + 1)
+                                        a = a + 1;
+
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+        For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+            For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                        For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                            BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))
+            )))))
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
@@ -951,27 +1168,22 @@ class ASTGenSuite(unittest.TestCase):
             Block([VarDecl("c",IntType()),VarDecl("d",IntType()),BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1))),Return(BinaryOp("+",Id("a"),Id("b")))])),Return(None)
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
+    def test_stmt_block_empty(self):
+        input = """void func()
+                {
+                    {}{}{}
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            Block([]),Block([]),Block([])
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
 
-'''
-    def test_simple_program(self):
-        """Simple program: int main() {} """
-        input = """int main() {}"""
-        expect = str(Program([FuncDecl(Id("main"),[],IntType(),Block([]))]))
-        self.assertTrue(TestAST.checkASTGen(input,expect,300))
-
-    def test_more_complex_program(self):
-        """More complex program"""
-        input = """int main () {
-            putIntLn(4);
-        }"""
-        expect = str(Program([FuncDecl(Id("main"),[],IntType(),Block([CallExpr(Id("putIntLn"),[IntLiteral(4)])]))]))
-        self.assertTrue(TestAST.checkASTGen(input,expect,301))
-    
-    def test_call_without_parameter(self):
-        """More complex program"""
-        input = """int main () {
-            getIntLn();
-        }"""
-        expect = str(Program([FuncDecl(Id("main"),[],IntType(),Block([CallExpr(Id("getIntLn"),[])]))]))
-        self.assertTrue(TestAST.checkASTGen(input,expect,301))
-'''
+    def test_stmt_block_nested(self):
+        input = """void func()
+                {
+                    {{}{}{}}{{}{}{}}{{}{}{}}
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            Block([Block([]),Block([]),Block([])]),Block([Block([]),Block([]),Block([])]),Block([Block([]),Block([]),Block([])])
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
