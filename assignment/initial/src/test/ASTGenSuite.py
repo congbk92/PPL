@@ -1187,3 +1187,190 @@ class ASTGenSuite(unittest.TestCase):
             Block([Block([]),Block([]),Block([])]),Block([Block([]),Block([]),Block([])]),Block([Block([]),Block([]),Block([])])
         ]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_mix_all_simple_1(self):
+        input = """void func()
+                {
+                    if(a==1)
+                        for (i = 1; i < 10; i = i + 1)
+                            do
+                                a = a+1;
+                            while a < 10;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            If(BinaryOp("==",Id("a"),IntLiteral(1)),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10)))),None)
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_mix_all_simple_2(self):
+        input = """void func()
+                {
+                    if(a==1)
+                        for (i = 1; i < 10; i = i + 1)
+                            do
+                                a = a+1;
+                            while a < 10;
+                    else
+                        for (i = 1; i < 10; i = i + 1)
+                            do
+                                a = a+1;
+                            while a < 10;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            If(BinaryOp("==",Id("a"),IntLiteral(1)),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10)))),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10)))))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_mix_all_simple_3(self):
+        input = """void func()
+                {
+                    for (i = 1; i < 10; i = i + 1)
+                        if(a==1)
+                            do
+                                a = a+1;
+                            while a < 10;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                If(BinaryOp("==",Id("a"),IntLiteral(1)),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10))),None))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_mix_all_simple_4(self):
+        input = """void func()
+                {
+                    for (i = 1; i < 10; i = i + 1)
+                        if(a==1)
+                            do
+                                a = a+1;
+                            while a < 10;
+                        else
+                            do
+                                a = a+1;
+                            while a < 10;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                If(BinaryOp("==",Id("a"),IntLiteral(1)),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10)))))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_mix_all_simple_5(self):
+        input = """void func()
+                {
+                    do
+                        a = a+1;
+                        if(a==1)
+                            for (i = 1; i < 10; i = i + 1)
+                                do
+                                    a = a+1;
+                                while a < 10;
+                    while a < 10;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1))),If(BinaryOp("==",Id("a"),IntLiteral(1)),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10)))),None)],BinaryOp("<",Id("a"),IntLiteral(10)))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_mix_all_simple_6(self):
+        input = """void func()
+                {
+                    do
+                        a = a+1;
+                        if(a==1)
+                            for (i = 1; i < 10; i = i + 1)
+                                do
+                                    a = a+1;
+                                while a < 10;
+                        else
+                            for (i = 1; i < 10; i = i + 1)
+                                do
+                                    a = a+1;
+                                while a < 10;
+                    while a < 10;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1))),If(BinaryOp("==",Id("a"),IntLiteral(1)),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10)))),For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1)))],BinaryOp("<",Id("a"),IntLiteral(10)))))],BinaryOp("<",Id("a"),IntLiteral(10)))
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_stmt_mix_all(self):
+        input = """void func()
+                {
+                    if(a==1)
+                        for (i = 1; i < 10; i = i + 1)
+                            do
+                                a = a+1;
+                                break;
+                                continue;
+                                return;
+                                return 1;
+                            while a < 10;
+                    else
+                        for (i = 1; i < 10; i = i + 1)
+                            do
+                                a = a+1;
+                                break;
+                                continue;
+                                return;
+                                return 1;
+                            while a < 10;
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+            If(BinaryOp("==",Id("a"),IntLiteral(1)),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1))),Break(),Continue(),Return(None),Return(IntLiteral(1))],BinaryOp("<",Id("a"),IntLiteral(10)))),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1))),Break(),Continue(),Return(None),Return(IntLiteral(1))],BinaryOp("<",Id("a"),IntLiteral(10)))),
+            )
+        ]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_program_super_case_1(self):
+        input = """void func()
+                {
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_program_super_case_2(self):
+        input = """void func()
+                {
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_program_super_case_3(self):
+        input = """void func()
+                {
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_program_super_case_4(self):
+        input = """void func()
+                {
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
+
+    def test_program_super_case_5(self):
+        input = """void func()
+                {
+                }"""
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        self.assertTrue(TestAST.checkASTGen(input,expect,400))
