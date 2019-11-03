@@ -1343,34 +1343,134 @@ class ASTGenSuite(unittest.TestCase):
     def test_program_super_case_1(self):
         input = """void func()
                 {
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    if(!a[1]||!b[1]&&!c[1])
+                        for (i = 1; i < 10; i = i + 1)
+                            do
+                               a = a*-b[1] + a/-b[1] - a%-b[1];
+                                a = a+1;
+                                break;
+                                continue;
+                                return;
+                                return 1;
+                            while a < 10;
+                    else
+                        for (i = 1; i < 10; i = i + 1)
+                            do
+                                a = a*-b[1] + a/-b[1] - a%-b[1];
+                                a = a+1;
+                                break;
+                                continue;
+                                return;
+                                return 1;
+                            while a < 10;
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
                 }"""
-        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([
+          VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+            If(BinaryOp("||",UnaryOp("!",ArrayCell(Id("a"),IntLiteral(1))),BinaryOp("&&",UnaryOp("!",ArrayCell(Id("b"),IntLiteral(1))),UnaryOp("!",ArrayCell(Id("c"),IntLiteral(1))))),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("-",BinaryOp("+",BinaryOp("*",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1)))),BinaryOp("/",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1))))),BinaryOp("%",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1)))))),
+                      BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1))),Break(),Continue(),Return(None),Return(IntLiteral(1))],BinaryOp("<",Id("a"),IntLiteral(10)))),
+                For(BinaryOp("=",Id("i"),IntLiteral(1)),BinaryOp("<",Id("i"),IntLiteral(10)),BinaryOp("=",Id("i"),BinaryOp("+",Id("i"),IntLiteral(1))),
+                    Dowhile([BinaryOp("=",Id("a"),BinaryOp("-",BinaryOp("+",BinaryOp("*",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1)))),BinaryOp("/",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1))))),BinaryOp("%",Id("a"),UnaryOp("-",ArrayCell(Id("b"),IntLiteral(1)))))),
+                      BinaryOp("=",Id("a"),BinaryOp("+",Id("a"),IntLiteral(1))),Break(),Continue(),Return(None),Return(IntLiteral(1))],BinaryOp("<",Id("a"),IntLiteral(10)))),
+            )
+        ,VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType()))]))]))
         self.assertTrue(TestAST.checkASTGen(input,expect,395))
 
     def test_program_super_case_2(self):
-        input = """void func()
-                {
-                }"""
-        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        input = """
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    int[] func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        int a,b,c,d,a[10],b[10],c[10],d[10];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    boolean[] func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        int a,b,c,d,a[10],b[10],c[10],d[10];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                """
+        expect =  str(Program([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],ArrayPointerType(IntType()),
+                                Block([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType()))])),
+                            VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],ArrayPointerType(BoolType()),
+                                Block([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType()))])),
+                            VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType()))
+                            ]))
         self.assertTrue(TestAST.checkASTGen(input,expect,396))
 
     def test_program_super_case_3(self):
-        input = """void func()
-                {
-                }"""
-        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        input = """
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    float[] func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        boolean a,b,c,d,a[20],b[20],c[20],d[20];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    string[] func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        boolean a,b,c,d,a[20],b[20],c[20],d[20];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                """
+        expect =  str(Program([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],ArrayPointerType(FloatType()),
+                                Block([VarDecl("a",BoolType()),VarDecl("b",BoolType()),VarDecl("c",BoolType()),VarDecl("d",BoolType()),VarDecl("a",ArrayType(20,BoolType())),VarDecl("b",ArrayType(20,BoolType())),VarDecl("c",ArrayType(20,BoolType())),VarDecl("d",ArrayType(20,BoolType()))])),
+                            VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],ArrayPointerType(StringType()),
+                                Block([VarDecl("a",BoolType()),VarDecl("b",BoolType()),VarDecl("c",BoolType()),VarDecl("d",BoolType()),VarDecl("a",ArrayType(20,BoolType())),VarDecl("b",ArrayType(20,BoolType())),VarDecl("c",ArrayType(20,BoolType())),VarDecl("d",ArrayType(20,BoolType()))])),
+                            VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType()))
+                            ]))
         self.assertTrue(TestAST.checkASTGen(input,expect,397))
 
     def test_program_super_case_4(self):
-        input = """void func()
-                {
-                }"""
-        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        input = """
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    int func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        float a,b,c,d,a[30],b[30],c[30],d[30];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    boolean func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        float a,b,c,d,a[30],b[30],c[30],d[30];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                   """
+        expect =  str(Program([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],IntType(),
+                                Block([VarDecl("a",FloatType()),VarDecl("b",FloatType()),VarDecl("c",FloatType()),VarDecl("d",FloatType()),VarDecl("a",ArrayType(30,FloatType())),VarDecl("b",ArrayType(30,FloatType())),VarDecl("c",ArrayType(30,FloatType())),VarDecl("d",ArrayType(30,FloatType()))])),
+                            VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],BoolType(),
+                                Block([VarDecl("a",FloatType()),VarDecl("b",FloatType()),VarDecl("c",FloatType()),VarDecl("d",FloatType()),VarDecl("a",ArrayType(30,FloatType())),VarDecl("b",ArrayType(30,FloatType())),VarDecl("c",ArrayType(30,FloatType())),VarDecl("d",ArrayType(30,FloatType()))])),
+                            VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType()))
+                            ]))
         self.assertTrue(TestAST.checkASTGen(input,expect,398))
 
     def test_program_super_case_5(self):
-        input = """void func()
-                {
-                }"""
-        expect =  str(Program([FuncDecl(Id("func"),[],VoidType(),Block([]))]))
+        input = """
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    float func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        string a,b,c,d,a[40],b[40],c[40],d[40];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    string func(int a, boolean b, float c, string d, int a[], boolean b[], float c[], string d[])
+                    {
+                        string a,b,c,d,a[40],b[40],c[40],d[40];
+                    }
+                    int a,b,c,d,a[10],b[10],c[10],d[10];
+                    """
+        expect =  str(Program([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],FloatType(),
+                                Block([VarDecl("a",StringType()),VarDecl("b",StringType()),VarDecl("c",StringType()),VarDecl("d",StringType()),VarDecl("a",ArrayType(40,StringType())),VarDecl("b",ArrayType(40,StringType())),VarDecl("c",ArrayType(40,StringType())),VarDecl("d",ArrayType(40,StringType()))])),
+                            VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType())),
+                            FuncDecl(Id("func"),[VarDecl("a",IntType()),VarDecl("b",BoolType()),VarDecl("c",FloatType()),VarDecl("d",StringType()),VarDecl("a",ArrayPointerType(IntType())),VarDecl("b",ArrayPointerType(BoolType())),VarDecl("c",ArrayPointerType(FloatType())),VarDecl("d",ArrayPointerType(StringType()))],StringType(),
+                                Block([VarDecl("a",StringType()),VarDecl("b",StringType()),VarDecl("c",StringType()),VarDecl("d",StringType()),VarDecl("a",ArrayType(40,StringType())),VarDecl("b",ArrayType(40,StringType())),VarDecl("c",ArrayType(40,StringType())),VarDecl("d",ArrayType(40,StringType()))])),
+                           VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("a",ArrayType(10,IntType())),VarDecl("b",ArrayType(10,IntType())),VarDecl("c",ArrayType(10,IntType())),VarDecl("d",ArrayType(10,IntType()))
+                           ]))
         self.assertTrue(TestAST.checkASTGen(input,expect,399))
