@@ -40,10 +40,8 @@ tailDecl: decl tailDecl | ;
 decl: funcDecl | varDecl ;
 
 varDecl: primitiveType listVar SM ;
-listVar: var tailListVar ;
-tailListVar: CM var tailListVar | ;
-var: ID | arrayDecl ;
-arrayDecl: ID LS INTLIT RS ;
+listVar: var (CM var)* ;
+var: ID (LS INTLIT RS)?;
 
 funcDecl: mctype ID LB paramList RB body;
 body: blockStmt;
@@ -63,8 +61,7 @@ memberBlock: varDecl | stmt ;
 stmt: ifStmt | dowhileStmt | forStmt | breakStmt | continueStmt | returnStmt | exprStmt | blockStmt ; 
 ifStmt: IF LB exp RB stmt (ELSE stmt)? ;
 dowhileStmt: DO listStmt WHILE exp SM ;
-listStmt: stmt tailListStmt ;
-tailListStmt: stmt tailListStmt | ;
+listStmt: stmt+ ;
 forStmt: FOR LB exp SM exp SM exp RB stmt ;
 breakStmt: BREAK SM ;
 continueStmt: CONTINUE SM ;
@@ -78,8 +75,8 @@ binaryExpr2: binaryExpr3 (EQ | DIF) binaryExpr3 | binaryExpr3;
 binaryExpr3: binaryExpr4 (BIG | BIGEQ | LESS | LESSEQ) binaryExpr4 | binaryExpr4;
 binaryExpr4: binaryExpr4 (ADD | SUB) binaryExpr5 | binaryExpr5;
 binaryExpr5: binaryExpr5 (MUL | DIV | MOD ) unaryExpr | unaryExpr;
-unaryExpr: (SUB | NOT) unaryExpr | indexExpr;
-indexExpr: (ID | funcall) LS exp RS | higherExpr;
+unaryExpr: (SUB | NOT) unaryExpr | indexExpr | higherExpr;
+indexExpr: (ID | funcall) LS exp RS;
 higherExpr: LB exp RB | INTLIT | FLOATLIT| BOOLEANLIT | STRINGLIT | ID | funcall;
 
 funcall: ID LB lisExpr RB ;

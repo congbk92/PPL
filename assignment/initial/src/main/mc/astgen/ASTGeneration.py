@@ -23,20 +23,15 @@ class ASTGeneration(MCVisitor):
 
     #varDecl: primitiveType listVar SM ;
     def visitVarDecl(self,ctx:MCParser.VarDeclContext):
-        self.varType = self.visit(ctx.primitiveType())
-        return self.visit(ctx.listVar()) 
-    #listVar: var tailListVar 
+        lstVar = self.visit(ctx.listVar())
+        mylambda = lambda x : VarDecl(x[0],ArrayType(x[1],self.visit(ctx.primitiveType()))) if x[1] >= 0 else VarDecl(x[0],self.visit(ctx.primitiveType()))
+        return list(map(mylambda,lstVar))
+    #listVar: var (CM var)* ;
     def visitListVar(self,ctx:MCParser.ListVarContext):
-        return [self.visit(ctx.var())] + self.visit(ctx.tailListVar())
-    #tailListVar: CM var tailListVar | ;
-    def visitTailListVar(self,ctx:MCParser.TailListVarContext):
-        return  [self.visit(ctx.var())] + self.visit(ctx.tailListVar()) if ctx.var() else []
-    #var: ID | arrayDecl ;
+        return [self.visit(i) for i in ctx.var()]
+    #var: ID (LS INTLIT RS)?;
     def visitVar(self,ctx:MCParser.VarContext):
-        return  self.visit(ctx.arrayDecl()) if ctx.arrayDecl() else VarDecl(ctx.ID().getText(),self.varType)
-    #arrayDecl: ID LS INTLIT RS;
-    def visitArrayDecl(self,ctx:MCParser.VarContext):
-        return VarDecl(ctx.ID().getText(),ArrayType(int(ctx.INTLIT().getText()),self.varType))
+        return  (ctx.ID().getText(),int(ctx.INTLIT().getText())) if ctx.getChildCount() == 4 else (ctx.ID().getText(),-1)
     #funcDecl: mctype ID LB paramList RB body;
     def visitFuncDecl(self,ctx:MCParser.FuncDeclContext):
         return FuncDecl(Id(ctx.ID().getText()),self.visit(ctx.paramList()),self.visit(ctx.mctype()),self.visit(ctx.body()))
@@ -48,20 +43,21 @@ class ASTGeneration(MCVisitor):
         elif ctx.arrayPntType():
             return self.visit(ctx.arrayPntType())
         else:
-            return VoidType
+            return VoidType()
     #arrayPntType: primitiveType LS RS ;
     def visitArrayPntType(self,ctx:MCParser.ArrayPntTypeContext):
         return ArrayPointerType(self.visit(ctx.primitiveType()))
     #primitiveType: BOOLEANTYPE | INTTYPE | FLOATTYPE | STRINGTYPE ;
     def visitPrimitiveType(self,ctx:MCParser.PrimitiveTypeContext):
         if ctx.INTTYPE():
-            return IntType
+            return IntType()
         elif ctx.FLOATTYPE():
-            return FloatType
+            return FloatType()
         elif ctx.BOOLEANTYPE():
-            return BoolType
+            return BoolType()
         else:
-            return StringType
+            return StringType()
+
     ''' paramList: paramDecl tailParamList | ;
         tailParamList: CM paramDecl tailParamList | ;
     '''
@@ -95,23 +91,7 @@ class ASTGeneration(MCVisitor):
 
     #stmt: ifStmt | dowhileStmt | forStmt | breakStmt | continueStmt | returnStmt | exprStmt | blockStmt ;
     def visitStmt(self,ctx:MCParser.StmtContext):
-        if ctx.ifStmt():
-            return self.visit(ctx.ifStmt())
-        elif ctx.dowhileStmt():
-            return self.visit(ctx.dowhileStmt())
-        elif ctx.forStmt():
-            return self.visit(ctx.forStmt())
-        elif ctx.breakStmt():
-            return self.visit(ctx.breakStmt())
-        elif ctx.continueStmt():
-            return self.visit(ctx.continueStmt())
-        elif ctx.returnStmt():
-            return self.visit(ctx.returnStmt())
-        elif ctx.exprStmt():
-            return self.visit(ctx.exprStmt())
-        elif ctx.blockStmt():
-            return self.visit(ctx.blockStmt())
-    
+        return self.visit(ctx.getChild(0))
 
     #exprStmt: exp SM ;
     def visitExprStmt(self,ctx:MCParser.ExprStmtContext):
@@ -125,7 +105,7 @@ class ASTGeneration(MCVisitor):
             return self.visit(ctx.binaryExpr())
     #lhs: ID | indexExpr ;
     def visitLhs(self,ctx:MCParser.LhsContext):
-        return self.visit(ctx.IndexExpr()) if ctx.IndexExpr() else Id(ctx.ID().getText())
+        return self.visit(ctx.indexExpr()) if ctx.indexExpr() else Id(ctx.ID().getText())
     #binaryExpr: binaryExpr OR binaryExpr1 | binaryExpr1;
     def visitBinaryExpr(self,ctx:MCParser.BinaryExprContext):
         if ctx.OR():
@@ -145,7 +125,7 @@ class ASTGeneration(MCVisitor):
         elif ctx.DIF():
             return BinaryOp(ctx.DIF().getText(), self.visit(ctx.binaryExpr3(0)), self.visit(ctx.binaryExpr3(1)))
         else:
-            return self.visit(ctx.binaryExpr3())
+            return self.visit(ctx.binaryExpr3(0))
     #binaryExpr3: binaryExpr4 (BIG | BIGEQ | LESS | LESSEQ) binaryExpr4 | binaryExpr4;
     def visitBinaryExpr3(self,ctx:MCParser.BinaryExpr3Context):
         if ctx.BIG():
@@ -176,22 +156,19 @@ class ASTGeneration(MCVisitor):
             return BinaryOp(ctx.MOD().getText(), self.visit(ctx.binaryExpr5()), self.visit(ctx.unaryExpr())) 
         else:
             return self.visit(ctx.unaryExpr())
-    #unaryExpr: (SUB | NOT) unaryExpr | indexExpr;
+    #unaryExpr: (SUB | NOT) unaryExpr | indexExpr | higherExpr;
     def visitUnaryExpr(self,ctx:MCParser.UnaryExprContext):
-        if ctx.SUB():
-            return UnaryOp(ctx.SUB().getText(),self.visit(ctx.unaryExpr()));
-        elif ctx.NOT():
-            return UnaryOp(ctx.NOT().getText(),self.visit(ctx.unaryExpr()));
+        if ctx.getChildCount() > 1:
+            return UnaryOp(ctx.getChild(0).getText(),self.visit(ctx.unaryExpr()));
         else:
-            return self.visit(ctx.indexExpr())
-    #indexExpr: (ID | funcall) LS exp RS | higherExpr;
+            return self.visit(ctx.getChild(0))
+    #indexExpr: (ID | funcall) LS exp RS;
     def visitIndexExpr(self,ctx:MCParser.IndexExprContext):
         if ctx.ID():
             return ArrayCell(Id(ctx.ID().getText()),self.visit(ctx.exp()))
-        elif ctx.funcall():
-            return ArrayCell(self.visit(ctx.funcall()),self.visit(ctx.exp()))
         else:
-            return self.visit(ctx.higherExpr())
+            return ArrayCell(self.visit(ctx.funcall()),self.visit(ctx.exp()))
+
     #higherExpr: LB exp RB | INTLIT | FLOATLIT| BOOLEANLIT | STRINGLIT | ID | funcall;
     def visitHigherExpr(self,ctx:MCParser.HigherExprContext):
         if ctx.exp():
@@ -201,9 +178,9 @@ class ASTGeneration(MCVisitor):
         elif ctx.FLOATLIT():
             return FloatLiteral(float(ctx.FLOATLIT().getText()))
         elif ctx.BOOLEANLIT():
-            return BooleanLiteral(bool(ctx.BOOLEANLIT().getText()))
+            return BooleanLiteral(ctx.BOOLEANLIT().getText() == "true")
         elif ctx.STRINGLIT():
-            return StringLiteral(ctx.FLOATLIT().getText())
+            return StringLiteral(ctx.STRINGLIT().getText())
         elif ctx.ID():
             return Id(ctx.ID().getText())
         else:
@@ -219,10 +196,27 @@ class ASTGeneration(MCVisitor):
         return [self.visit(ctx.exp())] + self.visit(ctx.lisExprTail()) if ctx.exp() else []
     def visitLisExprTail(self,ctx:MCParser.LisExprTailContext):
         return [self.visit(ctx.exp())] + self.visit(ctx.lisExprTail()) if ctx.exp() else []
-'''
-    def visitExp(self,ctx:MCParser.ExpContext):
-        if (ctx.funcall()):
-            return self.visit(ctx.funcall())
-        else:
-            return IntLiteral(int(ctx.INTLIT().getText()))
-'''
+
+    #ifStmt: IF LB exp RB stmt (ELSE stmt)? ;
+    def visitIfStmt(self,ctx:MCParser.IfStmtContext):
+        return If(self.visit(ctx.exp()),self.visit(ctx.stmt(0)),self.visit(ctx.stmt(1))) if len(ctx.stmt()) == 2 else If(self.visit(ctx.exp()),self.visit(ctx.stmt(0)),None)
+
+    #dowhileStmt: DO listStmt WHILE exp SM ;
+    def visitDowhileStmt(self,ctx:MCParser.DowhileStmtContext):
+        return Dowhile(self.visit(ctx.listStmt()),self.visit(ctx.exp()))
+    #listStmt: stmt+
+    def visitListStmt(self,ctx:MCParser.ListStmtContext):
+        return [self.visit(i) for i in ctx.stmt()]
+
+    #forStmt: FOR LB exp SM exp SM exp RB stmt ;
+    def visitForStmt(self,ctx:MCParser.ForStmtContext):
+        return For(self.visit(ctx.exp(0)),self.visit(ctx.exp(1)),self.visit(ctx.exp(2)),self.visit(ctx.stmt()))
+    #breakStmt: BREAK SM ;
+    def visitBreakStmt(self,ctx:MCParser.BreakStmtContext):
+        return Break()
+    #continueStmt: CONTINUE SM ;
+    def visitContinueStmt(self,ctx:MCParser.ContinueStmtContext):
+        return Continue()
+    #returnStmt: RETURN exp? SM ;
+    def visitReturnStmt(self,ctx:MCParser.ReturnStmtContext):
+        return Return(self.visit(ctx.exp())) if ctx.exp() else Return(None)

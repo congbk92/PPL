@@ -1325,3 +1325,11 @@ class ParserSuite(unittest.TestCase):
                     """
         expect = "Error on line 4 col 32: int"
         self.assertTrue(TestParser.checkParser(input,expect,399))
+
+    def test_expr_assign_assosiate(self):
+        input = """void func()
+                {
+                    true = 2;
+                }"""
+        expect = "Error on line 3 col 25: ="
+        self.assertTrue(TestParser.checkParser(input,expect,-1))
