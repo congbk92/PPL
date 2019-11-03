@@ -1,0 +1,3 @@
+Method resolution Order
+C(A,B) = L(C) = C + merge(L(A), L(B), {A,B})
+Currying Function: foo(x:int)(y:int)(z:int)
