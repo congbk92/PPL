@@ -32,7 +32,7 @@ options{
     language=Python3;
 }
 
-program: manyDecl;
+program: manyDecl EOF;
 
 manyDecl: decl tailDecl ;
 tailDecl: decl tailDecl | ;
