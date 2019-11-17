@@ -1,3 +1,7 @@
+import operator
+
+ops = { "+": operator.add, "-": operator.sub, "*":  operator.mul, "/": operator.truediv}
+
 class Expr():
 	pass
 
@@ -25,7 +29,13 @@ class BinOp(Expr):
 		self.operator = operator
 		self.left = left
 		self.right = right
-	def eval(self)
+	def eval(self):
+		return Number(ops[self.operator](self.left.n,self.right.n))
 		
+
 v = Var("x")
-BinOp(Number(0.2),"+",v)
+v.eval().print()
+BinOp(Number(0.2),"+",v.eval()).eval().print()
+BinOp(Number(0.2),"-",v.eval()).eval().print()
+BinOp(Number(0.2),"*",v.eval()).eval().print()
+BinOp(Number(0.2),"/",v.eval()).eval().print()

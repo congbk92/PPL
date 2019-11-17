@@ -1,14 +1,16 @@
 import sys,os
 from antlr4 import *
 from antlr4.error.ErrorListener import ConsoleErrorListener,ErrorListener
-#if not './main/mc/parser/' in sys.path:
-#    sys.path.append('./main/mc/parser/')
-#if os.path.isdir('../target/main/mc/parser') and not '../target/main/mc/parser/' in sys.path:
-#    sys.path.append('../target/main/mc/parser/')
+if not './main/mc/parser/' in sys.path:
+    sys.path.append('./main/mc/parser/')
+if os.path.isdir('../target/main/mc/parser') and not '../target/main/mc/parser/' in sys.path:
+    sys.path.append('../target/main/mc/parser/')
 from MCLexer import MCLexer
 from MCParser import MCParser
 from lexererr import *
 from ASTGeneration import ASTGeneration
+from StaticCheck import StaticChecker
+from StaticError import *
 
 class TestUtil:
     @staticmethod
@@ -94,9 +96,39 @@ class TestAST:
         parser = MCParser(tokens)
         tree = parser.program()
         asttree = ASTGeneration().visit(tree)
-        dest.write(str(asttree))
+        #dest.write(str(asttree))
         dest.close()
         dest = open("./test/solutions/" + str(num) + ".txt","r")
         line = dest.read()
         return line == expect
+
+
+
+class TestChecker:
+    @staticmethod
+    def test(input,expect,num):
+        dest = open("./test/solutions/" + str(num) + ".txt","w")
         
+        if type(input) is str:
+            inputfile = TestUtil.makeSource(input,num)
+            lexer = MCLexer(inputfile)
+            tokens = CommonTokenStream(lexer)
+            parser = MCParser(tokens)
+            tree = parser.program()
+            asttree = ASTGeneration().visit(tree)
+        else:
+            inputfile = TestUtil.makeSource(str(input),num)
+            asttree = input
+        
+        
+        checker = StaticChecker(asttree)
+        try:
+            res = checker.check()
+            #dest.write(str(list(res)))
+        except StaticError as e:
+            dest.write(str(e))
+        finally:
+            dest.close()
+        dest = open("./test/solutions/" + str(num) + ".txt","r")
+        line = dest.read()
+        return line == expect

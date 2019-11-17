@@ -1,0 +1,21 @@
+1.
+ID: [a-z][0-9a-z]*
+2.
+fragment Letter: [a-z];
+Manyletter: Letter+;
+fragment Number: [0-9];
+ID: Letter (Number | Letter)*
+3.
+a.
+fragment Digit: [0-9] ;
+fragment Expo: [eE][-]?Digit+ ;
+fragment Frac: Digit+'.'Digit* | Digit*'.'Digit+ ;
+FLOATLIT: Frac Expo? | Digit+ Expo ;
+
+b.
+STRINGLIT: ''' ( '''' | ~['] )* ''';
+
+4.
+a. a*bbb+
+b. (aa)+(bb)*|(aa)*(bb)+|(aa)*a(bb)*b
+c. (aaa)*ab

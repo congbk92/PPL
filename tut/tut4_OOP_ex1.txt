@@ -1,0 +1,38 @@
+1.
+a. Python3 L(A) = A + merge(L(X),L(Y),{X,Y})
+L(O) = O
+L(A) = A + merge(L(O),{O})
+	 = A,O
+L(B) = B + merge(L(O), {O})
+	 = B,O
+L(C) = C + merge(L(O), {O})
+	 = C,O
+L(D) = D + merge(L(A),L(B),{A,B})
+	 = D + merge({A,O},{B,O},{A,B})
+	 = D,A,B,O
+L(E) = E + merge(L(C),L(A),{C,A})
+	 = E + merge({C,O},{A,O},{C,A})
+	 = E,C,A,O
+L(F) = F + merge(L(D),L(B),L(E),{D,B,E})
+	 = F + merge({D,A,B,O},{B,O},{E,C,A,O},{D,B,E})
+	 = F,D, -> K tim dc good head
+
+Doi D(A,B) -> D(B,A)
+L(D) = D + merge(L(B),L(A),{B,A})
+	 = D + merge({B,O},{A,O},{B,A})
+	 = D,B,A,O
+L(F) = F + merge(L(D),L(B),L(E),{D,B,E})
+	 = F + merge({D,B,A,O},{B,O},{E,C,A,O},{D,B,E})
+	 = F,D,B,E,C,A,O
+
+a', scala
+L(O) = O
+L(A) =  A + L(O) = A,O
+L(B) -> B + L(O) = B,O
+L(C) -> C + L(O) = C,0
+L(D) -> D + L(A) + L(B) = D + {A,O} + {B,O} = D,A,B,O
+L(E) -> E + L(C) + L(A) = E + {C,O} + {A,O} = E,C,A,O
+L(F) -> F + L(D) + L(B) + L(E) = F + {D,A,B,O} + {B,O} + {E,C,A,O} = F,D,B,E,C,A,O
+
+b. foo() trong class C dc goi truoc ca tren scala hoac python3
+

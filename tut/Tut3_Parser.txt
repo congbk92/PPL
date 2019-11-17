@@ -1,0 +1,56 @@
+1
+a. BNF
+program -> manydecls EOF
+manydecls -> decl tail
+tail -> decl tail | empty
+decl -> vardecl | funcdecl
+vardecl -> type listIDs SM
+listIDs -> ID idlisttail
+idlisttail -> CM ID idlisttail | empty
+type -> INT | FLOAT
+funcdecl -> type ID para body
+para -> LP listParams RP
+listParams -> param paramtail | empty
+paramtail -> SM param paramtail | empty
+param -> type listIDs
+body -> LB bodylist RB
+bodylist -> onebody bodytail | empty
+bodytail -> onebody bodytail | empty
+onebody -> vardecl | stmt
+stmt -> assign | call | return
+assign -> ID EQ exp SM
+call -> callexp SM
+callexp -> ID LP explist RP
+explist -> exp exptail | empty
+exptail -> CM exp exptail | empty
+return -> RETURN exp SM
+exp -> exp1 ADD exp | exp1
+exp1 -> exp2 SUB exp2 | exp2
+exp2 -> exp2 (MUL | DIV) exp3 | exp3
+exp3 -> LP exp RP | ID | INTLIT | FLOATLIT | callexp
+
+b. ANTLR
+program: manyDecls EOF;
+manyDecls: decl+;
+decl: varDecl | funcDecl;
+varDecl: type listId SM;
+type: INT | FLOAT ;
+listId: ID (CM ID)* ;
+funcDecl: type ID param body;
+param: LP listParam RP;
+listParam: paramMember tailListParam | ;
+tailListParam: SM paramMember tailListParam | ;
+paramMember: type listId;
+body: LB listBodyMember RB;
+listBodyMember: bodyMember*;
+bodyMember: varDecl | stmt ;
+stmt: (assigment | call | return) SM;
+assignment: ID EQ expr;
+call: ID LP listExpr RB;
+return: RETURN expr;
+listExpr: expr tailListExpr | ;
+tailListExpr: CM expr tailListExpr | ;
+expr: expr1 ADD expr | expr1 ;
+expr1: expr2 SUB expr2 | expr2;
+expr2: expr2 MUL operand | expr2 DIV operand | operand;
+operand: LP expr RP | INTLIT | FLOATLIT | ID | call;

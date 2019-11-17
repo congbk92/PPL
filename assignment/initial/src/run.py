@@ -1,13 +1,14 @@
 import sys,os
-sys.path.append('./test/')
+
+import platform
 import subprocess
 import unittest
 from antlr4 import *
+import shutil
 
-#Make sure that ANTLR_JAR is set to antlr-4.7.2-complete.jar
 ANTLR_JAR = os.environ.get('ANTLR_JAR')
 TARGET = '../target/main/mc/parser' if os.name == 'posix' else os.path.normpath('../target/')
-locpath = ['./main/mc/parser/','./main/mc/astgen/','./main/mc/utils/']
+locpath = ['test','./main/mc/parser/','./main/mc/astgen/','./main/mc/utils/','./main/mc/checker']
 for p in locpath:
     if not p in sys.path:
         sys.path.append(p)
@@ -36,6 +37,10 @@ def main(argv):
             from ASTGenSuite import ASTGenSuite
             suite = unittest.makeSuite(ASTGenSuite)
             test(suite)
+        elif argv[1] == 'CheckSuite':
+            from CheckSuite import CheckSuite
+            suite = unittest.makeSuite(CheckSuite)
+            test(suite)
         else:
             printUsage()
     else:
@@ -59,5 +64,7 @@ def printUsage():
     print("python3 run.py test LexerSuite")
     print("python3 run.py test ParserSuite")
     print("python3 run.py test ASTGenSuite")
+    print("python3 run.py test CheckSuite")
+
 if __name__ == "__main__":
    main(sys.argv[1:])
