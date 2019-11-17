@@ -7,160 +7,160 @@ class Visitor(ABC):
         return ast.accept(self,param)
 
     @abstractmethod
-    def visitProgram(self, param):
+    def visitProgram(self, ast, param):
         pass
     @abstractmethod
-    def visitVarDecl(self, param):
+    def visitVarDecl(self, ast, param):
         pass
     @abstractmethod
-    def visitFuncDecl(self, param):
+    def visitFuncDecl(self, ast, param):
         pass
     @abstractmethod
-    def visitIntType(self, param):
+    def visitIntType(self, ast, param):
         pass
     @abstractmethod
-    def visitFloatType(self, param):
+    def visitFloatType(self, ast, param):
         pass
     @abstractmethod
-    def visitBoolType(self, param):
+    def visitBoolType(self, ast, param):
         pass
     @abstractmethod
-    def visitStringType(self, param):
+    def visitStringType(self, ast, param):
         pass
     @abstractmethod
-    def visitVoidType(self, param):
+    def visitVoidType(self, ast, param):
         pass
     @abstractmethod
-    def visitArrayType(self, param):
+    def visitArrayType(self, ast, param):
         pass
     @abstractmethod
-    def visitArrayPointerType(self, param):
+    def visitArrayPointerType(self, ast, param):
         pass
     @abstractmethod
-    def visitBinaryOp(self, param):
+    def visitBinaryOp(self, ast, param):
         pass
     @abstractmethod
-    def visitUnaryOp(self, param):
+    def visitUnaryOp(self, ast, param):
         pass
     @abstractmethod
-    def visitCallExpr(self, param):
+    def visitCallExpr(self, ast, param):
         pass
     @abstractmethod
-    def visitId(self, param):
+    def visitId(self, ast, param):
         pass
     @abstractmethod
-    def visitArrayCell(self, param):
+    def visitArrayCell(self, ast, param):
         pass
     @abstractmethod
-    def visitBlock(self, param):
+    def visitBlock(self, ast, param):
         pass
     @abstractmethod
-    def visitIf(self, param):
+    def visitIf(self, ast, param):
         pass
     @abstractmethod
-    def visitFor(self, param):
+    def visitFor(self, ast, param):
         pass
     @abstractmethod
-    def visitContinue(self, param):
+    def visitContinue(self, ast, param):
         pass
     @abstractmethod
-    def visitBreak(self, param):
+    def visitBreak(self, ast, param):
         pass
     @abstractmethod
-    def visitReturn(self, param):
+    def visitReturn(self, ast, param):
         pass
     @abstractmethod
-    def visitDowhile(self, param):
+    def visitDowhile(self, ast, param):
         pass
     @abstractmethod
-    def visitIntLiteral(self, param):
+    def visitIntLiteral(self, ast, param):
         pass
     @abstractmethod
-    def visitFloatLiteral(self, param):
+    def visitFloatLiteral(self, ast, param):
         pass
     @abstractmethod
-    def visitBooleanLiteral(self, param):
+    def visitBooleanLiteral(self, ast, param):
         pass
     @abstractmethod
-    def visitStringLiteral(self, param):
+    def visitStringLiteral(self, ast, param):
         pass
         
 class BaseVisitor(Visitor):
     
-    def visitProgram(self, param):
+    def visitProgram(self, ast, param):
         return None
     
-    def visitVarDecl(self, param):
+    def visitVarDecl(self, ast, param):
         return None
     
-    def visitFuncDecl(self, param):
+    def visitFuncDecl(self, ast, param):
         return None
     
-    def visitIntType(self, param):
+    def visitIntType(self, ast, param):
         return None
     
-    def visitFloatType(self, param):
+    def visitFloatType(self, ast, param):
         return None
     
-    def visitBoolType(self, param):
+    def visitBoolType(self, ast, param):
         return None
     
-    def visitStringType(self, param):
+    def visitStringType(self, ast, param):
         return None
     
-    def visitVoidType(self, param):
+    def visitVoidType(self, ast, param):
         return None
     
-    def visitArrayType(self, param):
+    def visitArrayType(self, ast, param):
         return None
     
-    def visitArrayPointerType(self, param):
+    def visitArrayPointerType(self, ast, param):
         return None
     
-    def visitBinaryOp(self, param):
+    def visitBinaryOp(self, ast, param):
         return None
     
-    def visitUnaryOp(self, param):
+    def visitUnaryOp(self, ast, param):
         return None
     
-    def visitCallExpr(self, param):
+    def visitCallExpr(self, ast, param):
         return None
     
-    def visitId(self, param):
+    def visitId(self, ast, param):
         return None
     
-    def visitArrayCell(self, param):
+    def visitArrayCell(self, ast, param):
         return None
     
-    def visitBlock(self, param):
+    def visitBlock(self, ast, param):
         return None
     
-    def visitIf(self, param):
+    def visitIf(self, ast, param):
         return None
     
-    def visitFor(self, param):
+    def visitFor(self, ast, param):
         return None
     
-    def visitContinue(self, param):
+    def visitContinue(self, ast, param):
         return None
     
-    def visitBreak(self, param):
+    def visitBreak(self, ast, param):
         return None
     
-    def visitReturn(self, param):
+    def visitReturn(self, ast, param):
         return None
     
-    def visitDowhile(self, param):
+    def visitDowhile(self, ast, param):
         return None
     
-    def visitIntLiteral(self, param):
+    def visitIntLiteral(self, ast, param):
         return None
     
-    def visitFloatLiteral(self, param):
+    def visitFloatLiteral(self, ast, param):
         return None
     
-    def visitBooleanLiteral(self, param):
+    def visitBooleanLiteral(self, ast, param):
         return None
     
-    def visitStringLiteral(self, param):
+    def visitStringLiteral(self, ast, param):
         return None
