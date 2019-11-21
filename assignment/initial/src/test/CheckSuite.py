@@ -48,12 +48,13 @@ class CheckSuite(unittest.TestCase):
         expect = "Type Mismatch In Statement: CallExpr(Id(putIntLn),[])"
         self.assertTrue(TestChecker.test(input,expect,405))
     '''
-
+    '''
     def test_simple(self):
         """More complex program"""
         input = Program([FuncDecl(Id("func"),[],VoidType(),Block([])),VarDecl("a",IntType())])
         expect = str(['func','a'])
         self.assertTrue(TestChecker.test(input,expect,400))
+    '''
     def test_redeclare_variable(self):
         """More complex program"""
         input = Program([FuncDecl(Id("func"),[],VoidType(),Block([])),VarDecl("a",IntType()),VarDecl("func",IntType())])
@@ -69,7 +70,7 @@ class CheckSuite(unittest.TestCase):
         input = """int main(int a, boolean a){
                     boolean c;
                 }"""
-        expect = "Redeclared Variable: a"
+        expect = "Redeclared Parameter: a"
         self.assertTrue(TestChecker.test(input,expect,403))
     def test_redeclared_var_param_local_var(self):
         """Simple program: int main() {} """
@@ -96,6 +97,7 @@ class CheckSuite(unittest.TestCase):
                 }"""
         expect = "Redeclared Variable: c"
         self.assertTrue(TestChecker.test(input,expect,405))
+
     def test_redeclared_var_param_local_var_complex_2(self):
         """Simple program: int main() {} """
         input = """int main(int a, boolean b){
@@ -103,12 +105,18 @@ class CheckSuite(unittest.TestCase):
                         boolean a;
                         {
                             int b;
+                            int e;
                             {
+                                int a;
+                                int b;
                                 string c;
-                                float c;
+                                float d;
                             }
+                            int c;
+                            int d;
+                            int e;
                         }
                     }
                 }"""
-        expect = "Redeclared Variable: c"
+        expect = "Redeclared Variable: e"
         self.assertTrue(TestChecker.test(input,expect,406))
