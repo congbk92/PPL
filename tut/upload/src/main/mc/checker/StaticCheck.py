@@ -63,9 +63,7 @@ class StaticChecker(BaseVisitor,Utils):
             raise Redeclared(Variable(),ast.variable)
         return ast.variable
     def visitBlock(self, ast, c):
-        tmp_c = c[:]
-        tmp_c.append("0_start_block")
-        reduce(lambda ac,it: ac + [self.visit(it,ac)] , ast.member, tmp_c)
+        reduce(lambda ac,it: ac + [self.visit(it,ac)] , ast.member, c + ["0_start_block"])
     def visitId(self, ast, c):
         if ast.name not in c:
             raise Undeclared(Variable(),ast.name)
