@@ -45,3 +45,17 @@ class CheckSuite(unittest.TestCase):
                 VarDecl("f",IntType()),VarDecl("f",IntType())])]))])
         expect = "Redeclared Variable: f"
         self.assertTrue(TestChecker.test(input,expect,408))
+    def test_local_var_undecl_simple(self):
+        """Simple program: int main() {} """
+        input = Program([VarDecl("a",IntType()),FuncDecl(Id("b"),[VarDecl("c",IntType()),VarDecl("d",IntType())],IntType(),Block([
+            Block([VarDecl("a",IntType()),VarDecl("e",IntType()),
+                VarDecl("f",IntType()),Id("m")])]))])
+        expect = "Undeclared Variable: m"
+        self.assertTrue(TestChecker.test(input,expect,409))
+    def test_local_var_undecl_complex(self):
+        """Simple program: int main() {} """
+        input = Program([VarDecl("a",IntType()),FuncDecl(Id("b"),[VarDecl("c",IntType()),VarDecl("d",IntType())],IntType(),Block([
+            Block([VarDecl("a",IntType()),VarDecl("e",IntType()),
+                VarDecl("f",IntType()),Id("a"),Id("b"),Id("c"),Id("d"),Id("e"),Id("f"),Id("i")])]))])
+        expect = "Undeclared Variable: i"
+        self.assertTrue(TestChecker.test(input,expect,410))

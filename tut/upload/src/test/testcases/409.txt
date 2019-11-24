@@ -1,0 +1,1 @@
+Program([VarDecl(a,IntType),FuncDecl(Id(b),[VarDecl(c,IntType),VarDecl(d,IntType)],IntType,Block([Block([VarDecl(a,IntType),VarDecl(e,IntType),VarDecl(f,IntType),Id(m)])]))])
