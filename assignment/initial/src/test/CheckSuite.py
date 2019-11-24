@@ -3,120 +3,222 @@ from TestUtils import TestChecker
 from AST import *
 
 class CheckSuite(unittest.TestCase):
-    '''
-    def test_undeclared_function(self):
-        """Simple program: int main() {} """
-        input = """int main() {foo();}"""
-        expect = "Undeclared Function: foo"
+    # Test redeclare build-in func
+    def test_redeclared_build_in_getInt_func(self):
+        input = """ int[] getInt(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: getInt"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_getInt_var(self):
+        input = """int getInt;"""
+        expect = "Redeclared Variable: getInt"
         self.assertTrue(TestChecker.test(input,expect,400))
 
-    def test_diff_numofparam_stmt(self):
-        """More complex program"""
-        input = """int main () {
-            putIntLn();
+    def test_redeclared_build_in_putInt_func(self):
+        input = """ int[] putInt(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putInt"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putInt_var(self):
+        input = """int putInt;"""
+        expect = "Redeclared Variable: putInt"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putIntLn_func(self):
+        input = """ int[] putIntLn(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putIntLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putIntLn_var(self):
+        input = """int putIntLn;"""
+        expect = "Redeclared Variable: putIntLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_getFloat_func(self):
+        input = """ int[] getFloat(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: getFloat"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_getFloat_var(self):
+        input = """int getFloat;"""
+        expect = "Redeclared Variable: getFloat"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putFloat_func(self):
+        input = """ int[] putFloat(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putFloat"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putFloat_var(self):
+        input = """int putFloat;"""
+        expect = "Redeclared Variable: putFloat"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putFloatLn_func(self):
+        input = """ int[] putFloatLn(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putFloatLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putFloatLn_var(self):
+        input = """int putFloatLn;"""
+        expect = "Redeclared Variable: putFloatLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putBool_func(self):
+        input = """ int[] putBool(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putBool"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putBool_var(self):
+        input = """int putBool;"""
+        expect = "Redeclared Variable: putBool"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putBoolLn_func(self):
+        input = """ int[] putBoolLn(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putBoolLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putBoolLn_var(self):
+        input = """int putBoolLn;"""
+        expect = "Redeclared Variable: putBoolLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putString_func(self):
+        input = """ int[] putString(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putString"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putString_var(self):
+        input = """int putString;"""
+        expect = "Redeclared Variable: putString"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putStringLn_func(self):
+        input = """ int[] putStringLn(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putStringLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putStringLn_var(self):
+        input = """int putStringLn;"""
+        expect = "Redeclared Variable: putStringLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_putLn_func(self):
+        input = """ int[] putLn(int a, int b, int c, int d){}"""
+        expect = "Redeclared Function: putLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_putLn_var(self):
+        input = """int putLn;"""
+        expect = "Redeclared Variable: putLn"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_build_in_param(self):
+        input = """int main(string getInt, string putInt, string putIntLn, string getFloat, string putFloat, string putFloatLn, 
+        string putBool, string putBoolLn, string putString, string putStringLn, string putLn, int abc){
+            int abc;
         }"""
-        expect = "Type Mismatch In Statement: CallExpr(Id(putIntLn),[])"
-        self.assertTrue(TestChecker.test(input,expect,401))
+        expect = "Redeclared Variable: abc"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclared_build_in_local_var(self):
+        input = """int main(int abc1){
+            string getInt, putInt, putIntLn, getFloat, putFloat, putFloatLn, putBool, putBoolLn, putString, putStringLn, putLn;
+            int abc1;
+        }"""
+        expect = "Redeclared Variable: abc1"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    #Test redeclare parameter, variable, user-define function
+    def test_redeclare_func_with_func(self):
+        input = """int func(){}
+                void func(){}
+        """
+        expect = "Redeclared Function: func"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclare_func_with_var(self):
+        input = """int func;
+                void func(){}
+        """
+        expect = "Redeclared Function: func"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclare_global_var_with_func(self):
+        input = """int var(){}
+                int var;
+        """
+        expect = "Redeclared Variable: var"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_redeclare_global_var_with_var(self):
+        input = """int var;
+                string var;
+        """
+        expect = "Redeclared Variable: var"
+        self.assertTrue(TestChecker.test(input,expect,400))
     
-    def test_diff_numofparam_expr(self):
-        """More complex program"""
-        input = """int main () {
-            putIntLn(getInt(4));
-        }"""
-        expect = "Type Mismatch In Expression: CallExpr(Id(getInt),[IntLiteral(4)])"
-        self.assertTrue(TestChecker.test(input,expect,402))
-    def test_undeclared_function_use_ast(self):
-        """Simple program: int main() {} """
-        input = Program([FuncDecl(Id("main"),[],IntType(),Block([
-            CallExpr(Id("foo"),[])]))])
-        expect = "Undeclared Function: foo"
-        self.assertTrue(TestChecker.test(input,expect,403))
-    def test_diff_numofparam_expr_use_ast(self):
-        """More complex program"""
-        input = Program([
-                FuncDecl(Id("main"),[],IntType(),Block([
-                    CallExpr(Id("putIntLn"),[
-                        CallExpr(Id("getInt"),[IntLiteral(4)])
-                        ])]))])
-        expect = "Type Mismatch In Expression: CallExpr(Id(getInt),[IntLiteral(4)])"
-        self.assertTrue(TestChecker.test(input,expect,404))
-    def test_diff_numofparam_stmt_use_ast(self):
-        """More complex program"""
-        input = Program([
-                FuncDecl(Id("main"),[],IntType(),Block([
-                    CallExpr(Id("putIntLn"),[])]))])
-        expect = "Type Mismatch In Statement: CallExpr(Id(putIntLn),[])"
-        self.assertTrue(TestChecker.test(input,expect,405))
-    '''
-    '''
-    def test_simple(self):
-        """More complex program"""
-        input = Program([FuncDecl(Id("func"),[],VoidType(),Block([])),VarDecl("a",IntType())])
-        expect = str(['func','a'])
-        self.assertTrue(TestChecker.test(input,expect,400))
-    '''
-    def test_redeclare_variable(self):
-        """More complex program"""
-        input = Program([FuncDecl(Id("func"),[],VoidType(),Block([])),VarDecl("a",IntType()),VarDecl("func",IntType())])
-        expect = "Redeclared Variable: func"
-        self.assertTrue(TestChecker.test(input,expect,401))
-    def test_redeclare_func(self):
-        """More complex program"""
-        input = Program([FuncDecl(Id("func"),[],VoidType(),Block([])),VarDecl("a",IntType()),FuncDecl(Id("a"),[],VoidType(),Block([]))])
-        expect = "Redeclared Function: a"
-        self.assertTrue(TestChecker.test(input,expect,402))
-    def test_redeclared_var_in_params(self):
-        """Simple program: int main() {} """
-        input = """int main(int a, boolean a){
-                    boolean c;
-                }"""
-        expect = "Redeclared Parameter: a"
-        self.assertTrue(TestChecker.test(input,expect,403))
-    def test_redeclared_var_param_local_var(self):
-        """Simple program: int main() {} """
-        input = """int main(int a, boolean b){
-                    boolean a;
-                }"""
-        expect = "Redeclared Variable: a"
-        self.assertTrue(TestChecker.test(input,expect,404))
-    def test_redeclared_var_param_local_var_complex(self):
-        """Simple program: int main() {} """
-        input = """int main(int a, boolean b){
-                    
-                    int c;
-                    {
-                        boolean a;
-                        {
-                            int b;
-                            {
-                                string c;
-                                float c;
-                            }
-                        }
-                    }
-                }"""
-        expect = "Redeclared Variable: c"
-        self.assertTrue(TestChecker.test(input,expect,405))
 
-    def test_redeclared_var_param_local_var_complex_2(self):
-        """Simple program: int main() {} """
-        input = """int main(int a, boolean b){
+    def test_redeclare_param_simple(self):
+        input = """
+                int func(){}
+                string var;
+                void main(int a, int b, string c, boolean d, float e, int c[]){}
+        """
+        expect = "Redeclared Parameter: c"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclare_param_complex(self):
+        input = """
+                int func(){}
+                string var;
+                void main(int a, int b, string c, boolean d, float e, float func, string var, boolean main, int e[]){}
+        """
+        expect = "Redeclared Parameter: e"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclare_local_var(self):
+        input = """
+                int func(){}
+                string var;
+                void main(int a, int b, string c, boolean d, float e, float func, string var)
+                {
+                    int var_local;
+                    string var_local;
+                }
+        """
+        expect = "Redeclared Variable: var_local"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclare_local_var_with_param(self):
+        input = """
+                int func(){}
+                string var;
+                void main(int a, int b, string c, boolean d, float e, float func, string var, int param)
+                {
+                    int main;
+                    int var_local;
+                    string param;
+                }
+        """
+        expect = "Redeclared Variable: param"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclare_local_var_more_complex(self):
+        input = """
+                int func(){}
+                string var;
+                void main(int a, int b, string c, boolean d, float e, float func, string var, int param, int main)
+                {
                     {
-                        boolean a;
+                        string local_var[1000];
+                        int a; int b; string c; boolean d; float e; float func; string var; int param; int main;
                         {
-                            int b;
-                            int e;
+                            int a; int b; string c; boolean d; float e; float func; string var; int param; int main;
                             {
-                                int a;
-                                int b;
-                                string c;
-                                float d;
+                                int a; int b; string c; boolean d; float e; float func; string var; int param; int main;
                             }
-                            int c;
-                            int d;
-                            int e;
+                            {
+                                int a; int b; string c; boolean d; float e; float func; string var; int param; int main;
+                            }
+                            {
+                                int a; int b; string c; boolean d; float e; float func; string var; int param; int main;
+                                {
+                                    int a; int b; string c; boolean d; float e; float func; string var; int param; int main;
+                                }
+                            }
                         }
+                        boolean local_var;
                     }
-                }"""
-        expect = "Redeclared Variable: e"
-        self.assertTrue(TestChecker.test(input,expect,406))
+                    float a[100];
+                }
+        """
+        expect = "Redeclared Variable: local_var"
+        self.assertTrue(TestChecker.test(input,expect,400))
