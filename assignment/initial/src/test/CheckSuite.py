@@ -109,7 +109,7 @@ class CheckSuite(unittest.TestCase):
             int abc;
         }"""
         expect = "Redeclared Variable: abc"
-        self.assertTrue(TestChecker.test(input,expect,400))
+        self.assertTrue(TestChecker.test(input,expect,401))
     def test_redeclared_build_in_local_var(self):
         input = """int main(int abc1){
             string getInt, putInt, putIntLn, getFloat, putFloat, putFloatLn, putBool, putBoolLn, putString, putStringLn, putLn;

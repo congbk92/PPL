@@ -21,12 +21,37 @@ class Symbol:
 
 class StaticChecker(BaseVisitor,Utils):
 
+    '''
+        int getInt(): reads and returns an integer value from the standard input
+        void putInt(int i): prints the value of the integer i to the standard output
+        void putIntLn(int i): same as putInt except that it also prints a newline
+        float getFloat(): reads and returns a floating-point value from the standard input
+        void putFloat(float f ): prints the value of the float f to the standard output
+        void putFloatLn(float f ): same as putFloat except that it also prints a newline
+        void putBool(boolean b): prints the value of the boolean b to the standard output
+        void putBoolLn(boolean b): same as putBoolLn except that it also prints a new line
+        void putString(string s): prints the value of the string to the standard output
+        void putStringLn(string s): same as putStringLn except that it also prints a new line
+        void putLn(): prints a newline to the standard output
+    '''
+
     global_envi = [
-    Symbol("getInt",MType([],IntType())),
-    Symbol("putIntLn",MType([IntType()],VoidType()))
+    Symbol('0_start_block', None),
+    Symbol("getInt",        MType([],               IntType())),
+    Symbol("putInt",        MType([IntType()],      VoidType())), 
+    Symbol("putIntLn",      MType([IntType()],      VoidType())),
+    Symbol("getFloat",      MType([],               FloatType())),
+    Symbol("putFloat",      MType([FloatType()],    VoidType())),
+    Symbol("putFloatLn",    MType([FloatType()],    VoidType())),
+    Symbol("putBool",       MType([BoolType()],     VoidType())),
+    Symbol("putBoolLn",     MType([BoolType()],     VoidType())),
+    Symbol("putString",     MType([StringType()],   VoidType())),
+    Symbol("putStringLn",   MType([StringType()],   VoidType())),
+    Symbol("putLn",         MType([],               VoidType())),
     ]
             
     
+
     def __init__(self,ast):
         #print(ast)
         #print(ast)
@@ -48,67 +73,48 @@ class StaticChecker(BaseVisitor,Utils):
         else:
             return False
 
-    def visitListNode(self,ast, c):
+    def getLstIdCurScope(self,c):
+        lst_block_idx = [i for i in range(len(c)) if c[i].name == "0_start_block"]
+        return [x.name for x in c[lst_block_idx[-1]:]]
+
+    def visitListLocalNode(self,ast, c):
         ac = c[:]
         for node in ast:
-            new_id = self.visit(node,ac)
-            if new_id is not None:
-                ac = ac + [new_id]
+            new_symbol = self.visit(node,ac)
+            if type(node) is VarDecl:
+                ac = ac + [new_symbol]
 
     def check(self):
         return self.visit(self.ast,StaticChecker.global_envi)
 
     def visitProgram(self,ast, c):
-        #TO DO: add built-in function to c
-        '''
-        int getInt(): reads and returns an integer value from the standard input
-        void putInt(int i): prints the value of the integer i to the standard output
-        void putIntLn(int i): same as putInt except that it also prints a newline
-        float getFloat(): reads and returns a floating-point value from the standard input
-        void putFloat(float f ): prints the value of the float f to the standard output
-        void putFloatLn(float f ): same as putFloat except that it also prints a newline
-        void putBool(boolean b): prints the value of the boolean b to the standard output
-        void putBoolLn(boolean b): same as putBoolLn except that it also prints a new line
-        void putString(string s): prints the value of the string to the standard output
-        void putStringLn(string s): same as putStringLn except that it also prints a new line
-        void putLn(): prints a newline to the standard output
-        FuncDecl(Id("func"),[VarDecl("a",IntType())],ArrayPointerType(IntType()),Block([])),
-        '''
-
-        c = [Id("0_start_block"),
-            FuncDecl(Id("getInt"),[],IntType(),Block([])),
-            FuncDecl(Id("putInt"),[VarDecl("i",IntType())],VoidType(),Block([])),
-            FuncDecl(Id("putIntLn"),[VarDecl("i",IntType())],VoidType(),Block([])),
-            FuncDecl(Id("getFloat"),[],FloatType(),Block([])),
-            FuncDecl(Id("putFloat"),[VarDecl("f",FloatType())],VoidType(),Block([])),
-            FuncDecl(Id("putFloatLn"),[VarDecl("f",FloatType())],VoidType(),Block([])),
-            FuncDecl(Id("putBool"),[VarDecl("b",BoolType())],VoidType(),Block([])),
-            FuncDecl(Id("putBoolLn"),[VarDecl("b",BoolType())],VoidType(),Block([])),
-            FuncDecl(Id("putString"),[VarDecl("s",StringType())],VoidType(),Block([])),
-            FuncDecl(Id("putStringLn"),[VarDecl("s",StringType())],VoidType(),Block([])),
-            FuncDecl(Id("putLn"),[],VoidType(),Block([]))]
-
-        reduce(lambda ac,it: ac + [self.visit(it,ac)], ast.decl, c)
+        #To Do: get all global variable and func decl
+        c = reduce(lambda ac,it: ac + [self.visit(it,ac)], ast.decl, [Symbol('0_initial', None)] + StaticChecker.global_envi)
+        #print(len(c))
+        del c[0]
+        #print(len(c))
+        list(map(lambda node: self.visit(node,c), list(filter(lambda x: type(x) is FuncDecl,  ast.decl))))
+        #self.visitListLocalNode(ast.decl, c)
 
     def visitFuncDecl(self,ast, c):
-        if self.isDuplicateId(c, ast.name.name):
-            raise Redeclared(Function(), ast.name.name)
-        
-        cur_ast = FuncDecl(ast.name, ast.param, ast.returnType, Block([]))
-        try:
-            cur_decl = reduce(lambda ac,it: ac + [self.visit(it,ac)] , ast.param, c + [cur_ast] + [Id("0_start_block")])
-        except Redeclared as e:
-            raise Redeclared(Parameter(),e.n)
-        self.visitListNode(ast.body.member, cur_decl)
-        return cur_ast
+        if c[0].name is '0_initial':
+            if ast.name.name in self.getLstIdCurScope(c): 
+                raise Redeclared(Function(), ast.name.name)
+            return Symbol(ast.name.name,MType([var.varType for var in ast.param], ast.returnType))
+        else:
+            try:
+                cur_decl = reduce(lambda ac,it: ac + [self.visit(it,ac)] , ast.param, c + [Symbol('0_start_block', None)])
+            except Redeclared as e:
+                raise Redeclared(Parameter(),e.n)
+            self.visitListLocalNode(ast.body.member, cur_decl)
 
     def visitVarDecl(self, ast, c):
-        if self.isDuplicateId(c,ast.variable):
+        if ast.variable in self.getLstIdCurScope(c):
             raise Redeclared(Variable(),ast.variable)
-        return ast
+        return Symbol(ast.variable,ast.varType)
 
     def visitBlock(self, ast, c):
-        self.visitListNode(ast.member, c + [Id("0_start_block")])
+        self.visitListLocalNode(ast.member, c + [Symbol('0_start_block', None)])
 
     def visitId(self, ast, c):
         if ast.name not in c:
