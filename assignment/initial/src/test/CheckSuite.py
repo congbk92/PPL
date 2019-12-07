@@ -329,8 +329,8 @@ class CheckSuite(unittest.TestCase):
         """
         expect = "Type Mismatch In Expression: BinaryOp(=,Id(d),Id(b))"
         self.assertTrue(TestChecker.test(input,expect,400))
-
-    def test_assign_operator_complex(self):
+    
+    def test_assign_operator_complex_1(self):
         """Simple program: int main() {} """
         input = """
                 int main()
@@ -359,3 +359,4 @@ class CheckSuite(unittest.TestCase):
         """
         expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(c))"
         self.assertTrue(TestChecker.test(input,expect,401))
+    

@@ -60,20 +60,6 @@ class StaticChecker(BaseVisitor,Utils):
         self.ast = ast
         #self.count = 0
 
- 
-    
-    def isDuplicateId(self,c,cur_id):
-        var_func_decl_list = list(filter(lambda x: type(x) in (FuncDecl,VarDecl,Id), c))
-        cur_id_list = list(map(lambda x: x.name.name if type(x) is FuncDecl else x.variable if type(x) is VarDecl else x.name, var_func_decl_list))
-        lstBlockIdx = [i for i in range(len(cur_id_list)) if cur_id_list[i] == "0_start_block"]
-        #print(cur_id_list)
-        #print(lstBlockIdx)
-        decl_cur_scope = cur_id_list[lstBlockIdx[-1]:]
-        if cur_id in decl_cur_scope:
-            return True
-        else:
-            return False
-
     def getLstIdCurScope(self,c):
         lst_block_idx = [i for i in range(len(c)) if c[i].name == "0_start_block"]
         return [x.name for x in c[lst_block_idx[-1]:]]
@@ -130,33 +116,67 @@ class StaticChecker(BaseVisitor,Utils):
                 #print('got')
                 return i.mtype
 
-    def visitCallExpr(self, ast, c):
-        pass
-    def visitUnaryOp(self, ast, c):
-        pass
+    def getTypeAssign(self,lhs,rhs):
+        primitive_type = [IntType, FloatType, BoolType, StringType]
+        if type(lhs) in primitive_type and type(rhs) in primitive_type:
+            if type(lhs) is type(rhs):
+                return lhs
+            elif type(lhs) is FloatType and type(rhs) is IntType:
+                return lhs
+        elif type(lhs) is ArrayPointerType and type(rhs) in [ArrayPointerType, ArrayType]:
+            return lhs.eleType if type(lhs.eleType) is type(rhs.eleType) else None
+
     def visitBinaryOp(self, ast, c):
         left_type = self.visit(ast.left, c)
         right_type = self.visit(ast.right, c)
         #print(ast.left, left_type)
         #print(ast.op)
         #print(ast.right, right_type)
-        if ast.op is '=':
-            validTypeOperand = [IntType, FloatType, BoolType, StringType]
-            if (type(left_type) not in validTypeOperand) or (type(right_type) not in validTypeOperand):
-                raise TypeMismatchInExpression(ast)
-                #pass
-            elif not isinstance(ast.left, LHS):
+        if ast.op == '=':
+            if not isinstance(ast.left, LHS):
                 raise NotLeftValue(ast.left)
-            elif type(left_type) is FloatType:
-                if type(right_type) is FloatType or type(right_type) is IntType:
-                    return left_type
-            elif type(left_type) is type(right_type):
-                    return left_type
-            else:
-                raise TypeMismatchInExpression(ast)
-        elif ast.op is '+':
-            return left_type
+            validTypeOperand = [IntType, FloatType, BoolType, StringType]
+            if (type(left_type) in validTypeOperand) and (type(right_type) in validTypeOperand):
+                type_result = self.getTypeAssign(left_type, right_type)
+                if type_result:
+                    return type_result
+        elif ast.op == '%':
+            if type(left_type) is IntType and type(right_type) is IntType:
+                return left_type
+        elif ast.op in ['+', '-', '*', '/']:
+            validTypeOperand = [IntType, FloatType]
+            if (type(left_type) in validTypeOperand) and (type(right_type) in validTypeOperand):
+                return FloatType() if FloatType in [type(left_type), type(right_type)] else IntType()
+        elif ast.op in ['<', '<=', '>', '>=']:
+            validTypeOperand = [IntType, FloatType]
+            if (type(left_type) in validTypeOperand) and (type(right_type) in validTypeOperand):
+                return BoolType()
+        elif ast.op in ['==', '!=']:
+            validTypeOperand = [IntType, BoolType]
+            if (type(left_type) in validTypeOperand) and (type(right_type) in validTypeOperand):
+                if type(left_type) is type(right_type):
+                    return BoolType()
+        elif ast.op in ['&&', '||']:
+            if (type(left_type) is BoolType) and (type(right_type) is BoolType):
+                return BoolType()
 
+        raise TypeMismatchInExpression(ast)
+
+    def visitCallExpr(self, ast, c):
+        if ast.method not in [x.name for x in c]:
+            raise Undeclared(Function(), ast.method)
+        for i in reversed(c):
+            if i.name == ast.method:
+                if len(i.mtype.partype) != len(ast.param):
+                    raise TypeMismatchInExpression(ast)
+                else:
+                    type_pass = [self.getTypeAssign(x) for x in zip(i.mtype.partype, ast.param)]
+                    if None in type_pass:
+                        raise TypeMismatchInExpression(ast)
+                    return i.mtype.rettype
+
+    def visitUnaryOp(self, ast, c):
+        pass
         
     def visitArrayCell(self, ast, c):
 
