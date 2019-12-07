@@ -4,6 +4,7 @@ from AST import *
 
 class CheckSuite(unittest.TestCase):
     # Test redeclare build-in func
+
     def test_redeclared_build_in_getInt_func(self):
         input = """ int[] getInt(int a, int b, int c, int d){}"""
         expect = "Redeclared Function: getInt"
@@ -109,13 +110,31 @@ class CheckSuite(unittest.TestCase):
             int abc;
         }"""
         expect = "Redeclared Variable: abc"
-        self.assertTrue(TestChecker.test(input,expect,401))
+        self.assertTrue(TestChecker.test(input,expect,400))
     def test_redeclared_build_in_local_var(self):
         input = """int main(int abc1){
             string getInt, putInt, putIntLn, getFloat, putFloat, putFloatLn, putBool, putBoolLn, putString, putStringLn, putLn;
             int abc1;
         }"""
         expect = "Redeclared Variable: abc1"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_var_main(self):
+        input = """int main(int abc1){
+            string getInt, putInt, putIntLn, getFloat, putFloat, putFloatLn, putBool, putBoolLn, putString, putStringLn, putLn;
+        }
+        int main;
+        """
+        expect = "Redeclared Variable: main"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_redeclared_func_main(self):
+        input = """int main(int abc1){
+            string getInt, putInt, putIntLn, getFloat, putFloat, putFloatLn, putBool, putBoolLn, putString, putStringLn, putLn;
+        }
+        int main(){}
+        """
+        expect = "Redeclared Function: main"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     #Test redeclare parameter, variable, user-define function
@@ -222,3 +241,121 @@ class CheckSuite(unittest.TestCase):
         """
         expect = "Redeclared Variable: local_var"
         self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_no_entry_point_1(self):
+        input = """
+                int func(){}
+                string var;
+                void func2(int a, int b, string c, boolean d, float e, float func, string var)
+                {
+                    int main;
+                    int var_local;
+                }
+        """
+        expect = "No Entry Point"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_no_entry_point_2(self):
+        input = """
+                int func(){}
+                string var;
+                void func2(int a, int b, string c, boolean d, float e, float func, string var)
+                {
+                    int main;
+                    int var_local;
+                }
+                int main;
+        """
+        expect = "No Entry Point"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    
+    def test_undeclare_Id(self):
+        input = """
+                int b;
+                int main()
+                {
+                b;
+                a;
+                }
+        """
+        expect = "Undeclared Variable: a"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_undeclare_Id_complex(self):
+        input = """
+                int main()
+                {
+                    a;
+                    b;
+                }
+                int a;
+        """
+        expect = "Undeclared Variable: b"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    #TO DO: add more
+    def test_not_left_value(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("e",IntType()),
+           BinaryOp("=",Id('a'),BinaryOp("=",BinaryOp("+",Id('c'),Id('b')),BinaryOp("=",Id('e'),Id('d'))))]))])
+        expect = "Not Left Value: BinaryOp(+,Id(c),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_operator(self):
+        """Simple program: int main() {} """
+        input = """
+                int main()
+                {
+                    a;
+                    int b[100];
+                    a = b;
+                }
+                int a;
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    def test_assign_operator_complex(self):
+        """Simple program: int main() {} """
+        input = """
+                int main()
+                {
+                    float a;
+                    float c;
+                    a = c;
+                    int b[100];
+                    int d[100]
+                    d = b;
+                }
+                int a;
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(d),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_operator_complex(self):
+        """Simple program: int main() {} """
+        input = """
+                int main()
+                {
+                    int k,l;
+                    k = l;
+                    int a1,a2;
+                    a2 = 1;
+                    a1 = a;
+                    float b1,b2;
+                    b2 = 1e5;
+                    b1 = b2;
+                    boolean c1,c2;
+                    c2 = true;
+                    c2= false;
+                    c1 = c2;
+                    string d1,d2;
+
+                    d2 = "this is a string";
+                    d1 = d2;
+
+                    float c;
+                    a = c;
+                }
+                int a;
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(c))"
+        self.assertTrue(TestChecker.test(input,expect,401))

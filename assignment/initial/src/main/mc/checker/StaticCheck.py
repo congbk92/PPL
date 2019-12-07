@@ -15,6 +15,7 @@ class MType:
 
 class Symbol:
     def __init__(self,name,mtype,value = None):
+        name:str
         self.name = name
         self.mtype = mtype
         self.value = value
@@ -88,11 +89,14 @@ class StaticChecker(BaseVisitor,Utils):
         return self.visit(self.ast,StaticChecker.global_envi)
 
     def visitProgram(self,ast, c):
-        #To Do: get all global variable and func decl
+        #get all global variable and func decl
         c = reduce(lambda ac,it: ac + [self.visit(it,ac)], ast.decl, [Symbol('0_initial', None)] + StaticChecker.global_envi)
-        #print(len(c))
+        
+        #Check entry-point
+        if 'main' not in [sym.name for sym in filter(lambda x: type(x.mtype) is MType, c)]:
+            raise NoEntryPoint()
+
         del c[0]
-        #print(len(c))
         list(map(lambda node: self.visit(node,c), list(filter(lambda x: type(x) is FuncDecl,  ast.decl))))
         #self.visitListLocalNode(ast.decl, c)
 
@@ -111,14 +115,53 @@ class StaticChecker(BaseVisitor,Utils):
     def visitVarDecl(self, ast, c):
         if ast.variable in self.getLstIdCurScope(c):
             raise Redeclared(Variable(),ast.variable)
+        #print(ast.variable,ast.varType)
         return Symbol(ast.variable,ast.varType)
 
     def visitBlock(self, ast, c):
         self.visitListLocalNode(ast.member, c + [Symbol('0_start_block', None)])
 
     def visitId(self, ast, c):
-        if ast.name not in c:
+        if ast.name not in [x.name for x in c]:
             raise Undeclared(Variable(),ast.name)
+        #Return type of last element
+        for i in reversed(c):
+            if i.name == ast.name:
+                #print('got')
+                return i.mtype
+
+    def visitCallExpr(self, ast, c):
+        pass
+    def visitUnaryOp(self, ast, c):
+        pass
+    def visitBinaryOp(self, ast, c):
+        left_type = self.visit(ast.left, c)
+        right_type = self.visit(ast.right, c)
+        #print(ast.left, left_type)
+        #print(ast.op)
+        #print(ast.right, right_type)
+        if ast.op is '=':
+            validTypeOperand = [IntType, FloatType, BoolType, StringType]
+            if (type(left_type) not in validTypeOperand) or (type(right_type) not in validTypeOperand):
+                raise TypeMismatchInExpression(ast)
+                #pass
+            elif not isinstance(ast.left, LHS):
+                raise NotLeftValue(ast.left)
+            elif type(left_type) is FloatType:
+                if type(right_type) is FloatType or type(right_type) is IntType:
+                    return left_type
+            elif type(left_type) is type(right_type):
+                    return left_type
+            else:
+                raise TypeMismatchInExpression(ast)
+        elif ast.op is '+':
+            return left_type
+
+        
+    def visitArrayCell(self, ast, c):
+
+        pass
+
     def visitDowhile(self, ast, c):
         pass
     def visitReturn(self, ast, c):
@@ -131,11 +174,11 @@ class StaticChecker(BaseVisitor,Utils):
         pass
     def visitIf(self, ast, c):
         pass
-    def visitCallExpr(self, ast, c):
-        pass
-    def visitUnaryOp(self, ast, c):
-        pass
-    def visitBinaryOp(self, ast, c):
-        pass
-    def visitArrayCell(self, ast, c):
-        pass
+    def visitIntLiteral(self, ast, c):
+        return IntType()
+    def visitFloatLiteral(self, ast, c):
+        return FloatType()
+    def visitStringLiteral(self, ast, c):
+        return StringType()
+    def visitBooleanLiteral(self, ast, c):
+        return BoolType()
