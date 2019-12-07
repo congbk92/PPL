@@ -167,21 +167,31 @@ class StaticChecker(BaseVisitor,Utils):
             raise Undeclared(Function(), ast.method)
         for i in reversed(c):
             if i.name == ast.method:
-                if len(i.mtype.partype) != len(ast.param):
-                    raise TypeMismatchInExpression(ast)
-                else:
+                if len(i.mtype.partype) == len(ast.param):
                     type_pass = [self.getTypeAssign(x) for x in zip(i.mtype.partype, ast.param)]
-                    if None in type_pass:
-                        raise TypeMismatchInExpression(ast)
-                    return i.mtype.rettype
+                    if None not in type_pass:
+                        return i.mtype.rettype
+
+        raise TypeMismatchInExpression(ast)
 
     def visitUnaryOp(self, ast, c):
-        pass
-        
+        expr_type = self.visit(ast.body)
+        if ast.op == '-':
+            if type(expr_type) is IntType or type(expr_type) is FloatType:
+                return expr_type
+        elif ast.op == '!':
+            if type(expr_type) is BoolType:
+                return expr_type
+
+        raise TypeMismatchInExpression(ast)
     def visitArrayCell(self, ast, c):
-
-        pass
-
+        arr_type = self.visit(ast.arr)
+        idx_type = self.visit(ast.idx)
+        if type(arr_type) is ArrayType or type(arr_type) is ArrayPointerType:
+            if type(idx_type) is IntType:
+                return arr_type.eleType
+                
+        raise TypeMismatchInExpression(ast)
     def visitDowhile(self, ast, c):
         pass
     def visitReturn(self, ast, c):
