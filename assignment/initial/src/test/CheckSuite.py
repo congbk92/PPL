@@ -293,70 +293,138 @@ class CheckSuite(unittest.TestCase):
         expect = "Undeclared Variable: b"
         self.assertTrue(TestChecker.test(input,expect,400))
     #TO DO: add more
-    def test_not_left_value(self):
+    def test_not_left_value_binary_op(self):
         """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("e",IntType()),
            BinaryOp("=",Id('a'),BinaryOp("=",BinaryOp("+",Id('c'),Id('b')),BinaryOp("=",Id('e'),Id('d'))))]))])
         expect = "Not Left Value: BinaryOp(+,Id(c),Id(b))"
         self.assertTrue(TestChecker.test(input,expect,400))
 
-    def test_assign_operator(self):
+    def test_not_left_value_float_lit(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",FloatType()),
+           BinaryOp("=",FloatLiteral(1.3),Id('a'))]))])
+        expect = "Not Left Value: FloatLiteral(1.3)"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_not_left_value_int_lit(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",IntType()),
+           BinaryOp("=",IntLiteral(3),Id('a'))]))])
+        expect = "Not Left Value: IntLiteral(3)"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_not_left_value_bool_lit(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",BoolType()),
+           BinaryOp("=",BooleanLiteral(True),Id('a'))]))])
+        expect = "Not Left Value: BooleanLiteral(true)"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_not_left_value_string_lit(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",StringType()),
+           BinaryOp("=",StringLiteral("This is a string"),Id('a'))]))])
+        expect = "Not Left Value: StringLiteral(This is a string)"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_not_left_value_unary_not(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",BoolType()),
+           BinaryOp("=",UnaryOp("!",Id("a")),Id('a'))]))])
+        expect = "Not Left Value: UnaryOp(!,Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_not_left_value_unary_sub(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",FloatType()),
+           BinaryOp("=",UnaryOp("-",Id("a")),Id('a'))]))])
+        expect = "Not Left Value: UnaryOp(-,Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_not_left_value_call_expr(self):
+        """Simple program: int main() {} """
+        input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",FloatType()),
+           BinaryOp("=",CallExpr(Id("func"), []),Id('a'))])), 
+        FuncDecl(Id("func"), [],VoidType(),Block([])) ])
+        expect = "Not Left Value: CallExpr(Id(func),[])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    '''
+    '''
+    def test_not_left_value_func_name(self):
         """Simple program: int main() {} """
         input = """
-                int main()
+                int[] func(int b[])
                 {
-                    a;
+                    return b;
+                }
+                void main()
+                {
+                    int a[100];
+                    int b[100];
+                    func = a;
+                }
+        """
+        expect = "Not Left Value: Id(func)"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_op_arr_vs_arr(self):
+        """Simple program: int main() {} """
+        input = """
+                void main()
+                {
+                    int a[100];
                     int b[100];
                     a = b;
                 }
-                int a;
         """
         expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
         self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_op_arr_vs_arr_pnt(self):
+        """Simple program: int main() {} """
+        input = """
+                int[] func(int b[])
+                {
+                    return b;
+                }
+                void main()
+                {
+                    int a[100];
+                    int b[100];
+                    a = func(b);
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),CallExpr(Id(func),[Id(b)]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
     def test_assign_operator_complex(self):
         """Simple program: int main() {} """
         input = """
                 int main()
                 {
-                    float a;
-                    float c;
-                    a = c;
-                    int b[100];
-                    int d[100]
-                    d = b;
-                }
-                int a;
-        """
-        expect = "Type Mismatch In Expression: BinaryOp(=,Id(d),Id(b))"
-        self.assertTrue(TestChecker.test(input,expect,400))
-    
-    def test_assign_operator_complex_1(self):
-        """Simple program: int main() {} """
-        input = """
-                int main()
-                {
-                    int k,l;
-                    k = l;
                     int a1,a2;
                     a2 = 1;
                     a1 = a;
+
                     float b1,b2;
                     b2 = 1e5;
                     b1 = b2;
+                    b1 = a1 = a2;
+
                     boolean c1,c2;
                     c2 = true;
                     c2= false;
                     c1 = c2;
-                    string d1,d2;
 
+                    string d1,d2;
                     d2 = "this is a string";
                     d1 = d2;
 
                     float c;
-                    a = c;
+                    a = c = a = a1 = a2;
                 }
                 int a;
         """
-        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(c))"
-        self.assertTrue(TestChecker.test(input,expect,401))
-    
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),BinaryOp(=,Id(c),BinaryOp(=,Id(a),BinaryOp(=,Id(a1),Id(a2)))))"
+        self.assertTrue(TestChecker.test(input,expect,400))

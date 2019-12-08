@@ -124,7 +124,7 @@ class StaticChecker(BaseVisitor,Utils):
             elif type(lhs) is FloatType and type(rhs) is IntType:
                 return lhs
         elif type(lhs) is ArrayPointerType and type(rhs) in [ArrayPointerType, ArrayType]:
-            return lhs.eleType if type(lhs.eleType) is type(rhs.eleType) else None
+            return lhs if type(lhs.eleType) is type(rhs.eleType) else None
 
     def visitBinaryOp(self, ast, c):
         left_type = self.visit(ast.left, c)
@@ -133,7 +133,9 @@ class StaticChecker(BaseVisitor,Utils):
         #print(ast.op)
         #print(ast.right, right_type)
         if ast.op == '=':
-            if not isinstance(ast.left, LHS):
+            if not isinstance(ast.left, LHS) or not isinstance(left_type, Type):
+
+            #if type(ast.left) not in [Id, ArrayCell]: 
                 raise NotLeftValue(ast.left)
             validTypeOperand = [IntType, FloatType, BoolType, StringType]
             if (type(left_type) in validTypeOperand) and (type(right_type) in validTypeOperand):
@@ -163,19 +165,23 @@ class StaticChecker(BaseVisitor,Utils):
         raise TypeMismatchInExpression(ast)
 
     def visitCallExpr(self, ast, c):
-        if ast.method not in [x.name for x in c]:
-            raise Undeclared(Function(), ast.method)
+        if ast.method.name not in [x.name for x in c]:
+            raise Undeclared(Function(), ast.method.name)
         for i in reversed(c):
-            if i.name == ast.method:
+            if i.name == ast.method.name:
                 if len(i.mtype.partype) == len(ast.param):
-                    type_pass = [self.getTypeAssign(x) for x in zip(i.mtype.partype, ast.param)]
+                    type_param = [self.visit(x,c) for x in ast.param]
+                    type_pass = [self.getTypeAssign(x[0],x[1]) for x in zip(i.mtype.partype, type_param)]
+                    #print (i.mtype.partype)
+                    #print(type_param)
+                    #print(type_pass)
                     if None not in type_pass:
                         return i.mtype.rettype
 
         raise TypeMismatchInExpression(ast)
 
     def visitUnaryOp(self, ast, c):
-        expr_type = self.visit(ast.body)
+        expr_type = self.visit(ast.body,c)
         if ast.op == '-':
             if type(expr_type) is IntType or type(expr_type) is FloatType:
                 return expr_type
@@ -184,6 +190,7 @@ class StaticChecker(BaseVisitor,Utils):
                 return expr_type
 
         raise TypeMismatchInExpression(ast)
+
     def visitArrayCell(self, ast, c):
         arr_type = self.visit(ast.arr)
         idx_type = self.visit(ast.idx)
