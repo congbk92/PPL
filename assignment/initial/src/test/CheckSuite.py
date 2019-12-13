@@ -278,7 +278,7 @@ class CheckSuite(unittest.TestCase):
                 a;
                 }
         """
-        expect = "Undeclared Variable: a"
+        expect = "Undeclared Identifier: a"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_undeclare_Id_complex(self):
@@ -290,7 +290,7 @@ class CheckSuite(unittest.TestCase):
                 }
                 int a;
         """
-        expect = "Undeclared Variable: b"
+        expect = "Undeclared Identifier: b"
         self.assertTrue(TestChecker.test(input,expect,400))
     #TO DO: add more
     def test_not_left_value_binary_op(self):

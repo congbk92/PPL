@@ -84,7 +84,20 @@ class StaticChecker(BaseVisitor,Utils):
 
         del c[0]
         list(map(lambda node: self.visit(node,c), list(filter(lambda x: type(x) is FuncDecl,  ast.decl))))
-        #self.visitListLocalNode(ast.decl, c)
+        # Check unreachable func
+
+    def isFullReturnStmt(self,stmt):
+        if type(stmt) is Return:
+            return True
+        elif type(stmt) is If:
+            if stmt.elseStmt is None:
+                return False
+            else:
+                return isFullReturnStmt(thenStmt) & isFullReturnStmt(elseStmt)
+        elif type(stmt) is Block:
+            return reduce(lambda ac,it: ac | isFullReturnStmt(it) , stmt.member , False)
+        else:
+            return False
 
     def visitFuncDecl(self,ast, c):
         if c[0].name is '0_initial':
@@ -96,7 +109,8 @@ class StaticChecker(BaseVisitor,Utils):
                 cur_decl = reduce(lambda ac,it: ac + [self.visit(it,ac)] , ast.param, c + [Symbol('0_start_block', None)])
             except Redeclared as e:
                 raise Redeclared(Parameter(),e.n)
-            self.visitListLocalNode(ast.body.member, cur_decl)
+            self.visitListLocalNode(ast.body.member, cur_decl + [Symbol('0_return_type', ast.returnType)])
+            #check not return
 
     def visitVarDecl(self, ast, c):
         if ast.variable in self.getLstIdCurScope(c):
@@ -109,7 +123,7 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitId(self, ast, c):
         if ast.name not in [x.name for x in c]:
-            raise Undeclared(Variable(),ast.name)
+            raise Undeclared(Identifier(),ast.name)
         #Return type of last element
         for i in reversed(c):
             if i.name == ast.name:
@@ -192,25 +206,51 @@ class StaticChecker(BaseVisitor,Utils):
         raise TypeMismatchInExpression(ast)
 
     def visitArrayCell(self, ast, c):
-        arr_type = self.visit(ast.arr)
-        idx_type = self.visit(ast.idx)
+        arr_type = self.visit(ast.arr, c)
+        idx_type = self.visit(ast.idx, c)
         if type(arr_type) is ArrayType or type(arr_type) is ArrayPointerType:
             if type(idx_type) is IntType:
                 return arr_type.eleType
-                
         raise TypeMismatchInExpression(ast)
+
     def visitDowhile(self, ast, c):
-        pass
+        # visit list stmt
+        [self.visit(stmt, c + [Symbol('0_in_loop', None)]) for stmt in ast.sl]
+        if type(self.visit(ast.exp)) is not BoolType:
+            raise TypeMismatchInStatement(ast)
+
     def visitReturn(self, ast, c):
-        pass
+        for i in reversed(c):
+            if i.name =='0_return_type':
+                if type(i.mtype) is not VoidType and ast.expr is not None:
+                    if self.getTypeAssign(i.mtype,self.visit(ast.expr,c)) is None:
+                        raise TypeMismatchInStatement(ast)
+                elif type(i.mtype) is VoidType and ast.expr is not None:
+                    raise TypeMismatchInStatement(ast)
+                elif type(i.mtype) is not VoidType and ast.expr is None:
+                    raise TypeMismatchInStatement(ast) 
+                break
+
     def visitContinue(self, ast, c):
-        pass
+        if '0_in_loop' not in [x.name for x in c]:
+            raise ContinueNotInLoop()
+
     def visitBreak(self, ast, c):
-        pass
+        if '0_in_loop' not in [x.name for x in c]:
+            raise BreakNotInLoop()
+
     def visitFor(self, ast, c):
-        pass
+        if [type(self.visit(ast.expr1,c)),type(self.visit(ast.expr2,c)),type(self.visit(ast.expr3,c))] is not [IntType,BoolType,IntType]:
+            raise TypeMismatchInStatement(ast)
+        self.visit(ast.loop, c + [Symbol('0_in_loop', None)])
+
     def visitIf(self, ast, c):
-        pass
+        if type(self.visit(ast.expr,c)) is not BoolType:
+            raise TypeMismatchInStatement(ast)
+        self.visit(ast.thenStmt,c)
+        if ast.elseStmt is not None:
+            self.visit(ast.elseStmt,c)
+
     def visitIntLiteral(self, ast, c):
         return IntType()
     def visitFloatLiteral(self, ast, c):
