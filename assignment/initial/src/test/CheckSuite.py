@@ -167,7 +167,10 @@ class CheckSuite(unittest.TestCase):
 
     def test_redeclare_param_simple(self):
         input = """
-                int func(){}
+                int func()
+                {
+                    return 1;
+                }
                 string var;
                 void main(int a, int b, string c, boolean d, float e, int c[]){}
         """
@@ -176,7 +179,10 @@ class CheckSuite(unittest.TestCase):
 
     def test_redeclare_param_complex(self):
         input = """
-                int func(){}
+                int func()
+                {
+                    return 0;
+                }
                 string var;
                 void main(int a, int b, string c, boolean d, float e, float func, string var, boolean main, int e[]){}
         """
@@ -185,7 +191,10 @@ class CheckSuite(unittest.TestCase):
 
     def test_redeclare_local_var(self):
         input = """
-                int func(){}
+                int func()
+                {
+                    return 0;
+                }
                 string var;
                 void main(int a, int b, string c, boolean d, float e, float func, string var)
                 {
@@ -198,7 +207,10 @@ class CheckSuite(unittest.TestCase):
 
     def test_redeclare_local_var_with_param(self):
         input = """
-                int func(){}
+                int func()
+                {
+                    return 0;
+                }
                 string var;
                 void main(int a, int b, string c, boolean d, float e, float func, string var, int param)
                 {
@@ -212,7 +224,10 @@ class CheckSuite(unittest.TestCase):
 
     def test_redeclare_local_var_more_complex(self):
         input = """
-                int func(){}
+                int func()
+                {
+                    return 0;
+                }
                 string var;
                 void main(int a, int b, string c, boolean d, float e, float func, string var, int param, int main)
                 {
@@ -244,7 +259,10 @@ class CheckSuite(unittest.TestCase):
 
     def test_no_entry_point_1(self):
         input = """
-                int func(){}
+                int func()
+                {
+                    return 0;
+                }
                 string var;
                 void func2(int a, int b, string c, boolean d, float e, float func, string var)
                 {
@@ -257,7 +275,10 @@ class CheckSuite(unittest.TestCase):
 
     def test_no_entry_point_2(self):
         input = """
-                int func(){}
+                int func()
+                {
+                    return 0;
+                }
                 string var;
                 void func2(int a, int b, string c, boolean d, float e, float func, string var)
                 {
@@ -292,58 +313,51 @@ class CheckSuite(unittest.TestCase):
         """
         expect = "Undeclared Identifier: b"
         self.assertTrue(TestChecker.test(input,expect,400))
+
     #TO DO: add more
     def test_not_left_value_binary_op(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",IntType()),VarDecl("b",IntType()),VarDecl("c",IntType()),VarDecl("d",IntType()),VarDecl("e",IntType()),
            BinaryOp("=",Id('a'),BinaryOp("=",BinaryOp("+",Id('c'),Id('b')),BinaryOp("=",Id('e'),Id('d'))))]))])
         expect = "Not Left Value: BinaryOp(+,Id(c),Id(b))"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_not_left_value_float_lit(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",FloatType()),
            BinaryOp("=",FloatLiteral(1.3),Id('a'))]))])
         expect = "Not Left Value: FloatLiteral(1.3)"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_not_left_value_int_lit(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",IntType()),
            BinaryOp("=",IntLiteral(3),Id('a'))]))])
         expect = "Not Left Value: IntLiteral(3)"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_not_left_value_bool_lit(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",BoolType()),
            BinaryOp("=",BooleanLiteral(True),Id('a'))]))])
         expect = "Not Left Value: BooleanLiteral(true)"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_not_left_value_string_lit(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",StringType()),
            BinaryOp("=",StringLiteral("This is a string"),Id('a'))]))])
         expect = "Not Left Value: StringLiteral(This is a string)"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_not_left_value_unary_not(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",BoolType()),
            BinaryOp("=",UnaryOp("!",Id("a")),Id('a'))]))])
         expect = "Not Left Value: UnaryOp(!,Id(a))"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_not_left_value_unary_sub(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",FloatType()),
            BinaryOp("=",UnaryOp("-",Id("a")),Id('a'))]))])
         expect = "Not Left Value: UnaryOp(-,Id(a))"
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_not_left_value_call_expr(self):
-        """Simple program: int main() {} """
         input = Program([FuncDecl(Id("main"),[],VoidType(),Block([VarDecl("a",FloatType()),
            BinaryOp("=",CallExpr(Id("func"), []),Id('a'))])), 
         FuncDecl(Id("func"), [],VoidType(),Block([])) ])
@@ -352,7 +366,6 @@ class CheckSuite(unittest.TestCase):
     '''
     '''
     def test_not_left_value_func_name(self):
-        """Simple program: int main() {} """
         input = """
                 int[] func(int b[])
                 {
@@ -369,7 +382,6 @@ class CheckSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_assign_op_arr_vs_arr(self):
-        """Simple program: int main() {} """
         input = """
                 void main()
                 {
@@ -382,7 +394,6 @@ class CheckSuite(unittest.TestCase):
         self.assertTrue(TestChecker.test(input,expect,400))
 
     def test_assign_op_arr_vs_arr_pnt(self):
-        """Simple program: int main() {} """
         input = """
                 int[] func(int b[])
                 {
@@ -398,33 +409,1794 @@ class CheckSuite(unittest.TestCase):
         expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),CallExpr(Id(func),[Id(b)]))"
         self.assertTrue(TestChecker.test(input,expect,400))
 
-    def test_assign_operator_complex(self):
-        """Simple program: int main() {} """
+    def test_assign_op_int_vs_arr(self):
         input = """
+                string a,b;
+                void main()
+                {
+                    int a;
+                    int b[100];
+                    a = b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_int_vs_float(self):
+        input = """
+                int a,b;
+                void main()
+                {
+                    int a;
+                    float b;
+                    a = b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_int_vs_bool(self):
+        input = """
+                int a,b;
+                void main()
+                {
+                    int a;
+                    boolean b;
+                    a = b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_int_vs_string(self):
+        input = """
+                int a,b;
+                void main()
+                {
+                    int a;
+                    string b;
+                    a = b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_float_vs_bool(self):
+        input = """
+                int a,b;
+                void main()
+                {
+                    float a;
+                    boolean b;
+                    a = b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_float_vs_string(self):
+        input = """
+                int a,b;
+                void main()
+                {
+                    float a;
+                    string b;
+                    a = b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_assign_bool_vs_string(self):
+        input = """
+                int a,b;
+                void main()
+                {
+                    boolean a;
+                    string b;
+                    a = b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_or_int_vs_int(self):
+        input = """
+                boolean a,b;
                 int main()
                 {
-                    int a1,a2;
-                    a2 = 1;
-                    a1 = a;
-
-                    float b1,b2;
-                    b2 = 1e5;
-                    b1 = b2;
-                    b1 = a1 = a2;
-
-                    boolean c1,c2;
-                    c2 = true;
-                    c2= false;
-                    c1 = c2;
-
-                    string d1,d2;
-                    d2 = "this is a string";
-                    d1 = d2;
-
-                    float c;
-                    a = c = a = a1 = a2;
+                    int a,b;
+                    a = a || b; 
                 }
-                int a;
         """
-        expect = "Type Mismatch In Expression: BinaryOp(=,Id(a),BinaryOp(=,Id(c),BinaryOp(=,Id(a),BinaryOp(=,Id(a1),Id(a2)))))"
+        expect = "Type Mismatch In Expression: BinaryOp(||,Id(a),Id(b))"
         self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_or_float_vs_float(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    float a,b;
+                    a = a || b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(||,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_or_string_vs_string(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    string a,b;
+                    a = a || b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(||,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_and_int_vs_int(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    int a,b;
+                    a = a && b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(&&,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_and_float_vs_float(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    float a,b;
+                    a = a && b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(&&,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_and_string_vs_string(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    string a,b;
+                    a = a && b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(&&,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_equal_float_vs_float(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    float a,b;
+                    a == b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(==,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_equal_string_vs_string(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    string a,b;
+                    a == b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(==,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_equal_int_vs_bool(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    int a;
+                    boolean b;
+                    a == b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(==,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_diff_float_vs_float(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    float a,b;
+                    a != b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(!=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_diff_string_vs_string(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    string a,b;
+                    a != b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(!=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_diff_int_vs_bool(self):
+        input = """
+                boolean a,b;
+                int main()
+                {
+                    int a;
+                    boolean b;
+                    a != b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(!=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_bigger_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a > b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(>,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_bigger_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a > b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(>,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_bigger_equal_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a >= b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(>=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_bigger_equal_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a >= b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(>=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_less_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a < b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(<,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_less_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a < b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(<,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_less_equal_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a <= b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(<=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_less_equal_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a <= b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(<=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_add_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a + b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(+,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_add_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a + b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(+,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_sub_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a - b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(-,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_sub_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a - b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(-,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_mul_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a * b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(*,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_mul_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a * b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(*,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_div_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a / b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(/,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_div_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a / b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(/,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_mod_bool_vs_bool(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    boolean a,b;
+                    a % b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(%,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_mod_string_vs_string(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    string a,b;
+                    a % b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(%,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_mod_float_vs_float(self):
+        input = """
+                int a,b;
+                int main()
+                {
+                    float a,b;
+                    a % b; 
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(%,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_diff_int(self):
+        input = """
+                boolean a;
+                int main()
+                {
+                    int a;
+                    !a; 
+                }
+        """
+        expect = "Type Mismatch In Expression: UnaryOp(!,Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_diff_float(self):
+        input = """
+                boolean a;
+                int main()
+                {
+                    float a;
+                    !a; 
+                }
+        """
+        expect = "Type Mismatch In Expression: UnaryOp(!,Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_diff_string(self):
+        input = """
+                boolean a;
+                int main()
+                {
+                    string a;
+                    !a; 
+                }
+        """
+        expect = "Type Mismatch In Expression: UnaryOp(!,Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+
+    def test_sub_unary_bool(self):
+        input = """
+                int a;
+                int main()
+                {
+                    boolean a;
+                    -a; 
+                }
+        """
+        expect = "Type Mismatch In Expression: UnaryOp(-,Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_sub_unary_string(self):
+        input = """
+                int a;
+                int main()
+                {
+                    string a;
+                    -a; 
+                }
+        """
+        expect = "Type Mismatch In Expression: UnaryOp(-,Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_by_string(self):
+        input = """
+                int a;
+                int main()
+                {
+                    string a;
+                    string b[100];
+                    a = b[a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_by_float(self):
+        input = """
+                int a;
+                int main()
+                {
+                    float a;
+                    string b[100];
+                    a = b[a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_by_bool(self):
+        input = """
+                int a;
+                int main()
+                {
+                    boolean a;
+                    string b[100];
+                    a = b[a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_not_arr_string(self):
+        input = """
+                int a;
+                int main()
+                {
+                    string b;
+                    a = b[a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_not_arr_float(self):
+        input = """
+                int a;
+                int main()
+                {
+                    float b;
+                    a = b[a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_not_arr_bool(self):
+        input = """
+                int a;
+                int main()
+                {
+                    boolean b;
+                    a = b[a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_not_arr_int(self):
+        input = """
+                int a;
+                int main()
+                {
+                    int b;
+                    a = b[a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_subcripting_not_int(self):
+        input = """
+                int a;
+                int main()
+                {
+                    int b[100];
+                    a = b[a * a - a/a%a];
+                    a = b[1.1 + a * a - a/a%a]; 
+                }
+        """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),BinaryOp(-,BinaryOp(+,FloatLiteral(1.1),BinaryOp(*,Id(a),Id(a))),BinaryOp(%,BinaryOp(/,Id(a),Id(a)),Id(a))))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_int_vs_float(self):
+        input = """
+                void func(int a){}
+                int main()
+                {
+                    float b;
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_int_vs_bool(self):
+        input = """
+                void func(int a){}
+                int main()
+                {
+                    boolean b;
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_int_vs_string(self):
+        input = """
+                void func(int a){}
+                int main()
+                {
+                    string b;
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_int_vs_void(self):
+        input = """
+                void param(){}
+                void func(int a){}
+                int main()
+                {
+                    func(param); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(param)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_float_vs_bool(self):
+        input = """
+                void func(float a){}
+                int main()
+                {
+                    boolean b;
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_float_vs_string(self):
+        input = """
+                void func(float a){}
+                int main()
+                {
+                    string b;
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_float_vs_void(self):
+        input = """
+                void param(){}
+                void func(float a){}
+                int main()
+                {
+                    func(param); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(param)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_bool_vs_string(self):
+        input = """
+                void func(boolean a){}
+                int main()
+                {
+                    string b;
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_bool_vs_void(self):
+        input = """
+                void param(){}
+                void func(boolean a){}
+                int main()
+                {
+                    func(param); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(param)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_string_vs_void(self):
+        input = """
+                void param(){}
+                void func(string a){}
+                int main()
+                {
+                    func(param); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(param)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+
+    def test_call_func_arr_int_vs_float(self):
+        input = """
+                void func(int a[]){}
+                int main()
+                {
+                    float b[100];
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_int_vs_bool(self):
+        input = """
+                void func(int a[]){}
+                int main()
+                {
+                    boolean b[100];
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_int_vs_string(self):
+        input = """
+                void func(int a[]){}
+                int main()
+                {
+                    string b[100];
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_float_vs_bool(self):
+        input = """
+                void func(float a[]){}
+                int main()
+                {
+                    boolean b[100];
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_float_vs_string(self):
+        input = """
+                void func(float a[]){}
+                int main()
+                {
+                    string b[100];
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_bool_vs_string(self):
+        input = """
+                void func(boolean a[]){}
+                int main()
+                {
+                    string b[100];
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_ptn_int_vs_float(self):
+        input = """
+                float[] b()
+                {
+                    float result[1];
+                    return result;
+                }
+                void func(int a[]){}
+                int main()
+                {
+                    func(b()); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[CallExpr(Id(b),[])])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+
+    def test_call_func_arr_ptn_int_vs_float(self):
+        input = """
+                float[] b()
+                {
+                    float result[1];
+                    return result;
+                }
+                void func(int a[]){}
+                int main()
+                {
+                    func(b()); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[CallExpr(Id(b),[])])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_ptn_int_vs_bool(self):
+        input = """
+                boolean[] b()
+                {
+                    boolean result[1];
+                    return result;
+                }
+                void func(int a[]){}
+                int main()
+                {
+                    func(b()); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[CallExpr(Id(b),[])])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_ptn_int_vs_string(self):
+        input = """
+                string[] b()
+                {
+                    string result[1];
+                    return result;
+                }
+                void func(int a[]){}
+                int main()
+                {
+                    func(b()); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[CallExpr(Id(b),[])])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_ptn_float_vs_bool(self):
+        input = """
+                boolean[] b()
+                {
+                    boolean result[1];
+                    return result;
+                }
+                void func(float a[]){}
+                int main()
+                {
+                    func(b()); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[CallExpr(Id(b),[])])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_ptn_float_vs_string(self):
+        input = """
+                string[] b()
+                {
+                    string result[1];
+                    return result;
+                }
+                void func(float a[]){}
+                int main()
+                {
+                    func(b()); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[CallExpr(Id(b),[])])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_ptn_bool_vs_string(self):
+        input = """
+                string[] b()
+                {
+                    string result[1];
+                    return result;
+                }
+                void func(boolean a[]){}
+                int main()
+                {
+                    func(b()); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[CallExpr(Id(b),[])])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_arr_by_func_type(self):
+        input = """
+                boolean[] b()
+                {
+                    boolean result[1];
+                    return result;
+                }
+                void func(boolean a[]){}
+                int main()
+                {
+                    func(b); 
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(b)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_more_num_param(self):
+        input = """
+                boolean[] b()
+                {
+                    boolean result[1];
+                    return result;
+                }
+                void func(boolean a[]){}
+                int main()
+                {
+                    func(b(1));
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(b),[IntLiteral(1)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_less_num_param(self):
+        input = """
+                boolean[] b(int a)
+                {
+                    boolean result[1];
+                    return result;
+                }
+                void func(boolean a[]){}
+                int main()
+                {
+                    func(b());
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(b),[])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_operator_complex(self):
+        input = """
+                void        func_void(){}
+                int         func_int(){return 1;}
+                float       func_float(){return 1;}
+                boolean     func_boolean(){return true;}
+                string      func_string(){return "string";}
+                int[]       func_arr_int()
+                {
+                    int result[100];
+                    return result;
+                }
+                float[]     func_arr_float()
+                {
+                    float result[100];
+                    return result;
+                }
+                boolean[]   func_arr_boolean()
+                {
+                    boolean result[100];
+                    return result;
+                }
+                string[]    func_arr_string()
+                {
+                    string result[100];
+                    return result;
+                }
+                void        func(int param1, float param2, string param3, boolean param4, int param5[], float param6[], string param7[], boolean param8[])
+                {
+                    param1 = param5[1];
+                    param2 = param6[1];
+                    param3 = param7[1];
+                    param4 = param8[1];
+
+                    param1 = param5[1] = param1;
+                    param2 = param6[1] = param2;
+                    param3 = param7[1] = param3;
+                    param4 = param8[1] = param4;
+
+                    param2 = param1;
+                    param2 = param5[1];
+                    param6[1] = param1;
+                    param6[1] = param5[1];
+                }
+                int main()
+                {
+                    int         var_int,var_int1;
+                    float       var_float,var_float1;
+                    boolean     var_boolean,var_boolean1;
+                    string      var_string,var_string1;
+                    int         var_arr_int[100];
+                    float       var_arr_float[100];
+                    boolean     var_arr_boolean[100];
+                    string      var_arr_string[100];
+
+                    //assign op
+                    var_int = 1;
+                    var_float = 1.1;
+                    var_float = 1;
+                    var_boolean = true;
+                    var_boolean = false;
+                    var_string = "this is a string";
+
+                    var_int = var_int1;
+                    var_float = var_int1;
+                    var_float = var_float1;
+                    var_boolean = var_boolean1;
+                    var_string = var_string1;
+
+                    var_int = func_int();
+                    var_float = func_int();
+                    var_float = func_float();
+                    var_boolean = func_boolean();
+                    var_string = func_string();
+
+                    var_int = var_arr_int[1];
+                    var_float = var_arr_int[1];
+                    var_float = var_arr_float[1];
+                    var_boolean = var_arr_boolean[1];
+                    var_string = var_arr_string[1];
+
+                    var_int = func_arr_int()[1];
+                    var_float = func_arr_int()[1];
+                    var_float = func_arr_float()[1];
+                    var_boolean = func_arr_boolean()[1];
+                    var_string = func_arr_string()[1];
+
+                    var_float = var_int = func_arr_int()[1] = var_arr_int[1] = 1;
+
+                    // ||, &&, >, < , <=, >=
+                    true || var_boolean && var_arr_boolean[1] || func_arr_boolean()[1];
+                    var_int > var_float || 1 > 1.1 || var_arr_int[1] > var_arr_float[1] || func_arr_int()[1] > func_arr_float()[1];
+                    var_int > var_float && 1 > 1.1 && var_arr_int[1] > var_arr_float[1] && func_arr_int()[1] > func_arr_float()[1];
+                    var_int >= var_float || 1 >= 1.1 || var_arr_int[1] >= var_arr_float[1] || func_arr_int()[1] >= func_arr_float()[1];
+                    var_int >= var_float && 1 >= 1.1 && var_arr_int[1] >= var_arr_float[1] && func_arr_int()[1] >= func_arr_float()[1];
+                    var_int < var_float || 1 < 1.1 || var_arr_int[1] < var_arr_float[1] || func_arr_int()[1] < func_arr_float()[1];
+                    var_int < var_float && 1 < 1.1 && var_arr_int[1] < var_arr_float[1] && func_arr_int()[1] < func_arr_float()[1];
+                    var_int <= var_float || 1 <= 1.1 || var_arr_int[1] <= var_arr_float[1] || func_arr_int()[1] <= func_arr_float()[1];
+                    var_int <= var_float && 1 <= 1.1 && var_arr_int[1] <= var_arr_float[1] && func_arr_int()[1] <= func_arr_float()[1];
+
+                    // +, - , *, /, !=, ==
+                    var_int + var_float - 1 * 1.1 / var_arr_int[1] + var_arr_float[1] - func_arr_int()[1] * func_arr_float()[1];
+                    var_int + var_float > 1 * 1.1 == var_arr_int[1] + var_arr_float[1] < func_arr_int()[1] * func_arr_float()[1];
+                    var_int + var_float >= 1 * 1.1 != var_arr_int[1] + var_arr_float[1] <= func_arr_int()[1] * func_arr_float()[1];
+                    true || var_boolean == var_arr_boolean[1] && func_arr_boolean()[1];
+                    true || var_boolean != var_arr_boolean[1] && func_arr_boolean()[1];
+
+                    // %
+                    var_int%1%var_arr_int[10]%func_int()%func_arr_int()[1];
+                    // !
+                    !var_boolean&&!var_arr_boolean[11]&&!func_boolean()||!func_arr_boolean()[32]||!true;
+                    // -
+                    -1--var_int--var_arr_int[1]--func_int()--func_arr_int()[1]--1.1--var_float--var_arr_float[1]--func_float()--func_arr_float()[1];
+                    //index arr
+                    var_arr_int[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    var_arr_float[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    var_arr_boolean[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    var_arr_string[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    func_arr_int()[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    func_arr_int()[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    func_arr_float()[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    func_arr_boolean()[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+                    func_arr_string()[1 + var_int - func_int() * func_arr_int()[1]/var_arr_int[1]%1];
+
+                    // Call func
+                    func(1, 1.5, "var_string", true, var_arr_int, var_arr_float, var_arr_string, var_arr_boolean);
+                    func(var_int, var_float, var_string, var_boolean, var_arr_int, var_arr_float, var_arr_string, var_arr_boolean);
+                    func(var_int, var_int, var_string, var_boolean, var_arr_int, var_arr_float, var_arr_string, var_arr_boolean);
+                    func(var_arr_int[1], var_arr_float[1], var_arr_string[1], var_arr_boolean[1], var_arr_int, var_arr_float, var_arr_string, var_arr_boolean);
+                    func(var_arr_int[1], var_arr_int[1], var_arr_string[1], var_arr_boolean[1], func_arr_int(), func_arr_float(), func_arr_string(), func_arr_boolean());
+                    func(func_arr_int()[10], func_arr_float()[10], func_arr_string()[10], func_arr_boolean()[10], func_arr_int(), func_arr_float(), func_arr_string(), func_arr_boolean());
+                    func(func_arr_int()[10], func_arr_int()[10], func_arr_string()[10], func_arr_boolean()[10], func_arr_int(), func_arr_float(), func_arr_string(), func_arr_boolean());
+
+                    //error case
+                    func(var_int, var_float, var_string, var_boolean, var_arr_int, var_arr_int, var_arr_string, var_arr_boolean);
+                }
+        """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(var_int),Id(var_float),Id(var_string),Id(var_boolean),Id(var_arr_int),Id(var_arr_int),Id(var_arr_string),Id(var_arr_boolean)])"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_coerce_int_vs_float(self):
+        input = """
+                int         func_int(){return 1;}
+                float       func_float(){return 1.4;}
+                int[]       func_arr_int()
+                {
+                    int result[1];
+                    return result;
+                }
+                float[]     func_arr_float()
+                {
+                    float result[1];
+                    return result;
+                }
+                void main()
+                {
+                    int         var_int;
+                    float       var_float;
+                    int         var_arr_int[100];
+                    float       var_arr_float[100];
+                    var_int=func_arr_float()[1]=var_arr_float[1]=var_float=func_arr_int()[1]=var_arr_int[1]=var_int=func_int();
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(=,Id(var_int),BinaryOp(=,ArrayCell(CallExpr(Id(func_arr_float),[]),IntLiteral(1)),BinaryOp(=,ArrayCell(Id(var_arr_float),IntLiteral(1)),BinaryOp(=,Id(var_float),BinaryOp(=,ArrayCell(CallExpr(Id(func_arr_int),[]),IntLiteral(1)),BinaryOp(=,ArrayCell(Id(var_arr_int),IntLiteral(1)),BinaryOp(=,Id(var_int),CallExpr(Id(func_int),[]))))))))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    #Statement
+    def test_if_statement_int_exp(self):
+        input = """
+                void main()
+                {
+                    boolean var_boolean;
+                    if (var_boolean)
+                    {
+                        var_boolean = true;
+                    }
+
+                    int var_int;
+                    if (var_int)
+                    {
+                        var_int = 1;
+                    }
+                }
+        """
+        expect = "Type Mismatch In Statement: If(Id(var_int),Block([BinaryOp(=,Id(var_int),IntLiteral(1))]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_if_statement_float_exp(self):
+        input = """
+                boolean func(){return true;}
+                void main()
+                {
+                    boolean var_boolean;
+                    if (func())
+                    {
+                        var_boolean = true;
+                    }
+
+                    float var_arr_float[100];
+                    if (var_arr_float[1])
+                    {
+                        var_int = 1;
+                    }
+                }
+        """
+        expect = "Type Mismatch In Statement: If(ArrayCell(Id(var_arr_float),IntLiteral(1)),Block([BinaryOp(=,Id(var_int),IntLiteral(1))]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_if_statement_string_exp(self):
+        input = """
+                string func(){return "string";}
+                void main()
+                {
+                    boolean var_boolean[100];
+                    if (var_boolean[1])
+                    {
+                        var_boolean[1] = true;
+                    }
+
+                    if (func())
+                    {
+                        true;
+                    }
+                }
+        """
+        expect = "Type Mismatch In Statement: If(CallExpr(Id(func),[]),Block([BooleanLiteral(true)]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_if_else_statement_func(self):
+        input = """
+                boolean func(){return true;}
+                void main()
+                {
+                    boolean var_boolean;
+                    if (func())
+                    {
+                        var_boolean = true;
+                    }
+                    else
+                    {
+                        var_boolean = false;
+                    }
+
+                    float var_int;
+                    if (func)
+                    {
+                        var_int = 1;
+                    }
+                }
+        """
+        expect = "Type Mismatch In Statement: If(Id(func),Block([BinaryOp(=,Id(var_int),IntLiteral(1))]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_if_else_statement_func(self):
+        input = """
+                boolean func(){return true;}
+                void main()
+                {
+                    boolean var_boolean;
+                    if (func())
+                    {
+                        var_boolean = true;
+                    }
+                    else
+                    {
+                        var_boolean = false;
+                    }
+
+                    float var_int;
+                    if (func)
+                    {
+                        var_int = 1;
+                    }
+                }
+        """
+        expect = "Type Mismatch In Statement: If(Id(func),Block([BinaryOp(=,Id(var_int),IntLiteral(1))]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_for_statement(self):
+        input = """
+                boolean func(){return true;}
+                void main()
+                {
+                    boolean var_boolean;
+                    int i;
+                    for(i = 1; func(); i = i +1)
+                    {
+                        var_boolean = true;
+                    }
+
+                    for(true; func(); i = i +1)
+                    {
+                        var_boolean = true;
+                    }
+                }
+        """
+        expect = "Type Mismatch In Statement: For(BooleanLiteral(true);CallExpr(Id(func),[]);BinaryOp(=,Id(i),BinaryOp(+,Id(i),IntLiteral(1)));Block([BinaryOp(=,Id(var_boolean),BooleanLiteral(true))]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_for_statement_complex(self):
+        input = """
+                boolean[] func()
+                {
+                    boolean result[100];
+                    return result;
+                }
+                int[] int_arr_func()
+                {
+                    int result[100];
+                    return result;
+                }
+                void main()
+                {
+                    boolean var_boolean;
+                    int i;
+                    for(i = 1; func()[1]; i = i +1)
+                    {
+                        int i[100];
+                        for(i[1] = 1; true; i[1] = i[1] +1)
+                        {
+                            for(int_arr_func()[1] = 1; true&&var_boolean||func()[1]; int_arr_func()[1] = int_arr_func()[1] +1)
+                            {
+
+                            }
+                        }
+                    }
+
+                    for(i = 1; func()[1]; i > i +1)
+                    {
+                        var_boolean = true;
+                    }
+                }
+        """
+        expect = "Type Mismatch In Statement: For(BinaryOp(=,Id(i),IntLiteral(1));ArrayCell(CallExpr(Id(func),[]),IntLiteral(1));BinaryOp(>,Id(i),BinaryOp(+,Id(i),IntLiteral(1)));Block([BinaryOp(=,Id(var_boolean),BooleanLiteral(true))]))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_do_while_statement(self):
+        input = """
+                void main()
+                {
+                    int a,b;
+                    do
+                    {
+                        boolean a;
+                        a = true;
+                    }
+                    b = b - 1;
+                    while a > b;
+
+                    do
+                    {
+                    }
+                    b = b - 1;
+                    while a;
+                }
+        """
+        expect = "Type Mismatch In Statement: Dowhile([Block([]),BinaryOp(=,Id(b),BinaryOp(-,Id(b),IntLiteral(1)))],Id(a))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_do_while_statement_complex(self):
+        input = """
+                void main()
+                {
+                    int a,b;
+                    do
+                    {
+                        do
+                        {
+                            boolean a;
+                            a = true;
+                            do
+                            {
+                                boolean a;
+                                a = true;
+                            }
+                            b = b - 1;
+                            while a <= b;
+                        }
+                        b = b - 1;
+                        while a <= b;
+                    }
+                    b = b - 1;
+                    while a > b;
+                }
+        """
+        expect = "Type Mismatch In Expression: BinaryOp(<=,Id(a),Id(b))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_void_func(self):
+        input = """
+                void func_void()
+                {
+                    return;
+                }
+                void func_void2()
+                {
+                }
+                void main()
+                {
+                    return 1;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(IntLiteral(1))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_int_func_1(self):
+        input = """
+                int func_int()
+                {
+                    int a;
+                    return a*a+a-a/a%a+1;
+                }
+                int main()
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_int_func_2(self):
+        input = """
+                int func_int()
+                {
+                    int a;
+                    return a*a+a-a/a%a+1;
+                }
+                int main()
+                {
+                    boolean a;
+                    return !a&&a||a;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(BinaryOp(||,BinaryOp(&&,UnaryOp(!,Id(a)),Id(a)),Id(a)))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_float_func_1(self):
+        input = """
+                float func()
+                {
+                    int a;
+                    return a*a+a-a/a%a+1;
+                    float b;
+                    return b*b+b-b/1;
+                }
+                float main()
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_float_func_2(self):
+        input = """
+                float func()
+                {
+                    int a;
+                    return a*a+a-a/a%a+1;
+                    float b;
+                    return b*b+b-b/1;
+                }
+                float main()
+                {
+                    boolean a;
+                    return !a&&a||a;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(BinaryOp(||,BinaryOp(&&,UnaryOp(!,Id(a)),Id(a)),Id(a)))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_string_func_1(self):
+        input = """
+                string func()
+                {
+                    string a;
+                    return a;
+                    string b[100];
+                    return b[1];
+                }
+                string main()
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_string_func_2(self):
+        input = """
+                string func()
+                {
+                    string a;
+                    return a;
+                    string b[100];
+                    return b[1];
+                }
+                string main()
+                {
+                    boolean a;
+                    return !a&&a||a;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(BinaryOp(||,BinaryOp(&&,UnaryOp(!,Id(a)),Id(a)),Id(a)))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_boolean_func_1(self):
+        input = """
+                boolean func()
+                {
+                    boolean a;
+                    return !a&&a||a;
+                }
+                boolean main()
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_boolean_func_2(self):
+        input = """
+                boolean func()
+                {
+                    boolean a;
+                    return !a&&a||a;
+                }
+                boolean main()
+                {
+                    float b;
+                    return b*b+b-b/1;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(BinaryOp(-,BinaryOp(+,BinaryOp(*,Id(b),Id(b)),Id(b)),BinaryOp(/,Id(b),IntLiteral(1))))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_int_arr_func_1(self):
+        input = """
+                int[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    int a;
+                    return int_param;
+                }
+                int[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_int_arr_func_2(self):
+        input = """
+                int[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    int a;
+                    return int_param;
+                }
+                int[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    boolean a;
+                    return float_param;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(Id(float_param))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_float_arr_func_1(self):
+        input = """
+                float[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    int a;
+                    return float_param;
+                }
+                float[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_float_arr_func_2(self):
+        input = """
+                float[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    int a;
+                    return float_param;
+                }
+                float[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    boolean a;
+                    return int_param;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(Id(int_param))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_string_arr_func_1(self):
+        input = """
+                string[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    string a;
+                    return string_param;
+                }
+                string[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_string_arr_func_2(self):
+        input = """
+                string[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    string a;
+                    return string_param;
+                }
+                string[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    boolean a;
+                    return bool_param;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(Id(bool_param))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_boolean_arr_func_1(self):
+        input = """
+                boolean[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    boolean a;
+                    return bool_param;
+                }
+                boolean[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    return;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return()"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_return_statement_boolean_arr_func_2(self):
+        input = """
+                boolean[] func(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    boolean a;
+                    return bool_param;
+                }
+                boolean[] main(int int_param[], boolean bool_param[], string string_param[], float float_param[])
+                {
+                    float b;
+                    return string_param;
+                }
+        """
+        expect = "Type Mismatch In Statement: Return(Id(string_param))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_break_statement(self):
+        input = """
+                boolean func(){return true;}
+                void main()
+                {
+                    boolean var_boolean;
+                    int i;
+                    for(i = 1; func(); i = i +1)
+                    {
+                        var_boolean = true;
+                    }
+                    int a,b;
+                    do
+                    {
+                        boolean a;
+                        a = true;
+                    }
+                    b = b - 1;
+                    while a > b;
+
+                    break;
+                }
+        """
+        expect = "Break Not In Loop"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_continue_statement(self):
+        input = """
+                boolean func(){return true;}
+                void main()
+                {
+                    boolean var_boolean;
+                    int i;
+                    for(i = 1; func(); i = i +1)
+                    {
+                        var_boolean = true;
+                    }
+                    int a,b;
+                    do
+                    {
+                        boolean a;
+                        a = true;
+                    }
+                    b = b - 1;
+                    while a > b;
+
+                    continue;
+                }
+        """
+        expect = "Continue Not In Loop"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_break_continue_statement_complex(self):
+        input = """
+                boolean func(){return true;}
+                void main()
+                {
+                    boolean var_boolean;
+                    int i;
+                    for(i = 1; func(); i = i +1)
+                    {
+                        var_boolean = true;
+                        if (var_boolean)
+                        {
+                            int a,b;
+                            do
+                            {
+                                boolean a;
+                                a = true;
+                                do
+                                {
+                                    boolean a;
+                                    a = true;
+                                    break;
+                                    continue;
+                                    if (var_boolean)
+                                    {
+                                        break;
+                                        continue;
+                                    }
+                                }
+                                break;
+                                continue;
+                                b = b - 1;
+                                while a;
+                            }
+                            b = b - 1;
+                            while a <= b;
+                            break;
+                            continue;
+                        }
+                        break;
+                        continue;
+                    }
+                    c;
+                }
+        """
+        expect = "Undeclared Identifier: c"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_func_not_return_error(self):
+        input = """
+                boolean func()
+                {
+                    return true;
+                }
+
+                int main()
+                {
+                    boolean var_boolean;
+                    int i;
+                    for(i = 1; func(); i = i +1)
+                    {
+                        var_boolean = true;
+                        if (var_boolean)
+                        {
+                            int a,b;
+                            do
+                            {
+                                boolean a;
+                                a = true;
+                                do
+                                {
+                                    boolean a;
+                                    a = true;
+                                    break;
+                                    continue;
+                                    if (var_boolean)
+                                    {
+                                        break;
+                                        continue;
+                                    }
+                                }
+                                break;
+                                continue;
+                                b = b - 1;
+                                while a;
+                            }
+                            b = b - 1;
+                            while a <= b;
+                            break;
+                            continue;
+                        }
+                        break;
+                        continue;
+                    }
+                }
+        """
+        expect = "Function main Not Return "
+        self.assertTrue(TestChecker.test(input,expect,401))

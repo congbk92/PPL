@@ -93,9 +93,9 @@ class StaticChecker(BaseVisitor,Utils):
             if stmt.elseStmt is None:
                 return False
             else:
-                return isFullReturnStmt(thenStmt) & isFullReturnStmt(elseStmt)
+                return self.isFullReturnStmt(thenStmt) & self.isFullReturnStmt(elseStmt)
         elif type(stmt) is Block:
-            return reduce(lambda ac,it: ac | isFullReturnStmt(it) , stmt.member , False)
+            return reduce(lambda ac,it: ac | self.isFullReturnStmt(it) , stmt.member , False)
         else:
             return False
 
@@ -111,6 +111,8 @@ class StaticChecker(BaseVisitor,Utils):
                 raise Redeclared(Parameter(),e.n)
             self.visitListLocalNode(ast.body.member, cur_decl + [Symbol('0_return_type', ast.returnType)])
             #check not return
+            if type(ast.returnType) is not VoidType and not self.isFullReturnStmt(ast.body):
+                raise FunctionNotReturn(ast.name.name)
 
     def visitVarDecl(self, ast, c):
         if ast.variable in self.getLstIdCurScope(c):
@@ -185,11 +187,14 @@ class StaticChecker(BaseVisitor,Utils):
             if i.name == ast.method.name:
                 if len(i.mtype.partype) == len(ast.param):
                     type_param = [self.visit(x,c) for x in ast.param]
-                    type_pass = [self.getTypeAssign(x[0],x[1]) for x in zip(i.mtype.partype, type_param)]
+                    type_pass = [type(self.getTypeAssign(x[0],x[1])) for x in zip(i.mtype.partype, type_param)]
+                    #print("i.mtype.partype = ")
                     #print (i.mtype.partype)
+                    #print("type_param = ")
                     #print(type_param)
+                    #print("type_pass = ")
                     #print(type_pass)
-                    if None not in type_pass:
+                    if type(None) not in type_pass:
                         return i.mtype.rettype
 
         raise TypeMismatchInExpression(ast)
@@ -215,9 +220,9 @@ class StaticChecker(BaseVisitor,Utils):
 
     def visitDowhile(self, ast, c):
         # visit list stmt
-        [self.visit(stmt, c + [Symbol('0_in_loop', None)]) for stmt in ast.sl]
-        if type(self.visit(ast.exp)) is not BoolType:
+        if type(self.visit(ast.exp, c)) is not BoolType:
             raise TypeMismatchInStatement(ast)
+        [self.visit(stmt, c + [Symbol('0_in_loop', None)]) for stmt in ast.sl]
 
     def visitReturn(self, ast, c):
         for i in reversed(c):
@@ -240,7 +245,7 @@ class StaticChecker(BaseVisitor,Utils):
             raise BreakNotInLoop()
 
     def visitFor(self, ast, c):
-        if [type(self.visit(ast.expr1,c)),type(self.visit(ast.expr2,c)),type(self.visit(ast.expr3,c))] is not [IntType,BoolType,IntType]:
+        if [type(self.visit(ast.expr1,c)),type(self.visit(ast.expr2,c)),type(self.visit(ast.expr3,c))] != [IntType,BoolType,IntType]:
             raise TypeMismatchInStatement(ast)
         self.visit(ast.loop, c + [Symbol('0_in_loop', None)])
 
