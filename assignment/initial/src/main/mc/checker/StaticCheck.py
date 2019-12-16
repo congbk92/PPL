@@ -50,14 +50,13 @@ class StaticChecker(BaseVisitor,Utils):
     Symbol("putStringLn",   MType([StringType()],   VoidType())),
     Symbol("putLn",         MType([],               VoidType())),
     ]
-            
-    
 
     def __init__(self,ast):
         #print(ast)
         #print(ast)
         #print()
         self.ast = ast
+        self.reachable_func = set()
         #self.count = 0
 
     def getLstIdCurScope(self,c):
@@ -78,13 +77,17 @@ class StaticChecker(BaseVisitor,Utils):
         #get all global variable and func decl
         c = reduce(lambda ac,it: ac + [self.visit(it,ac)], ast.decl, [Symbol('0_initial', None)] + StaticChecker.global_envi)
         
+        lst_user_func = list(map(lambda node: node.name.name , list(filter(lambda x: type(x) is FuncDecl,  ast.decl))))
         #Check entry-point
-        if 'main' not in [sym.name for sym in filter(lambda x: type(x.mtype) is MType, c)]:
+        if 'main' not in lst_user_func:
             raise NoEntryPoint()
 
         del c[0]
         list(map(lambda node: self.visit(node,c), list(filter(lambda x: type(x) is FuncDecl,  ast.decl))))
         # Check unreachable func
+        for func in lst_user_func:
+            if func != 'main' and func not in self.reachable_func:
+                raise UnreachableFunction(func)
 
     def isFullReturnStmt(self,stmt):
         if type(stmt) is Return:
@@ -93,7 +96,7 @@ class StaticChecker(BaseVisitor,Utils):
             if stmt.elseStmt is None:
                 return False
             else:
-                return self.isFullReturnStmt(thenStmt) & self.isFullReturnStmt(elseStmt)
+                return self.isFullReturnStmt(stmt.thenStmt) & self.isFullReturnStmt(stmt.elseStmt)
         elif type(stmt) is Block:
             return reduce(lambda ac,it: ac | self.isFullReturnStmt(it) , stmt.member , False)
         else:
@@ -195,6 +198,7 @@ class StaticChecker(BaseVisitor,Utils):
                     #print("type_pass = ")
                     #print(type_pass)
                     if type(None) not in type_pass:
+                        self.reachable_func.add(i.name)
                         return i.mtype.rettype
 
         raise TypeMismatchInExpression(ast)

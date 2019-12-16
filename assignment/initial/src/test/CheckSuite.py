@@ -2199,4 +2199,103 @@ class CheckSuite(unittest.TestCase):
                 }
         """
         expect = "Function main Not Return "
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_func_not_return_error_complex(self):
+        input = """
+            int main(){
+                boolean a1,a2,a3,a4,a5;
+                if (a1){
+                    if(a2){
+                        if(a3){
+                            if(a4){
+                                return 0;
+                            }
+                            else{
+                                return 0;
+                            }
+                            if(a5){
+                            }
+                        }else{
+                            return 0;
+                        }
+                    }else{
+                        return 0;
+                    }
+                }
+                else{
+                    if(a2){
+                        if(a3){
+                            if(a4){
+                                return 0;
+                            }
+                            else{
+                            }
+                            if(a5){
+                                return 0;
+                            }
+                        }else{
+                            return 0;
+                        }
+                    }else{
+                        return 0;
+                    }
+                }
+            }
+        """
+        expect = "Function main Not Return "
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_unreachable_func(self):
+        input = """
+            void func1(){}
+            void func2(){}
+            void func3(){}
+            void func4(){}
+            void func5(){}
+            void func6(){}
+            void func7(){}
+            void main(){
+                func1();
+                func2();
+                func3();
+                func5();
+                func6();
+                func7();
+            }
+        """
+        expect = "Unreachable Function: func4"
+        self.assertTrue(TestChecker.test(input,expect,400))
+    
+    def test_unreachable_func_complex(self):
+        input = """
+                int         func_int(){return 1;}
+                float       func_float(){return 1;}
+                boolean     func_boolean(){return true;}
+                int[]       func_arr_int()
+                {
+                    int result[100];
+                    return result;
+                }
+                float[]     func_arr_float()
+                {
+                    float result[100];
+                    return result;
+                }
+                void main(){
+                    int         var_int;
+                    float       var_float;
+                    int         var_arr_int[100];
+                    float       var_arr_float[100];
+                    func_int() + var_int > func_float() + var_float || 1 > 1.1 || var_arr_int[1] > var_arr_float[1] || func_arr_int()[1] > func_arr_float()[1];
+                    func_int() + var_int > func_float() + var_float && 1 > 1.1 && var_arr_int[1] > var_arr_float[1] && func_arr_int()[1] > func_arr_float()[1];
+                    func_int() + var_int >= func_float() + var_float || 1 >= 1.1 || var_arr_int[1] >= var_arr_float[1] || func_arr_int()[1] >= func_arr_float()[1];
+                    func_int() + var_int >= func_float() + var_float && 1 >= 1.1 && var_arr_int[1] >= var_arr_float[1] && func_arr_int()[1] >= func_arr_float()[1];
+                    func_int() + var_int < func_float() + var_float || 1 < 1.1 || var_arr_int[1] < var_arr_float[1] || func_arr_int()[1] < func_arr_float()[1];
+                    func_int() + var_int < func_float() + var_float && 1 < 1.1 && var_arr_int[1] < var_arr_float[1] && func_arr_int()[1] < func_arr_float()[1];
+                    func_int() + var_int <= func_float() + var_float || 1 <= 1.1 || var_arr_int[1] <= var_arr_float[1] || func_arr_int()[1] <= func_arr_float()[1];
+                    func_int() + var_int <= func_float() + var_float && 1 <= 1.1 && var_arr_int[1] <= var_arr_float[1] && func_arr_int()[1] <= func_arr_float()[1];
+                }
+        """
+        expect = "Unreachable Function: func_boolean"
         self.assertTrue(TestChecker.test(input,expect,401))
