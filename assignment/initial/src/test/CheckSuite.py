@@ -2298,4 +2298,127 @@ class CheckSuite(unittest.TestCase):
                 }
         """
         expect = "Unreachable Function: func_boolean"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_callrecusive_func(self):
+        input = """
+                void main(){
+                    int a;
+                    a = func(100);
+                }
+                int func(int input){
+                    return input*func(input-1);
+                }
+                int func_test(){
+                    return 0;
+                }
+        """
+        expect = "Unreachable Function: func_test"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_pnt_param(self):
+        input = """
+                int main(){
+                    int a[100];
+                    int result;
+                    result = func_sum(func_transform(func_init(a,100),100),100);
+                    return result;
+                }
+
+                int [] func_init(int input[], int len){
+                    int i;
+                    for (i=0;i<len;i = i + 1){
+                        input[i] = i;
+                    }
+                    return input;
+                }
+
+                int [] func_transform(int input[], int len){
+                    int i;
+                    for (i = 0; i < len; i = i + 1){
+                        if (i%4==0)
+                            input[i] = input[i] * 4;
+                        else if (i%4==3)
+                            input[i] = input[i] * 3;
+                        else if (i%4==2)
+                            input[i] = input[i] * 2;
+                        else
+                            input[i] = input[i/2];
+                    }
+                    return input;
+                }
+                int func_sum(int input[], int len){
+                    int sum;
+                    sum = 0;
+                    int i;
+                    for (i=0;i<len;i = i + 1){
+                        sum = sum + input[i];
+                    }
+                    return sum;
+                }
+                int test_arr_pnt_param(){
+                    return 0;
+                }
+        """
+        expect = "Unreachable Function: test_arr_pnt_param"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_indexing_by_arr(self):
+        input = """
+                int main(){
+                    int a[100];
+                    int b[100];
+                    float c[100];
+                    int d[100];
+                    return a[b[c[d[99]]]];
+                }
+                """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),ArrayCell(Id(c),ArrayCell(Id(d),IntLiteral(99))))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_indexing_by_arr_and_check_in_scope(self):
+        input = """
+                int main(){
+                    int a[100];
+                    int b[100];
+                    float c[100];
+                    int d[100];
+                    if (true)
+                    {
+                        int a[100];
+                        int b[100];
+                        int c[100];
+                        int d[100];
+                        return a[b[c[d[99]]]];
+                    }
+                    else{
+
+                    }
+                }
+                """
+        expect = "Function main Not Return "
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_arr_indexing_by_arr_and_check_out_scope(self):
+        input = """
+                int main(){
+                    int a[100];
+                    int b[100];
+                    float c[100];
+                    int d[100];
+                    if (true)
+                    {
+                        int a[100];
+                        int b[100];
+                        int c[100];
+                        int d[100];
+                        return a[b[c[d[99]]]];
+                    }
+                    else{
+
+                    }
+                    return a[b[c[d[99]]]];
+                }
+                """
+        expect = "Type Mismatch In Expression: ArrayCell(Id(b),ArrayCell(Id(c),ArrayCell(Id(d),IntLiteral(99))))"
         self.assertTrue(TestChecker.test(input,expect,401))
