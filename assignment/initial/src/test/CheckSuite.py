@@ -2421,4 +2421,21 @@ class CheckSuite(unittest.TestCase):
                 }
                 """
         expect = "Type Mismatch In Expression: ArrayCell(Id(b),ArrayCell(Id(c),ArrayCell(Id(d),IntLiteral(99))))"
+        self.assertTrue(TestChecker.test(input,expect,400))
+
+    def test_call_func_by_func_type(self):
+        input = """
+                void main(){
+                    int b;
+                    b = func(func_check,b);
+                }
+                int func(int a, int b)
+                {
+                    return a + b;
+                }
+                int func_check(){
+                    return 0;
+                }
+                """
+        expect = "Type Mismatch In Expression: CallExpr(Id(func),[Id(func_check),Id(b)])"
         self.assertTrue(TestChecker.test(input,expect,401))
