@@ -11,6 +11,10 @@ from lexererr import *
 from ASTGeneration import ASTGeneration
 from StaticCheck import StaticChecker
 from StaticError import *
+from CodeGenerator import CodeGenerator
+import subprocess
+
+JASMIN_JAR = "./external/jasmin.jar"
 
 class TestUtil:
     @staticmethod
@@ -124,11 +128,54 @@ class TestChecker:
         checker = StaticChecker(asttree)
         try:
             res = checker.check()
-            dest.write(str(list(res)))
+            #dest.write(str(list(res)))
         except StaticError as e:
             dest.write(str(e))
         finally:
             dest.close()
         dest = open("./test/solutions/" + str(num) + ".txt","r")
+        line = dest.read()
+        return line == expect
+
+class TestCodeGen():
+    @staticmethod
+    def test(input, expect, num):
+        global JASMIN_JAR
+        solpath = "./test/solutions/"
+        dest = open(solpath + str(num) + ".txt","w")
+        
+        if type(input) is str:
+            inputfile = TestUtil.makeSource(input,num)
+            lexer = MCLexer(inputfile)
+            tokens = CommonTokenStream(lexer)
+            parser = MCParser(tokens)
+            tree = parser.program()
+            asttree = ASTGeneration().visit(tree)
+        else:
+            inputfile = TestUtil.makeSource(str(input),num)
+            asttree = input
+        
+        
+        codeGen = CodeGenerator()
+        
+        path = solpath + str(num)
+        if not os.path.isdir(path):
+            os.mkdir(path)
+        try:
+            codeGen.gen(asttree, path)
+            
+            subprocess.call("java  -jar "+ JASMIN_JAR + " " + path + "/MCClass.j",shell=True,stderr=subprocess.STDOUT)
+            
+
+            f = open(solpath + str(num) + ".txt","w")
+            subprocess.call("java -cp ./lib" + os.pathsep + ". MCClass",shell=True, stdout = f)
+            f.close()
+        except StaticError as e:
+            dest.write(str(e))
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError("command '{}' return with error (code {}): {}".format(e.cmd, e.returncode, e.output))
+        finally:
+            dest.close()
+        dest = open(solpath + str(num) + ".txt","r")
         line = dest.read()
         return line == expect

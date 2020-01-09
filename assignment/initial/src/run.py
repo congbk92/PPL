@@ -8,7 +8,7 @@ import shutil
 
 ANTLR_JAR = os.environ.get('ANTLR_JAR')
 TARGET = '../target/main/mc/parser' if os.name == 'posix' else os.path.normpath('../target/')
-locpath = ['test','./main/mc/parser/','./main/mc/astgen/','./main/mc/utils/','./main/mc/checker']
+locpath = ['test','./main/mc/parser/','./main/mc/astgen/','./main/mc/utils/','./main/mc/checker','./main/mc/codegen']
 for p in locpath:
     if not p in sys.path:
         sys.path.append(p)
@@ -41,6 +41,10 @@ def main(argv):
             from CheckSuite import CheckSuite
             suite = unittest.makeSuite(CheckSuite)
             test(suite)
+        elif argv[1] == 'CodeGenSuite':
+            from CodeGenSuite import CheckCodeGenSuite
+            suite = unittest.makeSuite(CheckCodeGenSuite)
+            test(suite)
         else:
             printUsage()
     else:
@@ -65,6 +69,7 @@ def printUsage():
     print("python3 run.py test ParserSuite")
     print("python3 run.py test ASTGenSuite")
     print("python3 run.py test CheckSuite")
+    print("python3 run.py test CodeGenSuite")
 
 if __name__ == "__main__":
    main(sys.argv[1:])
