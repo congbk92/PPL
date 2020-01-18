@@ -20,6 +20,7 @@ class CodeGenerator(Utils):
         return [Symbol("getInt", MType(list(), IntType()), CName(self.libName)),
                     Symbol("putInt", MType([IntType()], VoidType()), CName(self.libName)),
                     Symbol("putIntLn", MType([IntType()], VoidType()), CName(self.libName)),
+                    Symbol("putFloat", MType([FloatType()], VoidType()), CName(self.libName)),
                     Symbol("putFloatLn", MType([FloatType()], VoidType()), CName(self.libName))
                     ]
 
@@ -108,10 +109,12 @@ class CodeGenVisitor(BaseVisitor, Utils):
         #frame: Frame
 
         isInit = consdecl.returnType is None
-        isMain = consdecl.name.name == "main" and len(consdecl.param) == 0 and type(consdecl.returnType) is VoidType
+        #isMain = consdecl.name.name == "main" and len(consdecl.param) == 0 and type(consdecl.returnType) is VoidType
+        isMain = consdecl.name.name == "main"
         returnType = VoidType() if isInit else consdecl.returnType
         methodName = "<init>" if isInit else consdecl.name.name
-        intype = [ArrayPointerType(StringType())] if isMain else list()
+        #intype = [ArrayPointerType(StringType())] if isMain else list()
+        intype = [ArrayPointerType(StringType())] if isMain else [param.varType  for param in consdecl.param]
         mtype = MType(intype, returnType)
 
         self.emit.printout(self.emit.emitMETHOD(methodName, mtype, not isInit, frame))
@@ -119,12 +122,18 @@ class CodeGenVisitor(BaseVisitor, Utils):
         frame.enterScope(True)
 
         glenv = o
+        env = o
 
         # Generate code for parameter declarations
         if isInit:
             self.emit.printout(self.emit.emitVAR(frame.getNewIndex(), "this", ClassType(self.className), frame.getStartLabel(), frame.getEndLabel(), frame))
-        if isMain:
+        elif isMain:
             self.emit.printout(self.emit.emitVAR(frame.getNewIndex(), "args", ArrayPointerType(StringType()), frame.getStartLabel(), frame.getEndLabel(), frame))
+        else:
+            for param in consdecl.param: 
+                new_idx = frame.getNewIndex()
+                self.emit.printout(self.emit.emitVAR(new_idx, param.variable, param.varType, frame.getStartLabel(), frame.getEndLabel(), frame))
+                env += [Symbol(param.variable, param.varType, Index(new_idx))] 
 
         body = consdecl.body
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
@@ -133,7 +142,8 @@ class CodeGenVisitor(BaseVisitor, Utils):
         if isInit:
             self.emit.printout(self.emit.emitREADVAR("this", ClassType(self.className), 0, frame))
             self.emit.printout(self.emit.emitINVOKESPECIAL(frame))
-        list(map(lambda x: self.visit(x, SubBody(frame, glenv)), body.member))
+            
+        list(map(lambda x: self.visit(x, SubBody(frame, env)), body.member))
 
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
         if type(returnType) is VoidType:
@@ -148,7 +158,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
         subctxt = o
         frame = Frame(ast.name, ast.returnType)
         self.genMETHOD(ast, subctxt.sym, frame)
-        return SubBody(None, [Symbol(ast.name, MType(list(), ast.returnType), CName(self.className))] + subctxt.sym)
+        return SubBody(None, [Symbol(ast.name.name, MType([param.varType for param in ast.param], ast.returnType), CName(self.className))] + subctxt.sym)
 
     def visitCallExpr(self, ast, o):
         #ast: CallExpr
@@ -157,18 +167,21 @@ class CodeGenVisitor(BaseVisitor, Utils):
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
+
         sym = self.lookup(ast.method.name, nenv, lambda x: x.name)
         cname = sym.value.value
-    
         ctype = sym.mtype
 
-        in_ = ("", list())
+        #in_ = ("", list())
+        print(ast.param)
         for x in ast.param:
+            #print(self.visit(x, Access(frame, nenv, False, True)))
             str1, typ1 = self.visit(x, Access(frame, nenv, False, True))
-            in_ = (in_[0] + str1, in_[1].append(typ1))
-        self.emit.printout(in_[0])
+            self.emit.printout(str1)
+            #in_ = (in_[0] + str1, in_[1].append(typ1))
+        #self.emit.printout(in_[0])
         self.emit.printout(self.emit.emitINVOKESTATIC(cname + "/" + ast.method.name, ctype, frame))
-
+        return "", sym.mtype.rettype
     def visitIntLiteral(self, ast, o):
         #ast: IntLiteral
         #o: Any
@@ -185,28 +198,58 @@ class CodeGenVisitor(BaseVisitor, Utils):
         frame = ctxt.frame
         return self.emit.emitPUSHFCONST(str(ast.value), frame), FloatType()
 
+    def visitVarDecl(self, ast, o):
+        #ast: IntLiteral
+        #o: Any
+
+        ctxt = o
+        frame = ctxt.frame
+        return self.emit.emitPUSHFCONST(str(ast.value), frame), FloatType()
+
+    def visitId(self, ast, o):
+        #ast: IntLiteral
+        #o: Any
+
+        ctxt = o
+        frame = ctxt.frame
+        nenv = ctxt.sym
+        sym = self.lookup(ast.name, nenv, lambda x: x.name)
+
+        return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+
+    def visitReturn(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        nenv = ctxt.sym
+        return_type = VoidType()
+        if ast.expr is not None:
+            code,return_type = self.visit(ast.expr, Access(frame, nenv, False, True))
+            self.emit.printout(code)
+        self.emit.printout(self.emit.emitRETURN(return_type, frame))
+
     def visitBinaryOp(self, ast, o):
         #ast: IntLiteral
         #o: Any
 
         ctxt = o
         frame = ctxt.frame
-        lcode = ""
         returnType = IntType()
-        if FloatLiteral in [type(ast.left),type(ast.right)]:
+
+        lcode,ltype = self.visit(ast.left,o)
+        rcode,rtype = self.visit(ast.right,o)
+        if FloatType in [type(ltype),type(rtype)]:
             returnType = FloatType()
-        for node in [ast.left,ast.right]:
-            if (type(node) is IntLiteral):
-                lcode += self.emit.emitPUSHICONST(str(node.value), frame)
-            else:
-                lcode += self.emit.emitPUSHFCONST(str(node.value), frame)
-            if type(node) is IntLiteral and FloatLiteral in [type(ast.left),type(ast.right)]:
-                lcode += self.emit.emitI2F(frame)
+        
+        if type(ltype) is IntType and type(returnType) is FloatType:
+            lcode += self.emit.emitI2F(frame)
+        if type(rtype) is IntType and type(returnType) is FloatType:
+            rcode += self.emit.emitI2F(frame)
 
+        opcode = ""
         if ast.op in ["+","-"]:
-            lcode += self.emit.emitADDOP(ast.op, returnType, frame)
-        else:
-            lcode += self.emit.emitMULOP(ast.op, returnType, frame)
+            opcode += self.emit.emitADDOP(ast.op, returnType, frame)
+        elif ast.op in ["*","/"]:
+            opcode += self.emit.emitMULOP(ast.op, returnType, frame)
 
-        return lcode, returnType
+        return lcode + rcode + opcode, returnType
 

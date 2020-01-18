@@ -20,6 +20,10 @@ class Symbol:
         self.mtype = mtype
         self.value = value
 
+    def __str__(self):
+        #return "Symbol(" + self.name + "," + str(self.mtype) + "," + str(self.value) +  ")"
+        return "Symbol(" + self.name + "," + str(self.value) +  ")"
+
 class StaticChecker(BaseVisitor,Utils):
 
     '''

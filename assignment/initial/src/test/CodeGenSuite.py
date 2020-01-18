@@ -4,44 +4,78 @@ from AST import *
 
 
 class CheckCodeGenSuite(unittest.TestCase):
+
     def test_int(self):
         """Simple program: int main() {} """
         input = """void main() {putInt(100);}"""
         expect = "100"
         self.assertTrue(TestCodeGen.test(input,expect,500))
     def test_int_ast(self):
-        input = Program([
-            FuncDecl(Id("main"),[],VoidType(),Block([
-                CallExpr(Id("putInt"),[IntLiteral(5)])]))])
-        expect = "5"
-        self.assertTrue(TestCodeGen.test(input,expect,501))
+        input = """void main() {
+                    putInt(100);
+                }"""
+        expect = "100"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     def test_float_ast(self):
-        input = Program([
-            FuncDecl(Id("main"),[],VoidType(),Block([
-                CallExpr(Id("putFloatLn"),[FloatLiteral(1.1)])]))])
-        expect = "1.1\n"
-        self.assertTrue(TestCodeGen.test(input,expect,502))
+        input = """void main() {
+                    putFloat(100.001);
+                }"""
+        expect = "100.001"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     def test_int_vs_int(self):
-        input = Program([
-            FuncDecl(Id("main"),[],VoidType(),Block([
-                CallExpr(Id("putInt"),[BinaryOp("+",IntLiteral(5),IntLiteral(5))])]))])
-        expect = "10"
-        self.assertTrue(TestCodeGen.test(input,expect,503))
+        input = """void main() {
+                    putInt(10 + 100);
+                }"""
+        expect = "110"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     def test_float_vs_float(self):
-        input = Program([
-            FuncDecl(Id("main"),[],VoidType(),Block([
-                CallExpr(Id("putFloatLn"),[BinaryOp("+",FloatLiteral(1.1),FloatLiteral(1.1))])]))])
-        expect = "2.2\n"
-        self.assertTrue(TestCodeGen.test(input,expect,504))
+        input = """void main() {
+                    putFloat(10.1 + 100.4);
+                }"""
+        expect = "110.5"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     def test_float_vs_int(self):
-        input = Program([
-            FuncDecl(Id("main"),[],VoidType(),Block([
-                CallExpr(Id("putFloatLn"),[BinaryOp("+",FloatLiteral(2.2),IntLiteral(2))])]))])
-        expect = "4.2\n"
-        self.assertTrue(TestCodeGen.test(input,expect,505))
+        input = """void main() {
+                    putFloat(10.1 + 100);
+                }"""
+        expect = "110.1"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     def test_int_vs_float(self):
-        input = Program([
-            FuncDecl(Id("main"),[],VoidType(),Block([
-                CallExpr(Id("putFloatLn"),[BinaryOp("+",IntLiteral(4),FloatLiteral(4.1))])]))])
-        expect = "8.1\n"
-        self.assertTrue(TestCodeGen.test(input,expect,506))
+        input = """void main() {
+                    putFloat(10 + 100.4);
+                }"""
+        expect = "110.4"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_int_vs_float_complex(self):
+        input = """void main() {
+                    putFloat(10*10 + 100.4/2 - 15*2.3 + 2.2/1.2);
+                }"""
+        expect = "117.53333"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+    '''
+    def test_id(self):
+        input = """void main() {
+                    int a;
+                    a = 100;
+                    putInt(a);
+                }"""
+        expect = "100"
+        self.assertTrue(TestCodeGen.test(input,expect,507))
+    '''
+    def test_func_decl(self):
+        input = """
+                int sum_int(int a, int b){
+                    return a + b;
+                }
+
+                void main() {
+                    putInt(sum_int(1001,10));
+                }"""
+        expect = "1011"
+        self.assertTrue(TestCodeGen.test(input,expect,501))
