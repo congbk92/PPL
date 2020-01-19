@@ -157,7 +157,8 @@ class CodeGenVisitor(BaseVisitor, Utils):
 
         subctxt = o
         frame = Frame(ast.name, ast.returnType)
-        self.genMETHOD(ast, subctxt.sym, frame)
+        self.genMETHOD(ast, [Symbol(ast.name.name, MType([param.varType for param in ast.param], ast.returnType), CName(self.className))] + subctxt.sym, frame)
+        #new_sym = 
         return SubBody(None, [Symbol(ast.name.name, MType([param.varType for param in ast.param], ast.returnType), CName(self.className))] + subctxt.sym)
 
     def visitCallExpr(self, ast, o):
@@ -173,11 +174,14 @@ class CodeGenVisitor(BaseVisitor, Utils):
         ctype = sym.mtype
 
         #in_ = ("", list())
-        print(ast.param)
-        for x in ast.param:
+        #print(ast.param)
+        for x in zip(ast.param,sym.mtype.partype):
             #print(self.visit(x, Access(frame, nenv, False, True)))
-            str1, typ1 = self.visit(x, Access(frame, nenv, False, True))
-            self.emit.printout(str1)
+
+            code, typ1 = self.visit(x[0], Access(frame, nenv, False, True))
+            if type(typ1) is IntType and type(x[1]) is FloatType:
+                code += self.emit.emitI2F(frame)
+            self.emit.printout(code)
             #in_ = (in_[0] + str1, in_[1].append(typ1))
         #self.emit.printout(in_[0])
         self.emit.printout(self.emit.emitINVOKESTATIC(cname + "/" + ast.method.name, ctype, frame))
@@ -221,9 +225,13 @@ class CodeGenVisitor(BaseVisitor, Utils):
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
+        sym = nenv[0]
         return_type = VoidType()
         if ast.expr is not None:
             code,return_type = self.visit(ast.expr, Access(frame, nenv, False, True))
+            if type(return_type) is IntType and type(sym.mtype.rettype)  is FloatType:
+                code += self.emit.emitI2F(frame)
+                return_type = FloatType()
             self.emit.printout(code)
         self.emit.printout(self.emit.emitRETURN(return_type, frame))
 
@@ -233,23 +241,25 @@ class CodeGenVisitor(BaseVisitor, Utils):
 
         ctxt = o
         frame = ctxt.frame
-        returnType = IntType()
+        if ast.op == "=":
+            pass
+        elif ast.op in ["+","-","*","/"]:
+            returnType = IntType()
+            lcode,ltype = self.visit(ast.left,o)
+            rcode,rtype = self.visit(ast.right,o)
+            if FloatType in [type(ltype),type(rtype)]:
+                returnType = FloatType()
+            
+            if type(ltype) is IntType and type(returnType) is FloatType:
+                lcode += self.emit.emitI2F(frame)
+            if type(rtype) is IntType and type(returnType) is FloatType:
+                rcode += self.emit.emitI2F(frame)
 
-        lcode,ltype = self.visit(ast.left,o)
-        rcode,rtype = self.visit(ast.right,o)
-        if FloatType in [type(ltype),type(rtype)]:
-            returnType = FloatType()
-        
-        if type(ltype) is IntType and type(returnType) is FloatType:
-            lcode += self.emit.emitI2F(frame)
-        if type(rtype) is IntType and type(returnType) is FloatType:
-            rcode += self.emit.emitI2F(frame)
-
-        opcode = ""
-        if ast.op in ["+","-"]:
-            opcode += self.emit.emitADDOP(ast.op, returnType, frame)
-        elif ast.op in ["*","/"]:
-            opcode += self.emit.emitMULOP(ast.op, returnType, frame)
+            opcode = ""
+            if ast.op in ["+","-"]:
+                opcode += self.emit.emitADDOP(ast.op, returnType, frame)
+            elif ast.op in ["*","/"]:
+                opcode += self.emit.emitMULOP(ast.op, returnType, frame)
 
         return lcode + rcode + opcode, returnType
 

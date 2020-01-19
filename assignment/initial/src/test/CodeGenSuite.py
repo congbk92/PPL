@@ -58,16 +58,7 @@ class CheckCodeGenSuite(unittest.TestCase):
                 }"""
         expect = "117.53333"
         self.assertTrue(TestCodeGen.test(input,expect,500))
-    '''
-    def test_id(self):
-        input = """void main() {
-                    int a;
-                    a = 100;
-                    putInt(a);
-                }"""
-        expect = "100"
-        self.assertTrue(TestCodeGen.test(input,expect,507))
-    '''
+
     def test_func_decl(self):
         input = """
                 int sum_int(int a, int b){
@@ -78,4 +69,62 @@ class CheckCodeGenSuite(unittest.TestCase):
                     putInt(sum_int(1001,10));
                 }"""
         expect = "1011"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_func_float(self):
+        input = """
+                float sum_float(float a, float b){
+                    return a + b;
+                }
+
+                void main() {
+                    putFloat(sum_float(1001.1,10.1));
+                }"""
+        expect = "1011.19995"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_func_pass_float_by_int(self):
+        input = """
+                int sum_int(int a, int b){
+                    return a + b;
+                }
+
+                void main() {
+                    putFloat(sum_int(1001,10));
+                }"""
+        expect = "1011.0"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+    
+    def test_func_pass_float_by_int_1(self):
+        input = """
+                float sum_float(float a, float b){
+                    return a + b;
+                }
+
+                void main() {
+                    putFloat(sum_float(1001,10));
+                }"""
+        expect = "1011.0"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_func_return_float_by_int(self):
+        input = """
+                float sum_float(int a, int b){
+                    return a + b;
+                }
+
+                void main() {
+                    putFloat(sum_float(1001,10));
+                }"""
+        expect = "1011.0"
         self.assertTrue(TestCodeGen.test(input,expect,501))
+    '''
+    def test_id(self):
+        input = """void main() {
+                    int a;
+                    a = 100;
+                    putInt(a);
+                }"""
+        expect = "100"
+        self.assertTrue(TestCodeGen.test(input,expect,507))
+    '''
