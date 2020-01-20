@@ -17,11 +17,19 @@ class CodeGenerator(Utils):
         self.libName = "io"
 
     def init(self):
-        return [Symbol("getInt", MType(list(), IntType()), CName(self.libName)),
-                    Symbol("putInt", MType([IntType()], VoidType()), CName(self.libName)),
-                    Symbol("putIntLn", MType([IntType()], VoidType()), CName(self.libName)),
-                    Symbol("putFloat", MType([FloatType()], VoidType()), CName(self.libName)),
-                    Symbol("putFloatLn", MType([FloatType()], VoidType()), CName(self.libName))
+        return [
+                    Symbol("getInt",        MType([],               IntType()), CName(self.libName)),
+                    Symbol("putInt",        MType([IntType()],      VoidType()), CName(self.libName)), 
+                    Symbol("putIntLn",      MType([IntType()],      VoidType()), CName(self.libName)),
+                    Symbol("getFloat",      MType([],               FloatType()), CName(self.libName)),
+                    Symbol("putFloat",      MType([FloatType()],    VoidType()), CName(self.libName)),
+                    Symbol("putFloatLn",    MType([FloatType()],    VoidType()), CName(self.libName)),
+                    Symbol("putBool",       MType([BoolType()],     VoidType()), CName(self.libName)),
+                    Symbol("putBoolLn",     MType([BoolType()],     VoidType()), CName(self.libName)),
+                    Symbol("putString",     MType([StringType()],   VoidType()), CName(self.libName)),
+                    Symbol("putStringLn",   MType([StringType()],   VoidType()), CName(self.libName)),
+                    Symbol("putLn",         MType([],               VoidType()), CName(self.libName)),
+
                     ]
 
     def gen(self, ast, dir_):
@@ -95,9 +103,17 @@ class CodeGenVisitor(BaseVisitor, Utils):
         #c: Any
 
         self.emit.printout(self.emit.emitPROLOG(self.className, "java.lang.Object"))
-        e = SubBody(None, self.env)
-        for x in ast.decl:
-            e = self.visit(x, e)
+        #Symbol("getInt", MType(list(), IntType()), CName(self.libName))
+        #
+
+        nenv = []
+        for decl in ast.decl:
+            if type(decl) is FuncDecl:
+                sym = Symbol(decl.name.name, MType([param.varType for param in decl.param], decl.returnType), CName(self.className))
+                nenv += [sym]
+
+        e = SubBody(None, self.env + nenv)
+        [self.visit(x, e) for x in ast.decl]
         # generate default constructor
         self.genMETHOD(FuncDecl(Id("<init>"), list(), None, Block(list())), c, Frame("<init>", VoidType))
         self.emit.emitEPILOG()
@@ -142,14 +158,34 @@ class CodeGenVisitor(BaseVisitor, Utils):
         if isInit:
             self.emit.printout(self.emit.emitREADVAR("this", ClassType(self.className), 0, frame))
             self.emit.printout(self.emit.emitINVOKESPECIAL(frame))
-            
-        list(map(lambda x: self.visit(x, SubBody(frame, env)), body.member))
+
+        cur_subody = SubBody(frame, env)
+        for x in body.member:
+            result = self.visit(x,cur_subody)
+            if type(result) is SubBody:
+                cur_subody = result
+            elif result is not None:
+                self.emit.printout(result[0])
 
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
         if type(returnType) is VoidType:
             self.emit.printout(self.emit.emitRETURN(VoidType(), frame))
         self.emit.printout(self.emit.emitENDMETHOD(frame))
         frame.exitScope();
+    
+    def visitBlock(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        nenv = ctxt.sym
+        cur_subody = SubBody(frame, nenv)
+        frame.enterScope(False)
+        for x in ast.member:
+            result = self.visit(x,cur_subody)
+            if type(result) is SubBody:
+                cur_subody = result
+            elif result is not None:
+                self.emit.printout(result[0])
+        frame.exitScope()
 
     def visitFuncDecl(self, ast, o):
         #ast: FuncDecl
@@ -157,9 +193,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
 
         subctxt = o
         frame = Frame(ast.name, ast.returnType)
-        self.genMETHOD(ast, [Symbol(ast.name.name, MType([param.varType for param in ast.param], ast.returnType), CName(self.className))] + subctxt.sym, frame)
-        #new_sym = 
-        return SubBody(None, [Symbol(ast.name.name, MType([param.varType for param in ast.param], ast.returnType), CName(self.className))] + subctxt.sym)
+        self.genMETHOD(ast, [Symbol("0_return", MType([param.varType for param in ast.param], ast.returnType), CName(self.className))] + subctxt.sym, frame)
 
     def visitCallExpr(self, ast, o):
         #ast: CallExpr
@@ -186,40 +220,13 @@ class CodeGenVisitor(BaseVisitor, Utils):
         #self.emit.printout(in_[0])
         self.emit.printout(self.emit.emitINVOKESTATIC(cname + "/" + ast.method.name, ctype, frame))
         return "", sym.mtype.rettype
-    def visitIntLiteral(self, ast, o):
-        #ast: IntLiteral
-        #o: Any
-
-        ctxt = o
-        frame = ctxt.frame
-        return self.emit.emitPUSHICONST(ast.value, frame), IntType()
-
-    def visitFloatLiteral(self, ast, o):
-        #ast: IntLiteral
-        #o: Any
-
-        ctxt = o
-        frame = ctxt.frame
-        return self.emit.emitPUSHFCONST(str(ast.value), frame), FloatType()
 
     def visitVarDecl(self, ast, o):
-        #ast: IntLiteral
-        #o: Any
-
-        ctxt = o
-        frame = ctxt.frame
-        return self.emit.emitPUSHFCONST(str(ast.value), frame), FloatType()
-
-    def visitId(self, ast, o):
-        #ast: IntLiteral
-        #o: Any
-
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
-        sym = self.lookup(ast.name, nenv, lambda x: x.name)
-
-        return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+        nenv += [Symbol(ast.variable, ast.varType, Index(frame.getNewIndex()))] 
+        return SubBody(frame, nenv)
 
     def visitReturn(self, ast, o):
         ctxt = o
@@ -235,14 +242,34 @@ class CodeGenVisitor(BaseVisitor, Utils):
             self.emit.printout(code)
         self.emit.printout(self.emit.emitRETURN(return_type, frame))
 
-    def visitBinaryOp(self, ast, o):
-        #ast: IntLiteral
-        #o: Any
-
+    def visitId(self, ast, o):
         ctxt = o
         frame = ctxt.frame
+        nenv = ctxt.sym
+        isLeft = ctxt.isLeft
+        isFirst = ctxt.isFirst
+
+        sym = self.lookup(ast.name, nenv, lambda x: x.name)
+        if not isLeft and isFirst:
+            return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+        elif isLeft and  isFirst:
+            return "", sym.mtype
+        elif isLeft and not isFirst:
+            return self.emit.emitWRITEVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+
+    def visitBinaryOp(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        nenv = ctxt.sym
         if ast.op == "=":
-            pass
+            #(self, frame, sym, isLeft, isFirst)
+            lcode_first,ltype = self.visit(ast.left, Access(frame, nenv, True, True))
+            rcode,rtype = self.visit(ast.right, Access(frame, nenv, False, True))
+            if type(rtype) is IntType and type(ltype) is FloatType:
+                rcode += self.emit.emitI2F(frame)
+            lcode_second,ltype = self.visit(ast.left, Access(frame, nenv, True, False))
+            return lcode_first + rcode + lcode_second, ltype
+
         elif ast.op in ["+","-","*","/"]:
             returnType = IntType()
             lcode,ltype = self.visit(ast.left,o)
@@ -261,5 +288,27 @@ class CodeGenVisitor(BaseVisitor, Utils):
             elif ast.op in ["*","/"]:
                 opcode += self.emit.emitMULOP(ast.op, returnType, frame)
 
-        return lcode + rcode + opcode, returnType
+            return lcode + rcode + opcode, returnType
 
+    def visitIntLiteral(self, ast, o):
+        #ast: IntLiteral
+        #o: Any
+        ctxt = o
+        frame = ctxt.frame
+        return self.emit.emitPUSHICONST(ast.value, frame), IntType()
+
+    def visitFloatLiteral(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        return self.emit.emitPUSHFCONST(str(ast.value), frame), FloatType()
+
+    def visitStringLiteral(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        return self.emit.emitPUSHCONST('"' + ast.value + '"', StringType() , frame), StringType()
+
+    def visitBooleanLiteral(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        value = "true" if ast.value else "false"
+        return self.emit.emitPUSHICONST(value , frame), BoolType()
