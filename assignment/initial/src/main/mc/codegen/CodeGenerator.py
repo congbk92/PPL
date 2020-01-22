@@ -152,6 +152,13 @@ class CodeGenVisitor(BaseVisitor, Utils):
                 env += [Symbol(param.variable, param.varType, Index(new_idx))] 
 
         body = consdecl.body
+        #Print .var
+        for member in body.member:
+            if type(member) is VarDecl:
+                new_idx = frame.getNewIndex()
+                self.emit.printout(self.emit.emitVAR(new_idx, member.variable, member.varType, frame.getStartLabel(), frame.getEndLabel(), frame))
+                env += [Symbol(member.variable, member.varType, Index(new_idx))]
+
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
 
         # Generate code for statements
@@ -159,12 +166,9 @@ class CodeGenVisitor(BaseVisitor, Utils):
             self.emit.printout(self.emit.emitREADVAR("this", ClassType(self.className), 0, frame))
             self.emit.printout(self.emit.emitINVOKESPECIAL(frame))
 
-        cur_subody = SubBody(frame, env)
         for x in body.member:
-            result = self.visit(x,cur_subody)
-            if type(result) is SubBody:
-                cur_subody = result
-            elif result is not None:
+            result = self.visit(x,SubBody(frame, env))
+            if result is not None:
                 self.emit.printout(result[0])
 
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
@@ -176,15 +180,20 @@ class CodeGenVisitor(BaseVisitor, Utils):
     def visitBlock(self, ast, o):
         ctxt = o
         frame = ctxt.frame
-        nenv = ctxt.sym
-        cur_subody = SubBody(frame, nenv)
+        env = ctxt.sym
         frame.enterScope(False)
+        #Print .var
+        for member in ast.member:
+            if type(member) is VarDecl:
+                new_idx = frame.getNewIndex()
+                self.emit.printout(self.emit.emitVAR(new_idx, member.variable, member.varType, frame.getStartLabel(), frame.getEndLabel(), frame))
+                env += [Symbol(member.variable, member.varType, Index(new_idx))]
+        self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
         for x in ast.member:
-            result = self.visit(x,cur_subody)
-            if type(result) is SubBody:
-                cur_subody = result
-            elif result is not None:
+            result = self.visit(x,SubBody(frame, env))
+            if result is not None:
                 self.emit.printout(result[0])
+        self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
         frame.exitScope()
 
     def visitFuncDecl(self, ast, o):
@@ -206,27 +215,26 @@ class CodeGenVisitor(BaseVisitor, Utils):
         sym = self.lookup(ast.method.name, nenv, lambda x: x.name)
         cname = sym.value.value
         ctype = sym.mtype
-
-        #in_ = ("", list())
         #print(ast.param)
+        #in_ = ("", list())
+        code = ""
         for x in zip(ast.param,sym.mtype.partype):
             #print(self.visit(x, Access(frame, nenv, False, True)))
-
-            code, typ1 = self.visit(x[0], Access(frame, nenv, False, True))
+            str1, typ1 = self.visit(x[0], Access(frame, nenv, False, True))
+            code += str1
             if type(typ1) is IntType and type(x[1]) is FloatType:
                 code += self.emit.emitI2F(frame)
-            self.emit.printout(code)
             #in_ = (in_[0] + str1, in_[1].append(typ1))
         #self.emit.printout(in_[0])
-        self.emit.printout(self.emit.emitINVOKESTATIC(cname + "/" + ast.method.name, ctype, frame))
-        return "", sym.mtype.rettype
+        code += self.emit.emitINVOKESTATIC(cname + "/" + ast.method.name, ctype, frame)
+        return code, sym.mtype.rettype
 
     def visitVarDecl(self, ast, o):
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
         nenv += [Symbol(ast.variable, ast.varType, Index(frame.getNewIndex()))] 
-        return SubBody(frame, nenv)
+        #return SubBody(frame, nenv)
 
     def visitReturn(self, ast, o):
         ctxt = o

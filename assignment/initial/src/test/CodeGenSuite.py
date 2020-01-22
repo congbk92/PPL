@@ -33,8 +33,6 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "This is a string"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
-
-
     def test_int_vs_int(self):
         input = """void main() {
                     putInt(10 + 100);
@@ -133,14 +131,21 @@ class CheckCodeGenSuite(unittest.TestCase):
     def test_func_using_before_define(self):
         input = """
                 void main() {
-                    putFloat(sum_float(1001,10));
+                    putFloatLn(sum_float(1001,10));
+                    {
+                        int a;
+                        int b;
+                        a = 1;
+                        b = 2;
+                        putInt(a+b);
+                    }
                 }
                 float sum_float(int a, int b){
                     return a + b;
                 }
                 """
-        expect = "1011.0"
-        self.assertTrue(TestCodeGen.test(input,expect,500))
+        expect = "1011.0\n3"
+        self.assertTrue(TestCodeGen.test(input,expect,501))
 
     def test_assign_op_simple(self):
         input = """void main() {
