@@ -269,6 +269,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
+
         if ast.op == "=":
             #(self, frame, sym, isLeft, isFirst)
             lcode_first,ltype = self.visit(ast.left, Access(frame, nenv, True, True))
@@ -278,7 +279,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
             lcode_second,ltype = self.visit(ast.left, Access(frame, nenv, True, False))
             return lcode_first + rcode + lcode_second, ltype
 
-        elif ast.op in ["+","-","*","/"]:
+        elif ast.op in ["+", "-", "*", "/"]:
             returnType = IntType()
             lcode,ltype = self.visit(ast.left,o)
             rcode,rtype = self.visit(ast.right,o)
@@ -290,13 +291,29 @@ class CodeGenVisitor(BaseVisitor, Utils):
             if type(rtype) is IntType and type(returnType) is FloatType:
                 rcode += self.emit.emitI2F(frame)
 
-            opcode = ""
-            if ast.op in ["+","-"]:
-                opcode += self.emit.emitADDOP(ast.op, returnType, frame)
-            elif ast.op in ["*","/"]:
-                opcode += self.emit.emitMULOP(ast.op, returnType, frame)
-
+            if ast.op in ["+", "-"]:
+                opcode = self.emit.emitADDOP(ast.op, returnType, frame)
+            elif ast.op in ["*", "/"]:
+                opcode = self.emit.emitMULOP(ast.op, returnType, frame)
             return lcode + rcode + opcode, returnType
+
+        elif ast.op in ["&&", "||"]:
+            lcode,ltype = self.visit(ast.left,o)
+            rcode,rtype = self.visit(ast.right,o)
+            new_label = frame.getNewLabel()
+            if ast.op == '||':
+                opcode =  self.emit.emitOROP(frame)
+                short_circuit = self.emit.emitDUP(frame) + self.emit.emitIFTRUE(new_label,frame)
+            else:
+                opcode = self.emit.emitANDOP(frame)
+                short_circuit = self.emit.emitDUP(frame) + self.emit.emitIFFALSE(new_label,frame)
+            end_lable = self.emit.emitLABEL(new_label, frame)
+            return lcode + short_circuit + rcode + opcode + end_lable, BoolType()
+
+        elif ast.op in [">","<", "<=", ">="]:
+            pass
+        elif ast.op in ["==","!="]:
+            pass
 
     def visitIntLiteral(self, ast, o):
         #ast: IntLiteral

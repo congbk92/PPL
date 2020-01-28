@@ -145,7 +145,7 @@ class CheckCodeGenSuite(unittest.TestCase):
                 }
                 """
         expect = "1011.0\n3"
-        self.assertTrue(TestCodeGen.test(input,expect,501))
+        self.assertTrue(TestCodeGen.test(input,expect,500))
 
     def test_assign_op_simple(self):
         input = """void main() {
@@ -167,4 +167,96 @@ class CheckCodeGenSuite(unittest.TestCase):
                     putFloat(a);
                 }"""
         expect = "100.0"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_and_op(self):
+        input = """void main() {
+                    putBoolLn(false&&false);
+                    putBoolLn(true&&false);
+                    putBoolLn(false&&true);
+                    putBool(true&&true);
+                }"""
+        expect = "false\nfalse\nfalse\ntrue"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_or_op(self):
+        input = """void main() {
+                    putBoolLn(false||false);
+                    putBoolLn(true||false);
+                    putBoolLn(false||true);
+                    putBool(true||true);
+                }"""
+        expect = "false\ntrue\ntrue\ntrue"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_or_op_short_circuit(self):
+        input = """
+                boolean val_true(){
+                    putStringLn("val_true");
+                    return true;
+                }
+                boolean val_false(){
+                    putStringLn("val_false");
+                    return false;
+                }
+                void main() {
+                    boolean a;
+                    a = val_true()||val_false();
+                }"""
+        expect = "val_true\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_or_op_short_circuit_complex(self):
+        input = """
+                boolean val_true(){
+                    putStringLn("val_true");
+                    return true;
+                }
+                boolean val_false(int a){
+                    putString("val_false");
+                    putInt(a);
+                    putLn();
+                    return false;
+                }
+                void main() {
+                    boolean a;
+                    a = val_false(1)||val_false(2)&&val_true();
+                }"""
+        expect = "val_false1\nval_false2\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_and_op_short_circuit(self):
+        input = """
+                boolean val_true(){
+                    putStringLn("val_true");
+                    return true;
+                }
+                boolean val_false(){
+                    putStringLn("val_false");
+                    return false;
+                }
+                void main() {
+                    boolean a;
+                    a = val_false()&&val_true();
+                }"""
+        expect = "val_false\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_and_op_short_circuit_complex(self):
+        input = """
+                boolean val_true(int a){
+                    putString("val_true");
+                    putInt(a);
+                    putLn();
+                    return true;
+                }
+                boolean val_false(){
+                    putStringLn("val_false");
+                    return false;
+                }
+                void main() {
+                    boolean a;
+                    a = val_true(1)&&(val_true(2)||val_false());
+                }"""
+        expect = "val_true1\nval_true2\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))

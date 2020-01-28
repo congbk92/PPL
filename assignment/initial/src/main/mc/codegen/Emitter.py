@@ -178,7 +178,7 @@ class Emitter():
         
         frame.pop()
 
-        if type(inType) is IntType:
+        if type(inType) in [IntType,BoolType]:
             return self.jvm.emitISTORE(index)
         elif type(inType) is FloatType:
             return self.jvm.emitFSTORE(index)
@@ -575,7 +575,7 @@ class Emitter():
         #in_: Type
         #frame: Frame
 
-        if type(in_) is IntType:
+        if type(in_) in [IntType, BoolType]:
             frame.pop()
             return self.jvm.emitIRETURN()
         if type(in_) is FloatType:
