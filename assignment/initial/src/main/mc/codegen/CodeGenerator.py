@@ -233,7 +233,10 @@ class CodeGenVisitor(BaseVisitor, Utils):
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
-        nenv += [Symbol(ast.variable, ast.varType, Index(frame.getNewIndex()))] 
+        if type(ast.varType) is ArrayType:
+            sym = self.lookup(ast.variable, nenv, lambda x: x.name)
+            self.emit.printout(self.emit.emitARRAY(ast.varType.eleType , ast.varType.dimen, frame))
+            self.emit.printout(self.emit.emitWRITEVAR(ast.variable, ast.varType, sym.value.value, frame))
         #return SubBody(frame, nenv)
 
     def visitReturn(self, ast, o):
@@ -258,12 +261,33 @@ class CodeGenVisitor(BaseVisitor, Utils):
         isFirst = ctxt.isFirst
 
         sym = self.lookup(ast.name, nenv, lambda x: x.name)
-        if not isLeft and isFirst:
+        if type(sym.mtype) in [ArrayType, ArrayPointerType]:
             return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
-        elif isLeft and  isFirst:
-            return "", sym.mtype
-        elif isLeft and not isFirst:
-            return self.emit.emitWRITEVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+        else:
+            if not isLeft and isFirst:
+                return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+            elif isLeft and  isFirst:
+                return "", sym.mtype
+            elif isLeft and not isFirst:
+                return self.emit.emitWRITEVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+
+    def visitArrayCell(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        nenv = ctxt.sym
+        isLeft = ctxt.isLeft
+        isFirst = ctxt.isFirst
+
+        arr_code,arr_type = self.visit(ast.arr, Access(frame, nenv, False, True))
+        idx_code,idx_type = self.visit(ast.idx, Access(frame, nenv, False, True))
+
+        if isLeft:
+            if isFirst:
+                return arr_code + idx_code , arr_type.eleType
+            else:
+                return self.emit.emitASTORE(arr_type.eleType , frame) , arr_type.eleType
+        else:
+            return arr_code + idx_code + self.emit.emitALOAD(arr_type.eleType , frame), arr_type.eleType
 
     def visitBinaryOp(self, ast, o):
         ctxt = o
@@ -309,11 +333,36 @@ class CodeGenVisitor(BaseVisitor, Utils):
                 short_circuit = self.emit.emitDUP(frame) + self.emit.emitIFFALSE(new_label,frame)
             end_lable = self.emit.emitLABEL(new_label, frame)
             return lcode + short_circuit + rcode + opcode + end_lable, BoolType()
+        elif ast.op in [">","<", "<=", ">=", "==", "!="]:
+            lcode,ltype = self.visit(ast.left,o)
+            rcode,rtype = self.visit(ast.right,o)
+            if FloatType in [type(ltype), type(rtype)]:
+                if type(ltype) is IntType:
+                    lcode += self.emit.emitI2F(frame)
+                if type(rtype) is IntType:
+                    rcode += self.emit.emitI2F(frame)
+                opcode = self.emit.emitFREOP(ast.op, frame)
+            else:
+                opcode = self.emit.emitREOP(ast.op, BoolType() ,  frame)
+            return lcode + rcode + opcode , BoolType()
+        elif ast.op == "%":
+            lcode,ltype = self.visit(ast.left,o)
+            rcode,rtype = self.visit(ast.right,o)
+            opcode = self.emit.emitMOD(frame)
+            return lcode + rcode + opcode , IntType()
 
-        elif ast.op in [">","<", "<=", ">="]:
-            pass
-        elif ast.op in ["==","!="]:
-            pass
+    def visitUnaryOp(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        nenv = ctxt.sym
+        
+        bdy_code,bdy_type = self.visit(ast.body,o)
+        if ast.op == "!":
+            opcode = self.emit.emitNOT(bdy_type, frame)
+        if ast.op == "-":
+            opcode = self.emit.emitNEGOP(bdy_type, frame)
+
+        return bdy_code + opcode , bdy_type
 
     def visitIntLiteral(self, ast, o):
         #ast: IntLiteral
