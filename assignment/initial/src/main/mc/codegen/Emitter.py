@@ -31,8 +31,10 @@ class Emitter():
 
     def getFullType(self, inType):
         typeIn = type(inType)
-        if typeIn in [IntType, BoolType]:
+        if typeIn is IntType:
             return "int"
+        elif typeIn is BoolType:
+            return "boolean"
         elif typeIn is FloatType:
             return "float"
         elif typeIn is StringType:
@@ -97,7 +99,7 @@ class Emitter():
             return self.emitPUSHICONST(in_, frame)
         elif type(typ) is StringType:
             frame.push()
-            return self.jvm.emitLDC(in_)
+            return self.jvm.emitLDC('\"'+in_+'\"')
         else:
             raise IllegalOperandException(in_)
 
@@ -109,8 +111,10 @@ class Emitter():
         #..., arrayref, index, value -> ...
         
         frame.pop()
-        if type(in_) in [IntType, BoolType]:
+        if type(in_) is IntType:
             return self.jvm.emitIALOAD()
+        elif type(in_) is BoolType:
+            return self.jvm.emitBALOAD()
         elif type(in_) is FloatType:
             return self.jvm.emitFALOAD()
         elif type(in_) is ArrayPointerType or type(in_) is cgen.ClassType or type(in_) is StringType:
@@ -126,8 +130,10 @@ class Emitter():
         frame.pop()
         frame.pop()
         frame.pop()
-        if type(in_) in [IntType, BoolType]:
+        if type(in_) is IntType:
             return self.jvm.emitIASTORE()
+        if type(in_) is BoolType:
+            return self.jvm.emitBASTORE()
         elif type(in_) is FloatType:
             return self.jvm.emitFASTORE()
         elif type(in_) is ArrayPointerType or type(in_) is cgen.ClassType or type(in_) is StringType:
@@ -194,7 +200,7 @@ class Emitter():
         
         frame.pop()
 
-        if type(inType) in [IntType,BoolType]:
+        if type(inType) in [IntType, BoolType]:
             return self.jvm.emitISTORE(index)
         elif type(inType) is FloatType:
             return self.jvm.emitFSTORE(index)
@@ -641,6 +647,10 @@ class Emitter():
         #frame: Frame
 
         return self.jvm.emitGOTO(label)
+
+    def emitSTATICFIELD(self, name, typeIn):
+
+        return self.jvm.emitSTATICFIELD(name, self.getJVMType(typeIn), False)
 
     ''' generate some starting directives for a class.<p>
     *   .source MPC.CLASSNAME.java<p>

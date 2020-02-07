@@ -5,6 +5,7 @@ from AST import *
 
 class CheckCodeGenSuite(unittest.TestCase):
     #Check Literal
+
     def test_int_lit(self):
         """Simple program: int main() {} """
         input = """void main() {putInt(100);}"""
@@ -437,9 +438,9 @@ class CheckCodeGenSuite(unittest.TestCase):
 
                 }"""
         expect = "true\nfalse\nfalse\n"
-        self.assertTrue(TestCodeGen.test(input,expect,500))
+        self.assertTrue(TestCodeGen.test(input,expect,501))
 
-    def test_arr_bool(self):
+    def test_arr_string(self):
         input = """
                 void main() {
                     string arr[3];
@@ -468,4 +469,45 @@ class CheckCodeGenSuite(unittest.TestCase):
 
                 }"""
         expect = "1005\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #To do: add code to set default value for array string
+    def test_global_var(self):
+        input = """
+                void main() {
+                    putIntLn(a);
+                    putFloatLn(b);
+                    putStringLn(c);
+                    putBoolLn(d);
+                    a = 1;
+                    b = 1.1;
+                    c = "abc";
+                    d = true;
+                    putIntLn(a);
+                    putFloatLn(b);
+                    putStringLn(c);
+                    putBoolLn(d);
+
+                    putIntLn(a_arr[3]);
+                    putFloatLn(b_arr[3]);
+                    putStringLn(c_arr[3]);
+                    putBoolLn(d_arr[3]);
+                    a_arr[3] = 123;
+                    b_arr[3] = 123.123;
+                    c_arr[3] = "string3";
+                    d_arr[3] = true;
+                    putIntLn(a_arr[3]);
+                    putFloatLn(b_arr[3]);
+                    putStringLn(c_arr[3]);
+                    putBoolLn(d_arr[3]);
+                }
+                int a;
+                float b;
+                string c;
+                boolean d;
+                int a_arr[5];
+                float b_arr[5];
+                string c_arr[5];
+                boolean d_arr[5];"""
+        expect = "0\n0.0\n\nfalse\n1\n1.1\nabc\ntrue\n0\n0.0\nnull\nfalse\n123\n123.123\nstring3\ntrue\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))

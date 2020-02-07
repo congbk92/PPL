@@ -111,11 +111,18 @@ class CodeGenVisitor(BaseVisitor, Utils):
             if type(decl) is FuncDecl:
                 sym = Symbol(decl.name.name, MType([param.varType for param in decl.param], decl.returnType), CName(self.className))
                 nenv += [sym]
+            else:
+                sym = Symbol(decl.variable, decl.varType, Index(-1))
+                nenv += [sym]
+        # generate field derective
+        lst_global_val_decl = [x for x in ast.decl if type(x) is VarDecl]
+        for decl in lst_global_val_decl:
+            self.emit.printout(self.emit.emitSTATICFIELD(decl.variable, decl.varType))
 
         e = SubBody(None, self.env + nenv)
-        [self.visit(x, e) for x in ast.decl]
+        [self.visit(x, e) for x in ast.decl if type(x) is FuncDecl]
         # generate default constructor
-        self.genMETHOD(FuncDecl(Id("<init>"), list(), None, Block(list())), c, Frame("<init>", VoidType))
+        self.genMETHOD(FuncDecl(Id("<init>"), list(), None, Block(list())), nenv, Frame("<init>", VoidType))
         self.emit.emitEPILOG()
         return c
 
@@ -136,8 +143,6 @@ class CodeGenVisitor(BaseVisitor, Utils):
         self.emit.printout(self.emit.emitMETHOD(methodName, mtype, not isInit, frame))
 
         frame.enterScope(True)
-
-        glenv = o
         env = o
 
         # Generate code for parameter declarations
@@ -165,6 +170,15 @@ class CodeGenVisitor(BaseVisitor, Utils):
         if isInit:
             self.emit.printout(self.emit.emitREADVAR("this", ClassType(self.className), 0, frame))
             self.emit.printout(self.emit.emitINVOKESPECIAL(frame))
+        elif isMain:
+            glbEnv = [sym for sym in env if sym.value.value == -1]
+            for sym in glbEnv:
+                if type(sym.mtype) is StringType:
+                    self.emit.printout(self.emit.emitPUSHCONST("", StringType(), frame))
+                    self.emit.printout(self.emit.emitPUTSTATIC(self.className + "." + sym.name, sym.mtype, frame))
+                if type(sym.mtype) is ArrayType:
+                    self.emit.printout(self.emit.emitARRAY(sym.mtype.eleType , sym.mtype.dimen, frame))
+                    self.emit.printout(self.emit.emitPUTSTATIC(self.className + "." + sym.name, sym.mtype, frame))
 
         for x in body.member:
             result = self.visit(x,SubBody(frame, env))
@@ -261,9 +275,24 @@ class CodeGenVisitor(BaseVisitor, Utils):
         isFirst = ctxt.isFirst
 
         sym = self.lookup(ast.name, nenv, lambda x: x.name)
-        if type(sym.mtype) in [ArrayType, ArrayPointerType]:
-            return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+        if sym.value.value == -1:
+            #Global variable
+            '''
+            if type(sym.mtype) in [ArrayType, ArrayPointerType]:
+                return self.emit.emitGETSTATIC(self.className + "." + ast.name, sym.mtype, frame), sym.mtype
+            else:
+            '''
+            if not isLeft and isFirst:
+                return self.emit.emitGETSTATIC(self.className + "." + ast.name, sym.mtype, frame), sym.mtype
+            elif isLeft and  isFirst:
+                return "", sym.mtype
+            elif isLeft and not isFirst:
+                return self.emit.emitPUTSTATIC(self.className + "." + ast.name, sym.mtype, frame), sym.mtype
         else:
+            #local variable
+            #if type(sym.mtype) in [ArrayType, ArrayPointerType]:
+                #return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
+            #else:
             if not isLeft and isFirst:
                 return self.emit.emitREADVAR(ast.name, sym.mtype, sym.value.value , frame), sym.mtype
             elif isLeft and  isFirst:
@@ -379,7 +408,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
     def visitStringLiteral(self, ast, o):
         ctxt = o
         frame = ctxt.frame
-        return self.emit.emitPUSHCONST('"' + ast.value + '"', StringType() , frame), StringType()
+        return self.emit.emitPUSHCONST(ast.value , StringType() , frame), StringType()
 
     def visitBooleanLiteral(self, ast, o):
         ctxt = o
