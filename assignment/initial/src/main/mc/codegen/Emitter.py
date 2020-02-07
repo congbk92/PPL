@@ -589,9 +589,14 @@ class Emitter():
     '''
     def emitDUP(self, frame):
         #frame: Frame
-
         frame.push()
         return self.jvm.emitDUP()
+
+    def emitDUPX2(self, frame):
+        #frame: Frame
+
+        frame.push()
+        return self.jvm.emitDUPX2()
 
     def emitPOP(self, frame):
         #frame: Frame

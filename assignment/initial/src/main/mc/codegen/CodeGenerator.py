@@ -181,7 +181,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
                     self.emit.printout(self.emit.emitPUTSTATIC(self.className + "." + sym.name, sym.mtype, frame))
 
         for x in body.member:
-            result = self.visit(x,SubBody(frame, env))
+            result = self.visit(x,Access(frame, env, True, True))
             if result is not None:
                 self.emit.printout(result[0])
 
@@ -204,7 +204,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
                 env += [Symbol(member.variable, member.varType, Index(new_idx))]
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
         for x in ast.member:
-            result = self.visit(x,SubBody(frame, env))
+            result = self.visit(x,Access(frame, env, True, True))
             if result is not None:
                 self.emit.printout(result[0])
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
@@ -322,6 +322,8 @@ class CodeGenVisitor(BaseVisitor, Utils):
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
+        isLeft = ctxt.isLeft
+        isFirst = ctxt.isFirst
 
         if ast.op == "=":
             #(self, frame, sym, isLeft, isFirst)
@@ -329,8 +331,14 @@ class CodeGenVisitor(BaseVisitor, Utils):
             rcode,rtype = self.visit(ast.right, Access(frame, nenv, False, True))
             if type(rtype) is IntType and type(ltype) is FloatType:
                 rcode += self.emit.emitI2F(frame)
+            dup_code = ""
+            if not isLeft:
+                if type(ast.left) is Id:
+                    dup_code = self.emit.emitDUP(frame)
+                elif type(ast.left) is ArrayCell:
+                    dup_code = self.emit.emitDUPX2(frame)
             lcode_second,ltype = self.visit(ast.left, Access(frame, nenv, True, False))
-            return lcode_first + rcode + lcode_second, ltype
+            return lcode_first + rcode + dup_code + lcode_second, ltype
 
         elif ast.op in ["+", "-", "*", "/"]:
             returnType = IntType()

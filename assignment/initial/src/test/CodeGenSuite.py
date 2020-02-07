@@ -438,7 +438,7 @@ class CheckCodeGenSuite(unittest.TestCase):
 
                 }"""
         expect = "true\nfalse\nfalse\n"
-        self.assertTrue(TestCodeGen.test(input,expect,501))
+        self.assertTrue(TestCodeGen.test(input,expect,500))
 
     def test_arr_string(self):
         input = """
@@ -510,4 +510,36 @@ class CheckCodeGenSuite(unittest.TestCase):
                 string c_arr[5];
                 boolean d_arr[5];"""
         expect = "0\n0.0\n\nfalse\n1\n1.1\nabc\ntrue\n0\n0.0\nnull\nfalse\n123\n123.123\nstring3\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_multi_assign_id(self):
+        input = """
+                void main() {
+                    int a,b,c,d;
+                    a = 123;
+                    b = c = d = a;
+                    putIntLn(a);
+                    putIntLn(b);
+                    putIntLn(c);
+                    putIntLn(d);
+                }
+                """
+        expect = "123\n123\n123\n123\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_multi_assign_arr(self):
+        input = """
+                void main() {
+                    int a;
+                    int arr[4];
+                    arr[1] = 123;
+                    arr[0] = arr[3] = a = arr[2] = arr[1];
+                    putIntLn(arr[0]);
+                    putIntLn(arr[1]);
+                    putIntLn(arr[2]);
+                    putIntLn(arr[3]);
+                    putIntLn(a);
+                }
+                """
+        expect = "123\n123\n123\n123\n123\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
