@@ -104,7 +104,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
 
         self.emit.printout(self.emit.emitPROLOG(self.className, "java.lang.Object"))
         #Symbol("getInt", MType(list(), IntType()), CName(self.libName))
-        #
+        #print(str(ast))
 
         nenv = []
         for decl in ast.decl:
@@ -186,8 +186,12 @@ class CodeGenVisitor(BaseVisitor, Utils):
                 self.emit.printout(result[0])
 
         self.emit.printout(self.emit.emitLABEL(frame.getEndLabel(), frame))
-        if type(returnType) is VoidType:
-            self.emit.printout(self.emit.emitRETURN(VoidType(), frame))
+        
+        if not isInit:
+            sym = self.lookup("0_return", env, lambda x: x.name)
+            self.emit.printout(self.emit.emitLABEL(sym.value.value, frame))
+
+        self.emit.printout(self.emit.emitRETURN(returnType, frame))
         self.emit.printout(self.emit.emitENDMETHOD(frame))
         frame.exitScope();
     
@@ -216,7 +220,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
 
         subctxt = o
         frame = Frame(ast.name, ast.returnType)
-        self.genMETHOD(ast, [Symbol("0_return", MType([param.varType for param in ast.param], ast.returnType), CName(self.className))] + subctxt.sym, frame)
+        self.genMETHOD(ast, [Symbol("0_return", MType([param.varType for param in ast.param], ast.returnType), Index(frame.getNewLabel()))] + subctxt.sym, frame)
 
     def visitCallExpr(self, ast, o):
         #ast: CallExpr
@@ -265,7 +269,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
                 code += self.emit.emitI2F(frame)
                 return_type = FloatType()
             self.emit.printout(code)
-        self.emit.printout(self.emit.emitRETURN(return_type, frame))
+        self.emit.printout(self.emit.emitGOTO(sym.value.value, frame))
 
     def visitId(self, ast, o):
         ctxt = o
@@ -423,3 +427,87 @@ class CodeGenVisitor(BaseVisitor, Utils):
         frame = ctxt.frame
         value = "true" if ast.value else "false"
         return self.emit.emitPUSHICONST(value , frame), BoolType()
+
+    def visitIf(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        env = ctxt.sym
+        
+        labelFalse = frame.getNewLabel()
+        labelExit = frame.getNewLabel()
+
+        expr_code,expr_type = self.visit(ast.expr, Access(frame, env, False, True))
+        self.emit.printout(expr_code)
+        self.emit.printout(self.emit.emitIFFALSE(labelFalse, frame))
+        code = self.visit(ast.thenStmt, Access(frame, env, True, True))
+        if code is not None:
+            self.emit.printout(code[0])
+        
+        if ast.elseStmt is not None:
+            self.emit.printout(self.emit.emitGOTO(labelExit, frame))
+        self.emit.printout(self.emit.emitLABEL(labelFalse, frame))
+        
+        if ast.elseStmt is not None:
+            code = self.visit(ast.elseStmt, Access(frame, env, True, True))
+            if code is not None:
+                self.emit.printout(code[0])
+            self.emit.printout(self.emit.emitLABEL(labelExit, frame))
+
+    def visitDowhile(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        env = ctxt.sym
+        
+        frame.enterLoop()
+
+        labelTrue = frame.getNewLabel()
+        self.emit.printout(self.emit.emitLABEL(labelTrue, frame))
+        for x in ast.sl:
+            result = self.visit(x,Access(frame, env, True, True))
+            if result is not None:
+                self.emit.printout(result[0])
+        self.emit.printout(self.emit.emitLABEL(frame.getContinueLabel(), frame))
+        result = self.visit(ast.exp,Access(frame, env, False, True))
+        if result is not None:
+                self.emit.printout(result[0])
+        self.emit.printout(self.emit.emitIFTRUE(labelTrue, frame))
+        self.emit.printout(self.emit.emitLABEL(frame.getBreakLabel(), frame))
+        frame.exitLoop()
+
+    def visitFor(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        env = ctxt.sym
+
+        frame.enterLoop()
+        labelFalse = frame.getNewLabel()
+        labelCheck = frame.getNewLabel()
+
+        result = self.visit(ast.expr1,Access(frame, env, True, True))
+        self.emit.printout(result[0])
+        self.emit.printout(self.emit.emitLABEL(labelCheck, frame))
+        result = self.visit(ast.expr2,Access(frame, env, False, True))
+        self.emit.printout(result[0])
+        self.emit.printout(self.emit.emitIFFALSE(labelFalse, frame))
+        result = self.visit(ast.loop,Access(frame, env, True, True))
+        if result is not None:
+                self.emit.printout(result[0])
+        self.emit.printout(self.emit.emitLABEL(frame.getContinueLabel(), frame))
+        result = self.visit(ast.expr3,Access(frame, env, True, True))
+        self.emit.printout(result[0])
+        self.emit.printout(self.emit.emitGOTO(labelCheck, frame))
+        self.emit.printout(self.emit.emitLABEL(labelFalse, frame))
+        self.emit.printout(self.emit.emitLABEL(frame.getBreakLabel(), frame))
+        frame.exitLoop()
+
+    def visitBreak(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        env = ctxt.sym
+        self.emit.printout(self.emit.emitGOTO(frame.getBreakLabel(), frame))
+    
+    def visitContinue(self, ast, o):
+        ctxt = o
+        frame = ctxt.frame
+        env = ctxt.sym
+        self.emit.printout(self.emit.emitGOTO(frame.getContinueLabel(), frame))

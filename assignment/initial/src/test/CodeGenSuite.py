@@ -2210,6 +2210,129 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
+    #if statement
+    def test_if_statement(self):
+        input = """
+                void main(){
+                    if(true){
+                        putStringLn("true");
+                    }
+                    if(true)    putStringLn("true1");
+                    if(false){
+                        putStringLn("false");
+                    }
+                    if(false)   putStringLn("false");
+                }
+                """
+        expect = "true\ntrue1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_if_else_statement(self):
+        input = """
+                void main(){
+                    if(false){
+                        putStringLn("true");
+                    } else{
+                        putStringLn("false");
+                    }
+
+                    if(false)    putStringLn("true");
+                    else putStringLn("false");
+                }
+                """
+        expect = "false\nfalse\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #do while statement
+    def test_do_while_statement(self):
+        input = """
+                void main(){
+                    int i;
+                    i = 0;
+                    do{
+                        i = i + 1;
+                        putIntLn(i);
+                    }while i < 5;
+
+                    i = 0;
+                    do
+                        putIntLn(i = i + 1);
+                    while i < 5;
+
+                    i = 0;
+                    do
+                        putIntLn(i);
+                    while (i = i+1) < 5;
+                }
+                """
+        expect = "1\n2\n3\n4\n5\n1\n2\n3\n4\n5\n0\n1\n2\n3\n4\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #for statement
+    def test_for_statement(self):
+        input = """
+                void main(){
+                    int i;
+                    for (i = 1; i < 3; i = i + 1)
+                        putIntLn(i);
+                    for (i = 1; i < 3; i = i + 1){
+                        putIntLn(i);
+                    }
+                }
+                """
+        expect = "1\n2\n1\n2\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #break statement
+    def test_break_statement(self):
+        input = """
+                void main(){
+                    int i;
+                    for (i = 1; i < 5; i = i + 1){
+                        if (i > 3){
+                            break;
+                        }
+                        putIntLn(i);
+                    }
+
+                    i = 1;
+                    do{
+                        i = i + 1;
+                        if (i > 3){
+                            break;
+                        }
+                        putIntLn(i);
+                    }while (i <5);
+                }
+                """
+        expect = "1\n2\n3\n2\n3\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #continue statement
+    def test_continue_statement(self):
+        input = """
+                void main(){
+                    int i;
+                    for (i = 1; i < 5; i = i + 1){
+                        if (i%2 == 1){
+                            continue;
+                        }
+                        putIntLn(i);
+                    }
+
+                    i = 1;
+                    do{
+                        i = i + 1;
+                        if (i%2 == 1){
+                            continue;
+                        }
+                        putIntLn(i);
+                    }while (i <5);
+                }
+                """
+        expect = "2\n4\n2\n4\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     def test_(self):
         input = """
                 void main(){
@@ -2231,5 +2354,22 @@ class CheckCodeGenSuite(unittest.TestCase):
                 }
         """
         expect = "3"
-        self.assertTrue(TestCodeGen.test(input,expect,501))
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     #Recursive func
+    def test_recursive_func(self):
+        input = """
+                int fibo(int a)
+                {
+                    if (a <= 1) return a;
+                    else return fibo(a-1) + fibo(a-2);
+                }
+                void main() {
+                    putIntLn(fibo(0));
+                    putIntLn(fibo(2));
+                    putIntLn(fibo(8));
+                    putIntLn(fibo(12));
+                }
+        """
+        expect = "0\n1\n21\n144\n"
+        self.assertTrue(TestCodeGen.test(input,expect,501))
