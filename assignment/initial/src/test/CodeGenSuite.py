@@ -543,3 +543,1693 @@ class CheckCodeGenSuite(unittest.TestCase):
                 """
         expect = "123\n123\n123\n123\n123\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #Test operation for int
+    def test_op_for_int_local_var(self):
+        input = """
+                void main() {
+                    int a;
+                    a = 2;
+                    int b;
+                    b = 5;
+                    int result;
+
+                    result = a+b;
+                    putIntLn(result);
+                    result = a-b;
+                    putIntLn(result);
+                    result = a*b;
+                    putIntLn(result);
+                    result = b/a;
+                    putIntLn(result);
+                    result = a+b*a+b/a-a/b;
+                    putIntLn(result);
+
+                    boolean rsult;
+                    rsult = a+b >= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b >= b-a;
+                    putBoolLn(rsult);
+                    rsult = a >= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a > a+b;
+                    putBoolLn(rsult);
+
+                    rsult = a+b <= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b <= b-a;
+                    putBoolLn(rsult);
+                    rsult = a <= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a < a+b;
+                    putBoolLn(rsult);
+
+                    putIntLn(b%a);
+                    putIntLn(---a);
+
+                    putBoolLn(a==a);
+                    putBoolLn(b!=b);
+                    putBoolLn(a==b);
+                    putBoolLn(b!=a);
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_global_var(self):
+        input = """
+                int a;
+                int b;
+                int result;
+                boolean rsult;
+                void main() {
+                    a = 2;
+                    b = 5;
+
+                    result = a+b;
+                    putIntLn(result);
+                    result = a-b;
+                    putIntLn(result);
+                    result = a*b;
+                    putIntLn(result);
+                    result = b/a;
+                    putIntLn(result);
+                    result = a+b*a+b/a-a/b;
+                    putIntLn(result);
+
+                    rsult = a+b >= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b >= b-a;
+                    putBoolLn(rsult);
+                    rsult = a >= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a > a+b;
+                    putBoolLn(rsult);
+
+                    rsult = a+b <= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b <= b-a;
+                    putBoolLn(rsult);
+                    rsult = a <= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a < a+b;
+                    putBoolLn(rsult);
+
+                    putIntLn(b%a);
+                    putIntLn(---a);
+
+                    putBoolLn(a==a);
+                    putBoolLn(b!=b);
+                    putBoolLn(a==b);
+                    putBoolLn(b!=a);
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_pass_func(self):
+        input = """
+                int a;
+                int b;
+                int result;
+                boolean rsult;
+
+                void func(int a, int b){
+                    result = a+b;
+                    putIntLn(result);
+                    result = a-b;
+                    putIntLn(result);
+                    result = a*b;
+                    putIntLn(result);
+                    result = b/a;
+                    putIntLn(result);
+                    result = a+b*a+b/a-a/b;
+                    putIntLn(result);
+
+                    rsult = a+b >= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b >= b-a;
+                    putBoolLn(rsult);
+                    rsult = a >= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a > a+b;
+                    putBoolLn(rsult);
+
+                    rsult = a+b <= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b <= b-a;
+                    putBoolLn(rsult);
+                    rsult = a <= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a < a+b;
+                    putBoolLn(rsult);
+
+                    putIntLn(b%a);
+                    putIntLn(---a);
+
+                    putBoolLn(a==a);
+                    putBoolLn(b!=b);
+                    putBoolLn(a==b);
+                    putBoolLn(b!=a);
+                }
+                void main() {
+                    func(2,5);
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_return_from_func(self):
+        input = """
+                int func_a()
+                {
+                    return 2;
+                }
+
+                int func_b()
+                {
+                    return 5;
+                }
+
+                int func_a1()
+                {
+                    int arr[1];
+                    arr[0] = 2;
+                    return arr[0];
+                }
+
+                int func_b1()
+                {
+                    int arr[1];
+                    arr[0] = 5;
+                    return arr[0];
+                }
+
+                void func(int a, int b){
+                    int result;
+                    boolean rsult;
+
+                    result = func_a()+func_b();
+                    putIntLn(result);
+                    result = func_a()-func_b();
+                    putIntLn(result);
+                    result = func_a()*func_b();
+                    putIntLn(result);
+                    result = func_b()/func_a();
+                    putIntLn(result);
+                    result = func_a()+func_b()*func_a()+func_b()/func_a()-func_a()/func_b();
+                    putIntLn(result);
+
+                    rsult = func_a()+func_b() >= func_b()-func_a()+func_a()+func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a()+func_b() >= func_b()-func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a() >= func_b()+func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a()+func_b() > func_b()-func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a()+func_b() > func_b()-func_a()+func_a()+func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a() > func_a()+func_b();
+                    putBoolLn(rsult);
+
+                    rsult = func_a1()+func_b1() <= func_b1()-func_a1()+func_a1()+func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1()+func_b1() <= func_b1()-func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1() <= func_b1()+func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1()+func_b1() < func_b1()-func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1()+func_b1() < func_b1()-func_a1()+func_a1()+func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1() < func_a1()+func_b1();
+                    putBoolLn(rsult);
+
+                    putIntLn(func_b()%func_a());
+                    putIntLn(---func_a());
+
+                    putBoolLn(func_a()==func_a());
+                    putBoolLn(func_b()!=func_b());
+                    putBoolLn(func_a()==func_b());
+                    putBoolLn(func_b()!=func_a());
+
+                }
+                void main() {
+                    func(2,5);
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_local_arr(self):
+        input = """
+                void main() {
+                    int arr[3];
+                    arr[0] = 2;
+                    arr[2] = 5;
+                    int result;
+                    boolean rsult;
+
+                    result = arr[0]+arr[2];
+                    putIntLn(result);
+                    result = arr[0]-arr[2];
+                    putIntLn(result);
+                    result = arr[0]*arr[2];
+                    putIntLn(result);
+                    result = arr[2]/arr[0];
+                    putIntLn(result);
+                    result = arr[0]+arr[2]*arr[0]+arr[2]/arr[0]-arr[0]/arr[2];
+                    putIntLn(result);
+
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] >= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] > arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] <= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] < arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    putIntLn(arr[2]%arr[0]);
+                    putIntLn(---arr[0]);
+
+                    putBoolLn(arr[0]==arr[0]);
+                    putBoolLn(arr[2]!=arr[2]);
+                    putBoolLn(arr[0]==arr[2]);
+                    putBoolLn(arr[0]!=arr[2]);
+
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_global_arr(self):
+        input = """
+                int arr[3];
+                boolean rsult;
+                int result;
+                void main() {
+                    arr[0] = 2;
+                    arr[2] = 5;
+
+                    result = arr[0]+arr[2];
+                    putIntLn(result);
+                    result = arr[0]-arr[2];
+                    putIntLn(result);
+                    result = arr[0]*arr[2];
+                    putIntLn(result);
+                    result = arr[2]/arr[0];
+                    putIntLn(result);
+                    result = arr[0]+arr[2]*arr[0]+arr[2]/arr[0]-arr[0]/arr[2];
+                    putIntLn(result);
+
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] >= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] > arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] <= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] < arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    putIntLn(arr[2]%arr[0]);
+                    putIntLn(---arr[0]);
+
+                    putBoolLn(arr[0]==arr[0]);
+                    putBoolLn(arr[2]!=arr[2]);
+                    putBoolLn(arr[0]==arr[2]);
+                    putBoolLn(arr[0]!=arr[2]);
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_array_pnt_pass_to_func(self):
+        input = """
+                void func(int arr[]){
+                    boolean rsult;
+                    int result;
+
+                    result = arr[0]+arr[2];
+                    putIntLn(result);
+                    result = arr[0]-arr[2];
+                    putIntLn(result);
+                    result = arr[0]*arr[2];
+                    putIntLn(result);
+                    result = arr[2]/arr[0];
+                    putIntLn(result);
+                    result = arr[0]+arr[2]*arr[0]+arr[2]/arr[0]-arr[0]/arr[2];
+                    putIntLn(result);
+
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] >= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] > arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] <= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] < arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    putIntLn(arr[2]%arr[0]);
+                    putIntLn(---arr[0]);
+
+                    putBoolLn(arr[0]==arr[0]);
+                    putBoolLn(arr[2]!=arr[2]);
+                    putBoolLn(arr[0]==arr[2]);
+                    putBoolLn(arr[0]!=arr[2]);
+                }
+
+                void main() {
+                    int arr[3];
+                    arr[0] = 2;
+                    arr[2] = 5;
+                    func(arr);
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_array_pnt_return_from_func(self):
+        input = """
+                int[] func(int arr[]){
+                    arr[0] = 2;
+                    arr[2] = 5;
+                    return arr;
+                }
+
+                void main() {
+                    int arr[3];
+                    boolean rsult;
+                    int result;
+
+                    result = func(arr)[0]+func(arr)[2];
+                    putIntLn(result);
+                    result = func(arr)[0]-func(arr)[2];
+                    putIntLn(result);
+                    result = func(arr)[0]*func(arr)[2];
+                    putIntLn(result);
+                    result = func(arr)[2]/func(arr)[0];
+                    putIntLn(result);
+                    result = func(arr)[0]+func(arr)[2]*func(arr)[0]+func(arr)[2]/func(arr)[0]-func(arr)[0]/func(arr)[2];
+                    putIntLn(result);
+
+                    rsult = func(arr)[0]+func(arr)[2] >= func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] >= func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] >= func(arr)[2]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] > func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] > func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] > func(arr)[0]+func(arr)[2];
+                    putBoolLn(rsult);
+
+                    rsult = func(arr)[0]+func(arr)[2] <= func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] <= func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] <= func(arr)[2]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] < func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] < func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] < func(arr)[0]+func(arr)[2];
+                    putBoolLn(rsult);
+
+                    putIntLn(func(arr)[2]%func(arr)[0]);
+                    putIntLn(---func(arr)[0]);
+
+                    putBoolLn(func(arr)[0]==func(arr)[0]);
+                    putBoolLn(func(arr)[2]!=func(arr)[2]);
+                    putBoolLn(func(arr)[0]==func(arr)[2]);
+                    putBoolLn(func(arr)[0]!=func(arr)[2]);
+                }
+                """
+        expect = "7\n-3\n10\n2\n14\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n1\n-2\ntrue\nfalse\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #Test operation for float
+
+    def test_op_for_float_local_var(self):
+        input = """
+                void main() {
+                    float a;
+                    a = 2.5;
+                    float b;
+                    b = 5.7;
+                    float result;
+
+                    result = a+b;
+                    putFloatLn(result);
+                    result = a-b;
+                    putFloatLn(result);
+                    result = a*b;
+                    putFloatLn(result);
+                    result = b/a;
+                    putFloatLn(result);
+                    result = a+b*a+b/a-a/b;
+                    putFloatLn(result);
+
+                    boolean rsult;
+                    rsult = a+b >= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b >= b-a;
+                    putBoolLn(rsult);
+                    rsult = a >= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a > a+b;
+                    putBoolLn(rsult);
+
+                    rsult = a+b <= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b <= b-a;
+                    putBoolLn(rsult);
+                    rsult = a <= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a < a+b;
+                    putBoolLn(rsult);
+
+                    putFloatLn(---a);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+    
+    def test_op_for_float_global_var(self):
+        input = """
+                float a;
+                float b;
+                float result;
+                boolean rsult;
+                void main() {
+                    a = 2.5;
+                    b = 5.7;
+
+                    result = a+b;
+                    putFloatLn(result);
+                    result = a-b;
+                    putFloatLn(result);
+                    result = a*b;
+                    putFloatLn(result);
+                    result = b/a;
+                    putFloatLn(result);
+                    result = a+b*a+b/a-a/b;
+                    putFloatLn(result);
+
+                    rsult = a+b >= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b >= b-a;
+                    putBoolLn(rsult);
+                    rsult = a >= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a > a+b;
+                    putBoolLn(rsult);
+
+                    rsult = a+b <= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b <= b-a;
+                    putBoolLn(rsult);
+                    rsult = a <= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a < a+b;
+                    putBoolLn(rsult);
+                    
+                    putFloatLn(---a);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_float_pass_func(self):
+        input = """
+                float a;
+                float b;
+                float result;
+                boolean rsult;
+
+                void func(float a, float b){
+                    result = a+b;
+                    putFloatLn(result);
+                    result = a-b;
+                    putFloatLn(result);
+                    result = a*b;
+                    putFloatLn(result);
+                    result = b/a;
+                    putFloatLn(result);
+                    result = a+b*a+b/a-a/b;
+                    putFloatLn(result);
+
+                    rsult = a+b >= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b >= b-a;
+                    putBoolLn(rsult);
+                    rsult = a >= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b > b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a > a+b;
+                    putBoolLn(rsult);
+
+                    rsult = a+b <= b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a+b <= b-a;
+                    putBoolLn(rsult);
+                    rsult = a <= b+a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a;
+                    putBoolLn(rsult);
+                    rsult = a+b < b-a+a+a;
+                    putBoolLn(rsult);
+                    rsult = a < a+b;
+                    putBoolLn(rsult);
+
+                    putFloatLn(---a);
+                }
+                void main() {
+                    func(2.5,5.7);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_float_return_from_func(self):
+        input = """
+                float func_a()
+                {
+                    return 2.5;
+                }
+
+                float func_b()
+                {
+                    return 5.7;
+                }
+
+                float func_a1()
+                {
+                    float arr[1];
+                    arr[0] = 2.5;
+                    return arr[0];
+                }
+
+                float func_b1()
+                {
+                    float arr[1];
+                    arr[0] = 5.7;
+                    return arr[0];
+                }
+
+                void func(int a, int b){
+                    float result;
+                    boolean rsult;
+
+                    result = func_a()+func_b();
+                    putFloatLn(result);
+                    result = func_a()-func_b();
+                    putFloatLn(result);
+                    result = func_a()*func_b();
+                    putFloatLn(result);
+                    result = func_b()/func_a();
+                    putFloatLn(result);
+                    result = func_a()+func_b()*func_a()+func_b()/func_a()-func_a()/func_b();
+                    putFloatLn(result);
+
+                    rsult = func_a()+func_b() >= func_b()-func_a()+func_a()+func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a()+func_b() >= func_b()-func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a() >= func_b()+func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a()+func_b() > func_b()-func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a()+func_b() > func_b()-func_a()+func_a()+func_a();
+                    putBoolLn(rsult);
+                    rsult = func_a() > func_a()+func_b();
+                    putBoolLn(rsult);
+
+                    rsult = func_a1()+func_b1() <= func_b1()-func_a1()+func_a1()+func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1()+func_b1() <= func_b1()-func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1() <= func_b1()+func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1()+func_b1() < func_b1()-func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1()+func_b1() < func_b1()-func_a1()+func_a1()+func_a1();
+                    putBoolLn(rsult);
+                    rsult = func_a1() < func_a1()+func_b1();
+                    putBoolLn(rsult);
+
+                    putFloatLn(---func_a());
+                }
+                void main() {
+                    func(2,5);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_float_local_arr(self):
+        input = """
+                void main() {
+                    float arr[3];
+                    arr[0] = 2.5;
+                    arr[2] = 5.7;
+                    float result;
+                    boolean rsult;
+
+                    result = arr[0]+arr[2];
+                    putFloatLn(result);
+                    result = arr[0]-arr[2];
+                    putFloatLn(result);
+                    result = arr[0]*arr[2];
+                    putFloatLn(result);
+                    result = arr[2]/arr[0];
+                    putFloatLn(result);
+                    result = arr[0]+arr[2]*arr[0]+arr[2]/arr[0]-arr[0]/arr[2];
+                    putFloatLn(result);
+
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] >= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] > arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] <= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] < arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    putFloatLn(---arr[0]);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_float_global_arr(self):
+        input = """
+                float arr[3];
+                boolean rsult;
+                float result;
+                void main() {
+                    arr[0] = 2.5;
+                    arr[2] = 5.7;
+
+                    result = arr[0]+arr[2];
+                    putFloatLn(result);
+                    result = arr[0]-arr[2];
+                    putFloatLn(result);
+                    result = arr[0]*arr[2];
+                    putFloatLn(result);
+                    result = arr[2]/arr[0];
+                    putFloatLn(result);
+                    result = arr[0]+arr[2]*arr[0]+arr[2]/arr[0]-arr[0]/arr[2];
+                    putFloatLn(result);
+
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] >= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] > arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] <= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] < arr[0]+arr[2];
+                    putBoolLn(rsult);
+                    
+                    putFloatLn(---arr[0]);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_float_array_pnt_pass_to_func(self):
+        input = """
+                void func(float arr[]){
+                    boolean rsult;
+                    float result;
+
+                    result = arr[0]+arr[2];
+                    putFloatLn(result);
+                    result = arr[0]-arr[2];
+                    putFloatLn(result);
+                    result = arr[0]*arr[2];
+                    putFloatLn(result);
+                    result = arr[2]/arr[0];
+                    putFloatLn(result);
+                    result = arr[0]+arr[2]*arr[0]+arr[2]/arr[0]-arr[0]/arr[2];
+                    putFloatLn(result);
+
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] >= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] >= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] > arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] > arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] <= arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] <= arr[2]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0]+arr[2] < arr[2]-arr[0]+arr[0]+arr[0];
+                    putBoolLn(rsult);
+                    rsult = arr[0] < arr[0]+arr[2];
+                    putBoolLn(rsult);
+
+                    putFloatLn(---arr[0]);
+                }
+
+                void main() {
+                    float arr[3];
+                    arr[0] = 2.5;
+                    arr[2] = 5.7;
+                    func(arr);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_float_array_pnt_return_from_func(self):
+        input = """
+                float[] func(float arr[]){
+                    arr[0] = 2.5;
+                    arr[2] = 5.7;
+                    return arr;
+                }
+
+                void main() {
+                    float arr[3];
+                    boolean rsult;
+                    float result;
+
+                    result = func(arr)[0]+func(arr)[2];
+                    putFloatLn(result);
+                    result = func(arr)[0]-func(arr)[2];
+                    putFloatLn(result);
+                    result = func(arr)[0]*func(arr)[2];
+                    putFloatLn(result);
+                    result = func(arr)[2]/func(arr)[0];
+                    putFloatLn(result);
+                    result = func(arr)[0]+func(arr)[2]*func(arr)[0]+func(arr)[2]/func(arr)[0]-func(arr)[0]/func(arr)[2];
+                    putFloatLn(result);
+
+                    rsult = func(arr)[0]+func(arr)[2] >= func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] >= func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] >= func(arr)[2]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] > func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] > func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] > func(arr)[0]+func(arr)[2];
+                    putBoolLn(rsult);
+
+                    rsult = func(arr)[0]+func(arr)[2] <= func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] <= func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] <= func(arr)[2]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] < func(arr)[2]-func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0]+func(arr)[2] < func(arr)[2]-func(arr)[0]+func(arr)[0]+func(arr)[0];
+                    putBoolLn(rsult);
+                    rsult = func(arr)[0] < func(arr)[0]+func(arr)[2];
+                    putBoolLn(rsult);
+
+                    putFloatLn(---func(arr)[0]);
+                }
+                """
+        expect = "8.2\n-3.1999998\n14.25\n2.28\n18.591404\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-2.5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #Test operation for boolean
+
+    def test_op_for_boolean_local_var(self):
+        input = """
+                void main(){
+                    boolean a,b;
+                    a = true;
+                    b = false;
+
+                    putBoolLn(a&&b);
+                    putBoolLn(a||b);
+                    putBoolLn(a!=b);
+                    putBoolLn(a==b);
+                    putBoolLn(!!!a);
+
+                    boolean result;
+                    result = (!a&&!b)==(!a||!b);
+                    putBoolLn(result);
+                    result = (!a&&!b)!=(!a||!b);
+                    putBoolLn(result);
+
+                    result = !a==!b&&!a!=!b;
+                    putBoolLn(result);
+                    result = !a==!b||!a!=!b;
+                    putBoolLn(result);
+                }
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_boolean_global_var(self):
+        input = """
+                void main(){
+                    a = true;
+                    b = false;
+
+                    putBoolLn(a&&b);
+                    putBoolLn(a||b);
+                    putBoolLn(a!=b);
+                    putBoolLn(a==b);
+                    putBoolLn(!!!a);
+
+                    result = (!a&&!b)==(!a||!b);
+                    putBoolLn(result);
+                    result = (!a&&!b)!=(!a||!b);
+                    putBoolLn(result);
+
+                    result = !a==!b&&!a!=!b;
+                    putBoolLn(result);
+                    result = !a==!b||!a!=!b;
+                    putBoolLn(result);
+                }
+                boolean result;
+                boolean a,b;
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_boolean_pass_func(self):
+        input = """
+                void func(boolean a, boolean b){
+                    putBoolLn(a&&b);
+                    putBoolLn(a||b);
+                    putBoolLn(a!=b);
+                    putBoolLn(a==b);
+                    putBoolLn(!!!a);
+
+                    result = (!a&&!b)==(!a||!b);
+                    putBoolLn(result);
+                    result = (!a&&!b)!=(!a||!b);
+                    putBoolLn(result);
+
+                    result = !a==!b&&!a!=!b;
+                    putBoolLn(result);
+                    result = !a==!b||!a!=!b;
+                    putBoolLn(result);
+                }
+                void main(){
+                    a = true;
+                    b = false;
+                    func(a,b);
+                }
+                boolean result;
+                boolean a,b;
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_boolean_return_from_func(self):
+        input = """
+                boolean func_a(){
+                    return true;
+                }
+                boolean func_b(){
+                    return false;
+                }
+
+                boolean func_a1(boolean a[]){
+                    return a[0];
+                }
+                boolean func_b1(boolean b[]){
+                    return b[1];
+                }
+
+                void func(boolean a, boolean b){
+                    putBoolLn(a&&b);
+                    putBoolLn(a||b);
+                    putBoolLn(a!=b);
+                    putBoolLn(a==b);
+                    putBoolLn(!!!a);
+
+                    result = (!func_a()&&!func_b())==(!func_a()||!func_b());
+                    putBoolLn(result);
+                    result = (!func_a()&&!func_b())!=(!func_a()||!func_b());
+                    putBoolLn(result);
+
+                    boolean arr[2];
+                    arr[0] = true;
+                    arr[1] = false;
+
+                    result = !func_a1(arr)==!func_b1(arr)&&!func_a1(arr)!=!func_b1(arr);
+                    putBoolLn(result);
+                    result = !func_a1(arr)==!func_b1(arr)||!func_a1(arr)!=!func_b1(arr);
+                    putBoolLn(result);
+                }
+                void main(){
+                    a = true;
+                    b = false;
+                    func(a,b);
+                }
+                boolean result;
+                boolean a,b;
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_boolean_local_arr(self):
+        input = """
+                void main(){
+                    boolean a[1],b[1];
+                    boolean result;
+                    a[0] = true;
+                    b[0] = false;
+
+                    putBoolLn(a[0]&&b[0]);
+                    putBoolLn(a[0]||b[0]);
+                    putBoolLn(a[0]!=b[0]);
+                    putBoolLn(a[0]==b[0]);
+                    putBoolLn(!!!a[0]);
+
+                    result = (!a[0]&&!b[0])==(!a[0]||!b[0]);
+                    putBoolLn(result);
+                    result = (!a[0]&&!b[0])!=(!a[0]||!b[0]);
+                    putBoolLn(result);
+
+                    result = !a[0]==!b[0]&&!a[0]!=!b[0];
+                    putBoolLn(result);
+                    result = !a[0]==!b[0]||!a[0]!=!b[0];
+                    putBoolLn(result);
+                }
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_boolean_global_arr(self):
+        input = """
+                boolean a[1],b[1];
+                boolean result;
+
+                void set_value(){
+                    a[0] = true;
+                    b[0] = false;
+                }
+                void main(){
+                    set_value();
+
+                    putBoolLn(a[0]&&b[0]);
+                    putBoolLn(a[0]||b[0]);
+                    putBoolLn(a[0]!=b[0]);
+                    putBoolLn(a[0]==b[0]);
+                    putBoolLn(!!!a[0]);
+
+                    result = (!a[0]&&!b[0])==(!a[0]||!b[0]);
+                    putBoolLn(result);
+                    result = (!a[0]&&!b[0])!=(!a[0]||!b[0]);
+                    putBoolLn(result);
+
+                    result = !a[0]==!b[0]&&!a[0]!=!b[0];
+                    putBoolLn(result);
+                    result = !a[0]==!b[0]||!a[0]!=!b[0];
+                    putBoolLn(result);
+                }
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_boolean_array_pnt_pass_to_func(self):
+        input = """
+                boolean a[1],b[1];
+                boolean result;
+
+                void func(boolean a[], boolean b[]){
+                    putBoolLn(a[0]&&b[0]);
+                    putBoolLn(a[0]||b[0]);
+                    putBoolLn(a[0]!=b[0]);
+                    putBoolLn(a[0]==b[0]);
+                    putBoolLn(!!!a[0]);
+
+                    result = (!a[0]&&!b[0])==(!a[0]||!b[0]);
+                    putBoolLn(result);
+                    result = (!a[0]&&!b[0])!=(!a[0]||!b[0]);
+                    putBoolLn(result);
+
+                    result = !a[0]==!b[0]&&!a[0]!=!b[0];
+                    putBoolLn(result);
+                    result = !a[0]==!b[0]||!a[0]!=!b[0];
+                    putBoolLn(result);
+                }
+
+                void main(){
+                    a[0] = true;
+                    b[0] = false;
+                    func(a,b);
+                }
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+    
+    def test_op_for_boolean_array_pnt_return_from_func(self):
+        input = """
+                boolean[] func(boolean a[]){
+                    return a;
+                }
+
+                void main(){
+                    boolean a[1],b[1];
+                    boolean result;
+                    a[0] = true;
+                    b[0] = false;
+                    
+
+                    putBoolLn(func(a)[0]&&func(b)[0]);
+                    putBoolLn(func(a)[0]||func(b)[0]);
+                    putBoolLn(func(a)[0]!=func(b)[0]);
+                    putBoolLn(func(a)[0]==func(b)[0]);
+                    putBoolLn(!!!func(a)[0]);
+
+                    result = (!func(a)[0]&&!func(b)[0])==(!func(a)[0]||!func(b)[0]);
+                    putBoolLn(result);
+                    result = (!func(a)[0]&&!func(b)[0])!=(!func(a)[0]||!func(b)[0]);
+                    putBoolLn(result);
+
+                    result = !func(a)[0]==!func(b)[0]&&!func(a)[0]!=!func(b)[0];
+                    putBoolLn(result);
+                    result = !func(a)[0]==!func(b)[0]||!func(a)[0]!=!func(b)[0];
+                    putBoolLn(result);
+                }
+                """
+        expect = "false\ntrue\ntrue\nfalse\nfalse\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #Test operation for string
+    def test_op_for_string_local_var(self):
+        input = """
+                void main(){
+                    string a;
+                    a = "This is a String";
+                    putString(a);
+                }
+                """
+        expect = "This is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_string_global_var(self):
+        input = """
+                void main(){
+                    a = "This is a String";
+                    putString(a);
+                }
+                string a;
+                """
+        expect = "This is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_string_pass_func(self):
+        input = """
+                void func(string a){
+                    putString(a);
+                }
+                void main(){
+                    a = "This is a String";
+                    func(a);
+                }
+                string a;
+                """
+        expect = "This is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_string_return_from_func(self):
+        input = """
+                string func(){
+                    return "This is a String";
+                }
+                string [] func_arr_pnt(string a[]){
+                    return a;
+                }
+
+                void main(){
+                    string a[100];
+                    a[0] = "This is a String";
+                    putStringLn(func());
+                    putString(func_arr_pnt(a)[0]);
+                }
+                """
+        expect = "This is a String\nThis is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_string_local_arr(self):
+        input = """
+                void main(){
+                    string a[3];
+                    a[1] = "This is a String";
+                    putString(a[1]);
+                }
+                
+                """
+        expect = "This is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_string_global_arr(self):
+        input = """
+                void main(){
+                    a[1] = "This is a String";
+                    putString(a[1]);
+                }
+                string a[3];
+                """
+        expect = "This is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_string_array_pnt_pass_to_func(self):
+        input = """
+                void func(string arr[]){
+                    putString(arr[1]);
+                }
+                void main(){
+                    a[1] = "This is a String";
+                    func(a);
+                }
+                string a[3];
+                """
+        expect = "This is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_string_array_pnt_return_from_func(self):
+        input = """
+                string [] func(string arr[]){
+                    return arr;
+                }
+                void main(){
+                    a[1] = "This is a String";
+                    putString(func(a)[1]);
+                }
+                string a[3];
+                """
+        expect = "This is a String"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #Test operation for int vs float
+    def test_op_for_int_vs_float_local_var(self):
+        input = """
+                void main(){
+                    int a;
+                    float b;
+                    a = 2;
+                    b = 5.1;
+
+                    putFloatLn(a+b);
+                    putFloatLn(a-b);
+                    putFloatLn(a*b);
+                    putFloatLn(b/a);
+                    putFloatLn(a+b*a+b/a-a/b);
+
+                    putBoolLn(a+b >= b-a+a+a);
+                    putBoolLn(a+b >= b-a);
+                    putBoolLn(a >= b+a);
+                    putBoolLn(a+b > b-a);
+                    putBoolLn(a+b > b-a+a+a);
+                    putBoolLn(a > a+b);
+
+
+                    putBoolLn(a+b <= b-a+a+a);
+                    putBoolLn(a+b <= b-a);
+                    putBoolLn(a <= b+a);
+                    putBoolLn(a+b < b-a);
+                    putBoolLn(a+b < b-a+a+a);
+                    putBoolLn(a < a+b);
+
+                    putFloatLn(-(a+b));
+                }
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_global_var(self):
+        input = """
+                void main(){
+                    a = 2;
+                    b = 5.1;
+
+                    putFloatLn(a+b);
+                    putFloatLn(a-b);
+                    putFloatLn(a*b);
+                    putFloatLn(b/a);
+                    putFloatLn(a+b*a+b/a-a/b);
+
+                    putBoolLn(a+b >= b-a+a+a);
+                    putBoolLn(a+b >= b-a);
+                    putBoolLn(a >= b+a);
+                    putBoolLn(a+b > b-a);
+                    putBoolLn(a+b > b-a+a+a);
+                    putBoolLn(a > a+b);
+
+
+                    putBoolLn(a+b <= b-a+a+a);
+                    putBoolLn(a+b <= b-a);
+                    putBoolLn(a <= b+a);
+                    putBoolLn(a+b < b-a);
+                    putBoolLn(a+b < b-a+a+a);
+                    putBoolLn(a < a+b);
+
+                    putFloatLn(-(a+b));
+                }
+
+                int a;
+                float b;
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_global_var(self):
+        input = """
+                void main(){
+                    a = 2;
+                    b = 5.1;
+
+                    putFloatLn(a+b);
+                    putFloatLn(a-b);
+                    putFloatLn(a*b);
+                    putFloatLn(b/a);
+                    putFloatLn(a+b*a+b/a-a/b);
+
+                    putBoolLn(a+b >= b-a+a+a);
+                    putBoolLn(a+b >= b-a);
+                    putBoolLn(a >= b+a);
+                    putBoolLn(a+b > b-a);
+                    putBoolLn(a+b > b-a+a+a);
+                    putBoolLn(a > a+b);
+
+
+                    putBoolLn(a+b <= b-a+a+a);
+                    putBoolLn(a+b <= b-a);
+                    putBoolLn(a <= b+a);
+                    putBoolLn(a+b < b-a);
+                    putBoolLn(a+b < b-a+a+a);
+                    putBoolLn(a < a+b);
+
+                    putFloatLn(-(a+b));
+                }
+
+                int a;
+                float b;
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_pass_func(self):
+        input = """
+                void func(float a, float b)
+                {
+                    putFloatLn(a+b);
+                    putFloatLn(a-b);
+                    putFloatLn(a*b);
+                    putFloatLn(b/a);
+                    putFloatLn(a+b*a+b/a-a/b);
+
+                    putBoolLn(a+b >= b-a+a+a);
+                    putBoolLn(a+b >= b-a);
+                    putBoolLn(a >= b+a);
+                    putBoolLn(a+b > b-a);
+                    putBoolLn(a+b > b-a+a+a);
+                    putBoolLn(a > a+b);
+
+
+                    putBoolLn(a+b <= b-a+a+a);
+                    putBoolLn(a+b <= b-a);
+                    putBoolLn(a <= b+a);
+                    putBoolLn(a+b < b-a);
+                    putBoolLn(a+b < b-a+a+a);
+                    putBoolLn(a < a+b);
+
+                    putFloatLn(-(a+b));
+                }
+                void main(){
+                    a = 2;
+                    b = 5.1;
+                    func(a,b);
+                }
+
+                int a;
+                float b;
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_return_from_func(self):
+        input = """
+                int func_a(int a){
+                    return a;
+                }
+                float func_b(float a){
+                    return a;
+                }
+                void func(int a, float b)
+                {
+                    putFloatLn(func_a(a)+func_b(b));
+                    putFloatLn(func_a(a)-func_b(b));
+                    putFloatLn(func_a(a)*func_b(b));
+                    putFloatLn(func_b(b)/func_a(a));
+                    putFloatLn(func_a(a)+func_b(b)*func_a(a)+func_b(b)/func_a(a)-func_a(a)/func_b(b));
+
+                    putBoolLn(func_a(a)+func_b(b) >= func_b(b)-func_a(a)+func_a(a)+func_a(a));
+                    putBoolLn(func_a(a)+func_b(b) >= func_b(b)-func_a(a));
+                    putBoolLn(func_a(a) >= func_b(b)+func_a(a));
+                    putBoolLn(func_a(a)+func_b(b) > func_b(b)-func_a(a));
+                    putBoolLn(func_a(a)+func_b(b) > func_b(b)-func_a(a)+func_a(a)+func_a(a));
+                    putBoolLn(func_a(a) > func_a(a)+func_b(b));
+
+                    putBoolLn(func_a(a)+func_b(b) <= func_b(b)-func_a(a)+func_a(a)+func_a(a));
+                    putBoolLn(func_a(a)+func_b(b) <= func_b(b)-func_a(a));
+                    putBoolLn(func_a(a) <= func_b(b)+func_a(a));
+                    putBoolLn(func_a(a)+func_b(b) < func_b(b)-func_a(a));
+                    putBoolLn(func_a(a)+func_b(b) < func_b(b)-func_a(a)+func_a(a)+func_a(a));
+                    putBoolLn(func_a(a) < func_a(a)+func_b(b));
+
+                    putFloatLn(-(func_a(a)+func_b(b)));
+                }
+                void main(){
+                    a = 2;
+                    b = 5.1;
+                    func(a,b);
+                }
+
+                int a;
+                float b;
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_local_arr(self):
+        input = """
+                void main(){
+                    int a[10];
+                    float b[10];
+                    a[5] = 2;
+                    b[5] = 5.1;
+
+                    putFloatLn(a[5]+b[5]);
+                    putFloatLn(a[5]-b[5]);
+                    putFloatLn(a[5]*b[5]);
+                    putFloatLn(b[5]/a[5]);
+                    putFloatLn(a[5]+b[5]*a[5]+b[5]/a[5]-a[5]/b[5]);
+
+                    putBoolLn(a[5]+b[5] >= b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5]+b[5] >= b[5]-a[5]);
+                    putBoolLn(a[5] >= b[5]+a[5]);
+                    putBoolLn(a[5]+b[5] > b[5]-a[5]);
+                    putBoolLn(a[5]+b[5] > b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5] > a[5]+b[5]);
+
+                    putBoolLn(a[5]+b[5] <= b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5]+b[5] <= b[5]-a[5]);
+                    putBoolLn(a[5] <= b[5]+a[5]);
+                    putBoolLn(a[5]+b[5] < b[5]-a[5]);
+                    putBoolLn(a[5]+b[5] < b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5] < a[5]+b[5]);
+
+                    putFloatLn(-(a[5]+b[5]));
+                }
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_global_arr(self):
+        input = """
+                int a[10];
+                float b[10];
+                void main(){
+                    a[5] = 2;
+                    b[5] = 5.1;
+
+                    putFloatLn(a[5]+b[5]);
+                    putFloatLn(a[5]-b[5]);
+                    putFloatLn(a[5]*b[5]);
+                    putFloatLn(b[5]/a[5]);
+                    putFloatLn(a[5]+b[5]*a[5]+b[5]/a[5]-a[5]/b[5]);
+
+                    putBoolLn(a[5]+b[5] >= b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5]+b[5] >= b[5]-a[5]);
+                    putBoolLn(a[5] >= b[5]+a[5]);
+                    putBoolLn(a[5]+b[5] > b[5]-a[5]);
+                    putBoolLn(a[5]+b[5] > b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5] > a[5]+b[5]);
+
+                    putBoolLn(a[5]+b[5] <= b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5]+b[5] <= b[5]-a[5]);
+                    putBoolLn(a[5] <= b[5]+a[5]);
+                    putBoolLn(a[5]+b[5] < b[5]-a[5]);
+                    putBoolLn(a[5]+b[5] < b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5] < a[5]+b[5]);
+
+                    putFloatLn(-(a[5]+b[5]));
+                }
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_array_pnt_pass_to_func(self):
+        input = """
+                int a[10];
+                float b[10];
+
+                void func(int a[], float b[]){
+                    putFloatLn(a[5]+b[5]);
+                    putFloatLn(a[5]-b[5]);
+                    putFloatLn(a[5]*b[5]);
+                    putFloatLn(b[5]/a[5]);
+                    putFloatLn(a[5]+b[5]*a[5]+b[5]/a[5]-a[5]/b[5]);
+
+                    putBoolLn(a[5]+b[5] >= b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5]+b[5] >= b[5]-a[5]);
+                    putBoolLn(a[5] >= b[5]+a[5]);
+                    putBoolLn(a[5]+b[5] > b[5]-a[5]);
+                    putBoolLn(a[5]+b[5] > b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5] > a[5]+b[5]);
+
+                    putBoolLn(a[5]+b[5] <= b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5]+b[5] <= b[5]-a[5]);
+                    putBoolLn(a[5] <= b[5]+a[5]);
+                    putBoolLn(a[5]+b[5] < b[5]-a[5]);
+                    putBoolLn(a[5]+b[5] < b[5]-a[5]+a[5]+a[5]);
+                    putBoolLn(a[5] < a[5]+b[5]);
+
+                    putFloatLn(-(a[5]+b[5]));
+                }
+                void main(){
+                    a[5] = 2;
+                    b[5] = 5.1;
+                    func(a,b);
+                }
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_op_for_int_vs_float_array_pnt_return_from_func(self):
+        input = """
+                int a[10];
+                float b[10];
+
+                int[] func_a(int a[]){
+                    return a;
+                }
+
+                float[] func_b(float a[]){
+                    return a;
+                }
+
+                void func(int a[], float b[]){
+                    putFloatLn(func_a(a)[5]+func_b(b)[5]);
+                    putFloatLn(func_a(a)[5]-func_b(b)[5]);
+                    putFloatLn(func_a(a)[5]*func_b(b)[5]);
+                    putFloatLn(func_b(b)[5]/func_a(a)[5]);
+                    putFloatLn(func_a(a)[5]+func_b(b)[5]*func_a(a)[5]+func_b(b)[5]/func_a(a)[5]-func_a(a)[5]/func_b(b)[5]);
+
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] >= func_b(b)[5]-func_a(a)[5]+func_a(a)[5]+func_a(a)[5]);
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] >= func_b(b)[5]-func_a(a)[5]);
+                    putBoolLn(func_a(a)[5] >= func_b(b)[5]+func_a(a)[5]);
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] > func_b(b)[5]-func_a(a)[5]);
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] > func_b(b)[5]-func_a(a)[5]+func_a(a)[5]+func_a(a)[5]);
+                    putBoolLn(func_a(a)[5] > func_a(a)[5]+func_b(b)[5]);
+
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] <= func_b(b)[5]-func_a(a)[5]+func_a(a)[5]+func_a(a)[5]);
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] <= func_b(b)[5]-func_a(a)[5]);
+                    putBoolLn(func_a(a)[5] <= func_b(b)[5]+func_a(a)[5]);
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] < func_b(b)[5]-func_a(a)[5]);
+                    putBoolLn(func_a(a)[5]+func_b(b)[5] < func_b(b)[5]-func_a(a)[5]+func_a(a)[5]+func_a(a)[5]);
+                    putBoolLn(func_a(a)[5] < func_a(a)[5]+func_b(b)[5]);
+
+                    putFloatLn(-(func_a(a)[5]+func_b(b)[5]));
+                }
+                void main(){
+                    a[5] = 2;
+                    b[5] = 5.1;
+                    func(a,b);
+                }
+                """
+        expect = "7.1\n-3.1\n10.2\n2.55\n14.357843\ntrue\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\nfalse\ntrue\nfalse\nfalse\ntrue\n-7.1\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_(self):
+        input = """
+                void main(){
+                    int a,b,c;
+                    putIntLn(a= (b=100) + (c=5));
+                    putIntLn(a);
+                    putIntLn(b);
+                    putIntLn(c);
+                }
+                """
+        expect = "105\n105\n100\n5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_2(self):
+        input = """
+                void main() {
+                    int a, b;
+                    putInt(1 + (a=2));
+                }
+        """
+        expect = "3"
+        self.assertTrue(TestCodeGen.test(input,expect,501))
+    #Recursive func

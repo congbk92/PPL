@@ -110,10 +110,10 @@ class CodeGenVisitor(BaseVisitor, Utils):
         for decl in ast.decl:
             if type(decl) is FuncDecl:
                 sym = Symbol(decl.name.name, MType([param.varType for param in decl.param], decl.returnType), CName(self.className))
-                nenv += [sym]
+                nenv = [sym] + nenv
             else:
                 sym = Symbol(decl.variable, decl.varType, Index(-1))
-                nenv += [sym]
+                nenv = [sym] + nenv
         # generate field derective
         lst_global_val_decl = [x for x in ast.decl if type(x) is VarDecl]
         for decl in lst_global_val_decl:
@@ -154,7 +154,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
             for param in consdecl.param: 
                 new_idx = frame.getNewIndex()
                 self.emit.printout(self.emit.emitVAR(new_idx, param.variable, param.varType, frame.getStartLabel(), frame.getEndLabel(), frame))
-                env += [Symbol(param.variable, param.varType, Index(new_idx))] 
+                env = [Symbol(param.variable, param.varType, Index(new_idx))] + env
 
         body = consdecl.body
         #Print .var
@@ -162,7 +162,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
             if type(member) is VarDecl:
                 new_idx = frame.getNewIndex()
                 self.emit.printout(self.emit.emitVAR(new_idx, member.variable, member.varType, frame.getStartLabel(), frame.getEndLabel(), frame))
-                env += [Symbol(member.variable, member.varType, Index(new_idx))]
+                env = [Symbol(member.variable, member.varType, Index(new_idx))] + env
 
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
 
@@ -201,7 +201,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
             if type(member) is VarDecl:
                 new_idx = frame.getNewIndex()
                 self.emit.printout(self.emit.emitVAR(new_idx, member.variable, member.varType, frame.getStartLabel(), frame.getEndLabel(), frame))
-                env += [Symbol(member.variable, member.varType, Index(new_idx))]
+                env = [Symbol(member.variable, member.varType, Index(new_idx))] + env
         self.emit.printout(self.emit.emitLABEL(frame.getStartLabel(), frame))
         for x in ast.member:
             result = self.visit(x,Access(frame, env, True, True))
@@ -257,7 +257,7 @@ class CodeGenVisitor(BaseVisitor, Utils):
         ctxt = o
         frame = ctxt.frame
         nenv = ctxt.sym
-        sym = nenv[0]
+        sym = self.lookup("0_return", nenv, lambda x: x.name)
         return_type = VoidType()
         if ast.expr is not None:
             code,return_type = self.visit(ast.expr, Access(frame, nenv, False, True))
