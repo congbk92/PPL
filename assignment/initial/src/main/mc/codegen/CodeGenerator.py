@@ -448,7 +448,6 @@ class CodeGenVisitor(BaseVisitor, Utils):
 
         expr_code,expr_type = self.visit(ast.expr, Access(frame, env, False, True))
         self.emit.printout(expr_code)
-        frame.pop()
         self.emit.printout(self.emit.emitIFFALSE(labelFalse, frame))
         self.visit(ast.thenStmt, SubBody(frame, env))
         

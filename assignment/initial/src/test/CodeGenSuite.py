@@ -568,7 +568,7 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
-    def test_var_to_func(self):
+    def test_var_pass_to_func(self):
         input = """
                 int func(int a){
                     a = 1000;
@@ -583,6 +583,24 @@ class CheckCodeGenSuite(unittest.TestCase):
                 """
         expect = "10\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_bool_arr_left_right(self):
+        input = """
+                void main() {
+                    boolean a[10];
+                    int i;
+                    for (i = 0; i < 4; i = i + 1){
+                        a[i] = i%2 == 0;
+                    }
+                    for (i = 0; i < 4; i = i + 1){
+                        putBoolLn(a[i]);
+                    }
+                    a[0] = a[3]||a[1]&&a[2]||a[0];
+                    putBoolLn(a[0]);
+                }
+                """
+        expect = "true\nfalse\ntrue\nfalse\ntrue\n"
+        self.assertTrue(TestCodeGen.test(input,expect,501))
 
     def test_global_var(self):
         input = """
