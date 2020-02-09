@@ -471,7 +471,119 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "1005\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
-    #To do: add code to set default value for array string
+    def test_arr_func_idx(self):
+        input = """
+                int getIdx(int i){
+                    return i*2;
+                }
+                void main() {
+                    int arr[10];
+                    int i;
+                    for(i = 0; i < 10; i = i + 1){
+                        arr[i] = i;
+                    }
+                    for(i = 0; i < 5; i = i + 1){
+                        putIntLn(arr[getIdx(i)]);
+                    }
+                }"""
+        expect = "0\n2\n4\n6\n8\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_arr_func_sub_body_1(self):
+        input = """
+                int global_var;
+                int getIdx(int i){
+                    return global_var = i*2;
+                }
+                void main() {
+                    int arr[10];
+                    int i;
+                    for(i = 0; i < 10; i = i + 1){
+                        arr[i] = i;
+                    }
+                    for(i = 0; i < 5; i = i + 1){
+                        arr[getIdx(i)];
+                        putIntLn(global_var);
+                    }
+                }"""
+        expect = "0\n2\n4\n6\n8\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_arr_func_sub_body_2(self):
+        input = """
+                int global_var;
+                int [] func(int i){
+                    global_var = i*2;
+                    int a[10];
+                    return a;
+                }
+                void main() {
+                    int i;
+                    for(i = 0; i < 5; i = i + 1){
+                        func(i)[i];
+                        putIntLn(global_var);
+                    }
+                }"""
+        expect = "0\n2\n4\n6\n8\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_arr_decl_in_func(self):
+        input = """
+                int [] func(){
+                    int a[10];
+                    int i;
+                    for (i = 0; i < 10; i = i +1)
+                        a[i] = i;
+                    return a;
+                }
+                void main() {
+                    int i;
+                    for(i = 0; i < 10; i = i + 1){
+                        putIntLn(func()[i]);
+                    }
+                }"""
+        expect = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_arr_pass_to_func(self):
+        input = """
+                int [] func(int a[]){
+                    int i;
+                    for (i = 0; i < 10; i = i +1)
+                        a[i] = i;
+                    return a;
+                }
+                void main() {
+                    int i;
+                    int a[10];
+                    for(i = 0; i < 10; i = i + 1){
+                        a[i] = i*2;
+                    }
+                    func(a);
+                    for(i = 0; i < 10; i = i + 1){
+                        putIntLn(a[i]);
+                    }
+                }
+                """
+        expect = "0\n1\n2\n3\n4\n5\n6\n7\n8\n9\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_var_to_func(self):
+        input = """
+                int func(int a){
+                    a = 1000;
+                    return a;
+                }
+                void main() {
+                    int a;
+                    a = 10;
+                    func(a);
+                    putIntLn(a);
+                }
+                """
+        expect = "10\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     def test_global_var(self):
         input = """
                 void main() {
@@ -542,6 +654,19 @@ class CheckCodeGenSuite(unittest.TestCase):
                 }
                 """
         expect = "123\n123\n123\n123\n123\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_multi_assign(self):
+        input = """
+                void main(){
+                    int a,b,c;
+                    putIntLn(a= (b=100) + (c=5));
+                    putIntLn(a);
+                    putIntLn(b);
+                    putIntLn(c);
+                }
+                """
+        expect = "105\n105\n100\n5\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
     #Test operation for int
@@ -2243,6 +2368,34 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "false\nfalse\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
+    def test_if_else_statement_complex(self):
+        input = """
+                int global;
+                int set_global(int in){
+                    return global = in;
+                }
+                void main(){
+                    boolean a;
+                    if( a = 3 == 2){
+                        putStringLn("true");
+                    } else{
+                        putStringLn("false");
+                    }
+                    putBoolLn(a);
+
+                    if(set_global(9) == 9)
+                        set_global(10);
+                    else{
+                        int b[10];
+                        b[9];
+                        set_global(10);
+                    }
+                    putIntLn(global);
+                }
+                """
+        expect = "false\nfalse\n10\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     #do while statement
     def test_do_while_statement(self):
         input = """
@@ -2268,6 +2421,37 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "1\n2\n3\n4\n5\n1\n2\n3\n4\n5\n0\n1\n2\n3\n4\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
+    def test_do_while_statement_complex(self):
+        input = """
+                int global;
+                int set_global(int in){
+                    return global = in;
+                }
+                void main(){
+                    int i;
+                    i = 0;
+                    do{
+                        int a;
+                        a;
+                        set_global(10);
+                    }
+                    while (i = i+1) < 5;
+                    putIntLn(global);
+                    do
+                        set_global(5);
+                        {
+                            int a [100];
+                            a[20];
+                        }
+                        i;
+                    while false;
+                    putIntLn(global);
+                }
+                """
+        expect = "10\n5\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+
     #for statement
     def test_for_statement(self):
         input = """
@@ -2281,6 +2465,32 @@ class CheckCodeGenSuite(unittest.TestCase):
                 }
                 """
         expect = "1\n2\n1\n2\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_for_statement_complex(self):
+        input = """
+                int global;
+                int set_global(int in){
+                    return global = in;
+                }
+                void main(){
+                    int i;
+                    i = 1;
+
+                    for (100; i < 3; 1){
+                        set_global(i);
+                        i = i + 1;
+                        i;
+                        int a[100];
+                        a[19];
+                    }
+                    putIntLn(global);
+                    for (i = 1; i < 3; i = i + 1)
+                        set_global(i);
+                    putIntLn(global);
+                }
+                """
+        expect = "2\n2\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
     #break statement
@@ -2308,6 +2518,72 @@ class CheckCodeGenSuite(unittest.TestCase):
         expect = "1\n2\n3\n2\n3\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
+    def test_break_statement_complex_1(self):
+        input = """
+                void main(){
+                    int i;
+                    for (i = 1; i < 5; i = i + 1){
+                        int j;
+                        for (j = i; j < 5; j = j + 1){
+                            if (i + j > 7){
+                                break;
+                            }
+                            putInt(i);
+                            putString(" ");
+                            putIntLn(j);
+                        }
+                    }
+                }
+                """
+        expect = "1 1\n1 2\n1 3\n1 4\n2 2\n2 3\n2 4\n3 3\n3 4\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_break_statement_complex_2(self):
+        input = """
+                void main(){
+                    int i;
+                    i = 1;
+                    do{
+                        int j;
+                        j = i;
+                        do {
+                            if (i + j > 7){
+                                break;
+                            }
+                            putInt(i);
+                            putString(" ");
+                            putIntLn(j);
+                            j = j + 1;
+                        }while (j < 5);
+                        i = i + 1;
+                    }while (i < 5);
+                }
+                """
+        expect = "1 1\n1 2\n1 3\n1 4\n2 2\n2 3\n2 4\n3 3\n3 4\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_break_statement_complex_3(self):
+        input = """
+                void main(){
+                    int i;
+                    i = 1;
+                    do{
+                        int j;
+                        for (j = i; j < 5; j = j + 1){
+                            if (i + j > 7){
+                                break;
+                            }
+                            putInt(i);
+                            putString(" ");
+                            putIntLn(j);
+                        }
+                        i = i + 1;
+                    }while (i < 5);
+                }
+                """
+        expect = "1 1\n1 2\n1 3\n1 4\n2 2\n2 3\n2 4\n3 3\n3 4\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
     #continue statement
     def test_continue_statement(self):
         input = """
@@ -2332,28 +2608,180 @@ class CheckCodeGenSuite(unittest.TestCase):
                 """
         expect = "2\n4\n2\n4\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
-
-    def test_(self):
+    
+    def test_continue_statement_complex_1(self):
         input = """
                 void main(){
-                    int a,b,c;
-                    putIntLn(a= (b=100) + (c=5));
-                    putIntLn(a);
-                    putIntLn(b);
-                    putIntLn(c);
+                    int i;
+                    for (i = 1; i < 5; i = i + 1){
+                        int j;
+                        for (j = i; j < 5; j = j + 1){
+                            if ((i + j) % 2 == 0){
+                                continue;
+                            }
+                            putInt(i);
+                            putString(" ");
+                            putIntLn(j);
+                        }
+                    }
                 }
                 """
-        expect = "105\n105\n100\n5\n"
+        expect = "1 2\n1 4\n2 3\n3 4\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
-    def test_2(self):
+    def test_continue_statement_complex_2(self):
         input = """
-                void main() {
-                    int a, b;
-                    putInt(1 + (a=2));
+                void main(){
+                    int i;
+                    i = 1;
+                    do{
+                        int j;
+                        j = i;
+                        do {
+                            if ((i + j) % 2 == 0){
+                                j = j + 1;
+                                continue;
+                            }
+                            putInt(i);
+                            putString(" ");
+                            putIntLn(j);
+                            j = j + 1;
+                        }while (j < 5);
+                        i = i + 1;
+                    }while (i < 5);
                 }
-        """
-        expect = "3"
+                """
+        expect = "1 2\n1 4\n2 3\n3 4\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    def test_continue_statement_complex_3(self):
+        input = """
+                void main(){
+                    int i;
+                    i = 1;
+                    do{
+                        int j;
+                        for (j = i; j < 5; j = j + 1){
+                            if ((i + j) % 2 == 0){
+                                continue;
+                            }
+                            putInt(i);
+                            putString(" ");
+                            putIntLn(j);
+                        }
+                        i = i + 1;
+                    }while (i < 5);
+                }
+                """
+        expect = "1 2\n1 4\n2 3\n3 4\n"
+        self.assertTrue(TestCodeGen.test(input,expect,500))
+
+    #Test block statement
+    def test_block_statement(self):
+        input = """
+                void main(){
+                    int a;
+                    float b;
+                    boolean c;
+                    string d;
+                    int a_arr[10];
+                    float b_arr[10];
+                    boolean c_arr[10];
+                    string d_arr[10];
+
+                    a = 1;
+                    b = 1.1;
+                    c = true;
+                    d = "string1";
+                    a_arr[1] = 1;
+                    b_arr[1] = 1.1;
+                    c_arr[1] = true;
+                    d_arr[1] = "string1";
+
+                    putIntLn(a);
+                    putFloatLn(b);
+                    putBoolLn(c);
+                    putStringLn(d);
+                    putIntLn(a_arr[1]);
+                    putFloatLn(b_arr[1]);
+                    putBoolLn(c_arr[1]);
+                    putStringLn(d_arr[1]);
+
+                    {
+                        int a;
+                        float b;
+                        boolean c;
+                        string d;
+                        int a_arr[10];
+                        float b_arr[10];
+                        boolean c_arr[10];
+                        string d_arr[10];
+
+                        a = 2;
+                        b = 2.2;
+                        c = false;
+                        d = "string2";
+                        a_arr[1] = 2;
+                        b_arr[1] = 2.2;
+                        c_arr[1] = false;
+                        d_arr[1] = "string2";
+
+                        putIntLn(a);
+                        putFloatLn(b);
+                        putBoolLn(c);
+                        putStringLn(d);
+                        putIntLn(a_arr[1]);
+                        putFloatLn(b_arr[1]);
+                        putBoolLn(c_arr[1]);
+                        putStringLn(d_arr[1]);
+                        {
+                            int a;
+                            float b;
+                            boolean c;
+                            string d;
+                            int a_arr[10];
+                            float b_arr[10];
+                            boolean c_arr[10];
+                            string d_arr[10];
+
+                            a = 3;
+                            b = 3.3;
+                            c = true;
+                            d = "string3";
+                            a_arr[1] = 3;
+                            b_arr[1] = 3.3;
+                            c_arr[1] = true;
+                            d_arr[1] = "string3";
+
+                            putIntLn(a);
+                            putFloatLn(b);
+                            putBoolLn(c);
+                            putStringLn(d);
+                            putIntLn(a_arr[1]);
+                            putFloatLn(b_arr[1]);
+                            putBoolLn(c_arr[1]);
+                            putStringLn(d_arr[1]);
+                        }
+                        putIntLn(a);
+                        putFloatLn(b);
+                        putBoolLn(c);
+                        putStringLn(d);
+                        putIntLn(a_arr[1]);
+                        putFloatLn(b_arr[1]);
+                        putBoolLn(c_arr[1]);
+                        putStringLn(d_arr[1]);
+                    }
+                    putIntLn(a);
+                    putFloatLn(b);
+                    putBoolLn(c);
+                    putStringLn(d);
+                    putIntLn(a_arr[1]);
+                    putFloatLn(b_arr[1]);
+                    putBoolLn(c_arr[1]);
+                    putStringLn(d_arr[1]);
+                }
+                """
+        expect = "1\n1.1\ntrue\nstring1\n1\n1.1\ntrue\nstring1\n2\n2.2\nfalse\nstring2\n2\n2.2\nfalse\nstring2\n3\n3.3\ntrue\nstring3\n3\n3.3\ntrue\nstring3\n2\n2.2\nfalse\nstring2\n2\n2.2\nfalse\nstring2\n1\n1.1\ntrue\nstring1\n1\n1.1\ntrue\nstring1\n"
         self.assertTrue(TestCodeGen.test(input,expect,500))
 
     #Recursive func
@@ -2372,4 +2800,4 @@ class CheckCodeGenSuite(unittest.TestCase):
                 }
         """
         expect = "0\n1\n21\n144\n"
-        self.assertTrue(TestCodeGen.test(input,expect,501))
+        self.assertTrue(TestCodeGen.test(input,expect,500))

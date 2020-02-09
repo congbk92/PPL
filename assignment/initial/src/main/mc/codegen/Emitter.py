@@ -277,7 +277,7 @@ class Emitter():
 
         typ = in_
         list(map(lambda x: frame.pop(), typ.partype))
-        if not type(typ.rettype) is VoidType:
+        if type(typ.rettype) is not VoidType:
             frame.push()
         return self.jvm.emitINVOKESTATIC(lexeme, self.getJVMType(in_))
 
